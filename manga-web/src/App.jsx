@@ -1,7 +1,13 @@
-import StarBackground from './components/layout/StarBackground'
+import Layout from './components/layout/Layout'
+import AuthCard from './components/auth/AuthCard'
 
 function App() {
-  return <StarBackground />
+  return (
+    <Layout>
+      <AuthCard />
+    </Layout>
+  )
 }
 
 export default App
+

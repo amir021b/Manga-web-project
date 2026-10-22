@@ -101,9 +101,20 @@ export function useStarfield(canvasRef) {
         const gray = Math.round(255 * star.brightness)
 
         if (star.isBig) {
-          ctx.fillStyle = `rgba(${gray}, ${gray}, ${gray}, ${alpha * 0.15})`
+          const haloRadius = star.radius * 5
+          const haloGradient = ctx.createRadialGradient(
+            star.x,
+            star.y,
+            0,
+            star.x,
+            star.y,
+            haloRadius
+          )
+          haloGradient.addColorStop(0, `rgba(255, 255, 255, ${0.35 * twinkle})`)
+          haloGradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
+          ctx.fillStyle = haloGradient
           ctx.beginPath()
-          ctx.arc(star.x, star.y, star.radius * 4, 0, Math.PI * 2)
+          ctx.arc(star.x, star.y, haloRadius, 0, Math.PI * 2)
           ctx.fill()
         }
 
