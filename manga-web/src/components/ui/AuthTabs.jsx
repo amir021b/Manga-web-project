@@ -1,6 +1,6 @@
 import { AUTH_MODES, AUTH_COPY } from '../../constants/authCopy';
 
-function AuthTabs({ mode, onChange }) {
+function AuthTabs({ mode, onChange, disabled = false }) {
   const modes = [AUTH_MODES.LOGIN, AUTH_MODES.SIGNUP];
   const isSignup = mode === AUTH_MODES.SIGNUP;
 
@@ -26,11 +26,13 @@ function AuthTabs({ mode, onChange }) {
             type="button"
             role="tab"
             aria-selected={isActive}
+            disabled={disabled}
             onClick={() => onChange(tabMode)}
             className={[
               "relative z-10 py-2.5 text-sm font-medium bg-transparent border-none cursor-pointer",
               "transition-colors focus-visible:outline-2 focus-visible:outline-white/60 focus-visible:outline-offset-2",
               isActive ? "text-white" : "text-[#9a9a9a]",
+              disabled ? "cursor-not-allowed" : "",
             ].join(" ")}
           >
             {AUTH_COPY[tabMode].tabLabel}
