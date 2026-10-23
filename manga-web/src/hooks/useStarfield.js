@@ -1,10 +1,7 @@
 import { useEffect, useRef } from 'react'
 
-/** Pixels of sky area that produce one star. */
 const STAR_DENSITY = 4200
-/** Never render above 2x pixel density. */
 const MAX_DPR = 2
-/** Wait this long after the last resize event before rebuilding the stars. */
 const RESIZE_DEBOUNCE_MS = 120
 
 function randomBetween(min, max) {
@@ -44,17 +41,6 @@ function createShootingStar(width, height) {
   }
 }
 
-/**
- * Animates a starfield on an HTML canvas: a black sky with twinkling stars
- * that drift slowly to the left and the occasional shooting star.
- *
- * All mutable values (stars, shooting stars, animation frame id) live in refs
- * so the animation never triggers a React re-render.
- *
- * @param {React.RefObject<HTMLCanvasElement>} canvasRef Ref to the canvas element
- *   that should receive the starfield.
- * @returns {void}
- */
 export function useStarfield(canvasRef) {
   const frameRef = useRef(null)
   const starsRef = useRef([])
@@ -127,7 +113,6 @@ export function useStarfield(canvasRef) {
 
     const drawShooters = () => {
       for (const shooter of shootersRef.current) {
-        // Sine curve fades the meteor in at the start and out at the end.
         const fade = Math.sin((shooter.life / shooter.maxLife) * Math.PI)
         const tailX = shooter.x - shooter.dirX * shooter.length
         const tailY = shooter.y - shooter.dirY * shooter.length
@@ -169,7 +154,7 @@ export function useStarfield(canvasRef) {
 
       for (let i = shootersRef.current.length - 1; i >= 0; i -= 1) {
         const shooter = shootersRef.current[i]
-        shooter.life += dt
+        shooter.life += dt / 1000
         shooter.x += shooter.dirX * shooter.speed * dt
         shooter.y += shooter.dirY * shooter.speed * dt
         if (shooter.life >= shooter.maxLife) shootersRef.current.splice(i, 1)
@@ -195,7 +180,7 @@ export function useStarfield(canvasRef) {
     if (reducedMotion) {
       drawStars(0, false)
     } else {
-      nextShooterRef.current = randomBetween(3500, 8500)
+      nextShooterRef.current = 1200
       frameRef.current = requestAnimationFrame(frame)
     }
 

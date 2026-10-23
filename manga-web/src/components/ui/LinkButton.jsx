@@ -1,11 +1,3 @@
-/**
- * LinkButton - a button styled as a muted text link.
- *
- * @param {string} [type="button"] - The button type attribute.
- * @param {import('react').ReactNode} children - Link label content.
- * @param {(event: React.MouseEvent<HTMLButtonElement>) => void} [onClick] - Click handler.
- * @returns {import('react').ReactElement}
- */
 function LinkButton({ type = "button", children, onClick }) {
   return (
     <button

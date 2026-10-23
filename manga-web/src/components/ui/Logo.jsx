@@ -1,13 +1,3 @@
-/**
- * Logo - MangaHub brand mark.
- *
- * A presentational component: it only renders what it is given through props
- * and has no state of its own.
- *
- * @param {boolean} [isFilled=false] - When true, the badge inverts
- *   (black background, white star, white border at ~45% opacity).
- * @returns {import('react').ReactElement}
- */
 function Logo({ isFilled = false }) {
   return (
     <div className="flex items-center justify-center gap-2.5">

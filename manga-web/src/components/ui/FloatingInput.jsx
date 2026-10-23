@@ -1,29 +1,15 @@
-/**
- * FloatingInput - an outlined text field with a floating label (MUI-style).
- *
- * Presentational and fully controlled: the parent owns the value and handles
- * changes. This component renders nothing of its own beyond the input, label,
- * and border fieldset; it keeps no internal state.
- *
- * @param {string} id - The input id (also used for the label's htmlFor).
- * @param {string} label - The label text.
- * @param {"text"|"email"|"password"|...} [type="text"] - The input type.
- * @param {string} value - The controlled value.
- * @param {(event: React.ChangeEvent<HTMLInputElement>) => void} onChange - Change handler.
- * @param {string} [placeholder] - Placeholder text.
- * @param {string} [autoComplete] - Autocomplete attribute.
- * @returns {import('react').ReactElement}
- */
-function FloatingInput({ id, label, type = "text", value, onChange, placeholder, autoComplete }) {
+function FloatingInput({ id, label, type = "text", value, onChange, placeholder, autoComplete, name, disabled = false }) {
   return (
     <div className="group relative h-[52px]">
       <input
         id={id}
+        name={name}
         type={type}
         value={value}
         onChange={onChange}
         placeholder={placeholder}
         autoComplete={autoComplete}
+        disabled={disabled}
         className={[
           "peer h-full w-full rounded-[11px] border-0 outline-none",
           "bg-white/4 text-[#f5f5f5] text-[15px] px-[14px]",
@@ -40,18 +26,14 @@ function FloatingInput({ id, label, type = "text", value, onChange, placeholder,
           "text-[15px] text-[#9a9a9a]",
           "pointer-events-none",
           "transition-all duration-200 motion-reduce:transition-none",
-          "peer-[:not(:placeholder-shown)]:text-[#9a9a9a] peer-focus:text-[#f5f5f5]",
+          "peer-[:not(:placeholder-shown)]:text-[#9a9a9a] peer-focus:text-[#f5f5f5] peer-[:autofill]:text-[#f5f5f5] peer-[:-webkit-autofill]:text-[#f5f5f5]",
           "peer-focus:top-0 peer-focus:left-[12px] peer-focus:-translate-y-1/2 peer-focus:text-[12px]",
           "peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:left-[12px] peer-[:not(:placeholder-shown)]:-translate-y-1/2 peer-[:not(:placeholder-shown)]:text-[12px]",
+          "peer-[:autofill]:top-0 peer-[:autofill]:left-[12px] peer-[:autofill]:-translate-y-1/2 peer-[:autofill]:text-[12px] peer-[:-webkit-autofill]:top-0 peer-[:-webkit-autofill]:left-[12px] peer-[:-webkit-autofill]:-translate-y-1/2 peer-[:-webkit-autofill]:text-[12px]",
         ].join(" ")}
       >
         {label}
       </label>
-      {/* A fieldset with a legend draws the border instead of the input. The
-          legend's width creates a real gap in the border line (the border
-          doesn't render under the legend), so the background behind the field
-          shows through. A solid background patch behind the label could never
-          do that on a transparent / glass background. */}
       <fieldset
         aria-hidden="true"
         className={[
@@ -67,7 +49,7 @@ function FloatingInput({ id, label, type = "text", value, onChange, placeholder,
           className={[
             "block h-3 p-0 w-auto text-[12px] invisible whitespace-nowrap",
             "max-w-[0.01px] min-w-0",
-            "group-focus-within:max-w-full group-has-[input:not(:placeholder-shown)]:max-w-full",
+            "group-focus-within:max-w-full group-has-[input:not(:placeholder-shown)]:max-w-full group-has-[input:-webkit-autofill]:max-w-full group-has-[input:autofill]:max-w-full",
             "transition-all duration-200 motion-reduce:transition-none",
           ].join(" ")}
         >

@@ -10,14 +10,6 @@ import Checkbox from '../ui/Checkbox';
 import LinkButton from '../ui/LinkButton';
 import Collapse from '../ui/Collapse';
 
-/**
- * AuthCard - the login / sign up card.
- *
- * It owns the mode state and all form field values. Every FloatingInput is
- * fully controlled by this parent. Switching modes does not clear values.
- *
- * @returns {import('react').ReactElement}
- */
 function AuthCard() {
   const [mode, setMode] = useState(AUTH_MODES.LOGIN);
   const [values, setValues] = useState({
@@ -38,7 +30,6 @@ function AuthCard() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // validation comes next
   };
 
   return (
@@ -52,38 +43,39 @@ function AuthCard() {
         <p className="text-sm text-[#9a9a9a] mb-6">{copy.subtitle}</p>
       </div>
       <form noValidate onSubmit={handleSubmit}>
-        {/* Username - sign up only */}
         <Collapse open={isSignup}>
           <div className="pb-5">
             <FloatingInput
               id="username"
+              name="username"
               label="Username"
               type="text"
               value={values.username}
               onChange={handleChange("username")}
               placeholder="yourname"
-              autoComplete="username"
+              autoComplete="nickname"
+              disabled={!isSignup}
             />
           </div>
         </Collapse>
 
-        {/* Email - always shown */}
         <div className="pb-5">
           <FloatingInput
             id="email"
+            name="email"
             label="Email"
             type="email"
             value={values.email}
             onChange={handleChange("email")}
             placeholder="you@example.com"
-            autoComplete="email"
+            autoComplete={isSignup ? "email" : "username"}
           />
         </div>
 
-        {/* Password - always shown */}
         <div className="pb-5">
           <FloatingInput
             id="password"
+            name="password"
             label="Password"
             type="password"
             value={values.password}
@@ -93,22 +85,22 @@ function AuthCard() {
           />
         </div>
 
-        {/* Confirm password - sign up only */}
         <Collapse open={isSignup}>
           <div className="pb-5">
             <FloatingInput
               id="confirmPassword"
+              name="confirmPassword"
               label="Confirm password"
               type="password"
               value={values.confirmPassword}
               onChange={handleChange("confirmPassword")}
               placeholder="At least 8 characters"
               autoComplete="new-password"
+              disabled={!isSignup}
             />
           </div>
         </Collapse>
 
-        {/* Terms checkbox - sign up only */}
         <Collapse open={isSignup}>
           <div className="pb-5">
             <Checkbox
@@ -120,7 +112,6 @@ function AuthCard() {
           </div>
         </Collapse>
 
-        {/* Forgot password - log in only */}
         <Collapse open={!isSignup}>
           <div className="pb-5">
             <div className="text-right mt-[8px]">

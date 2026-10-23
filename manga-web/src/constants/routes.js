@@ -1,7 +1,3 @@
-/**
- * All route paths of the site in one place, so links and the router
- * always point to the same urls.
- */
 export const ROUTES = {
   home: '/',
   search: '/search',

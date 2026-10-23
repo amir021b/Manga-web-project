@@ -1,12 +1,3 @@
-/**
- * Button - a full-width, glass-style action button.
- *
- * @param {string} [type="button"] - The button type attribute.
- * @param {import('react').ReactNode} children - Button label content.
- * @param {boolean} [disabled] - When true, the button is disabled.
- * @param {(event: React.MouseEvent<HTMLButtonElement>) => void} [onClick] - Click handler.
- * @returns {import('react').ReactElement}
- */
 function Button({ type = "button", children, disabled, onClick }) {
   return (
     <button

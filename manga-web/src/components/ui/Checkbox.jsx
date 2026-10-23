@@ -1,16 +1,3 @@
-/**
- * Checkbox - a custom-styled checkbox with a real underlying input.
- *
- * The real <input type="checkbox"> is visually hidden (sr-only) and marked
- * with `peer` so the custom box and label can react to its state via Tailwind
- * peer variants. Clicking the label toggles the checkbox via htmlFor.
- *
- * @param {string} id - The input id (also used for the label's htmlFor).
- * @param {boolean} checked - Whether the checkbox is checked.
- * @param {(event: React.ChangeEvent<HTMLInputElement>) => void} onChange - Change handler.
- * @param {string} label - The label text shown next to the checkbox.
- * @returns {import('react').ReactElement}
- */
 function Checkbox({ id, checked, onChange, label }) {
   return (
     <label

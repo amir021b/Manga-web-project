@@ -1,16 +1,5 @@
 import { AUTH_MODES, AUTH_COPY } from '../../constants/authCopy';
 
-/**
- * AuthTabs - a segmented Log in / Sign up control.
- *
- * Presentational component: it owns no state. The parent supplies the current
- * `mode` and an `onChange` handler, and AuthTabs only renders and reports
- * clicks back up.
- *
- * @param {string} mode - One of AUTH_MODES.LOGIN or AUTH_MODES.SIGNUP.
- * @param {(mode: string) => void} onChange - Called with the selected mode.
- * @returns {import('react').ReactElement}
- */
 function AuthTabs({ mode, onChange }) {
   const modes = [AUTH_MODES.LOGIN, AUTH_MODES.SIGNUP];
   const isSignup = mode === AUTH_MODES.SIGNUP;
