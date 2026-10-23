@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { AUTH_MODES, AUTH_COPY, TERMS_TEXT, FORGOT_PASSWORD_TEXT, REQUIRED_FIELDS, ERROR_MESSAGES, STATUS } from '../../constants/authCopy';
+import { AUTH_MODES, AUTH_COPY, TERMS_INTRO, TERMS_LINK, FORGOT_PASSWORD_TEXT, REQUIRED_FIELDS, ERROR_MESSAGES, STATUS } from '../../constants/authCopy';
 import { validateForm } from '../../utils/validators';
 import { submitAuth } from '../../services/authApi';
 import GlassCard from '../ui/GlassCard';
@@ -12,6 +12,7 @@ import Checkbox from '../ui/Checkbox';
 import LinkButton from '../ui/LinkButton';
 import Collapse from '../ui/Collapse';
 import SuccessMessage from './SuccessMessage';
+import TermsDialog from './TermsDialog';
 
 function AuthCard() {
   const [mode, setMode] = useState(AUTH_MODES.LOGIN);
@@ -25,6 +26,7 @@ function AuthCard() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [errors, setErrors] = useState({});
+  const [isTermsOpen, setIsTermsOpen] = useState(false);
   const [status, setStatus] = useState(STATUS.IDLE);
   const isSubmitting = status === STATUS.SUBMITTING;
   const isSuccess = status === STATUS.SUCCESS;
@@ -113,11 +115,25 @@ function AuthCard() {
     setShowConfirm(false);
     setStatus(STATUS.IDLE);
     setMode(AUTH_MODES.LOGIN);
+    setIsTermsOpen(false);
     submittingRef.current = false;
     requestAnimationFrame(() => {
       const el = document.getElementById("email");
       if (el && typeof el.focus === "function") el.focus();
     });
+  };
+
+  const openTerms = () => setIsTermsOpen(true);
+  const closeTerms = () => setIsTermsOpen(false);
+  const handleAcceptTerms = () => {
+    setValues((prev) => ({ ...prev, acceptTerms: true }));
+    setErrors((prev) => {
+      if (!prev.acceptTerms) return prev;
+      const next = { ...prev };
+      delete next.acceptTerms;
+      return next;
+    });
+    setIsTermsOpen(false);
   };
 
   const isFilled = REQUIRED_FIELDS[mode].every((key) => {
@@ -148,7 +164,7 @@ function AuthCard() {
       <div className="mb-6">
         <Logo isFilled={isFilled} />
       </div>
-      <AuthTabs mode={mode} onChange={(m) => { if (isSubmitting) return; setMode(m); setErrors({}); }} disabled={isSubmitting} />
+      <AuthTabs mode={mode} onChange={(m) => { if (isSubmitting) return; setMode(m); setErrors({}); setIsTermsOpen(false); }} disabled={isSubmitting} />
       <div>
         <h1 className="text-2xl font-bold mb-1.5">{copy.title}</h1>
         <p className="text-sm text-[#9a9a9a] mb-6">{copy.subtitle}</p>
@@ -238,7 +254,15 @@ function AuthCard() {
               id="acceptTerms"
               checked={values.acceptTerms}
               onChange={handleChange("acceptTerms")}
-              label={TERMS_TEXT}
+              label={TERMS_INTRO}
+              labelAction={
+                <>
+                  <LinkButton type="button" onClick={openTerms} disabled={isSubmitting}>
+                    {TERMS_LINK}
+                  </LinkButton>
+                  .
+                </>
+              }
               disabled={isSubmitting}
               error={errors.acceptTerms ? ERROR_MESSAGES[errors.acceptTerms] : undefined}
             />
@@ -266,13 +290,20 @@ function AuthCard() {
         <div className="text-center mt-5">
           <span className="text-[#9a9a9a] text-[13.5px]">{copy.swapText}</span>{" "}
           <LinkButton
-            onClick={() => { if (isSubmitting) return; setMode(isSignup ? AUTH_MODES.LOGIN : AUTH_MODES.SIGNUP); setErrors({}); }}
+            onClick={() => { if (isSubmitting) return; setMode(isSignup ? AUTH_MODES.LOGIN : AUTH_MODES.SIGNUP); setErrors({}); setIsTermsOpen(false); }}
             disabled={isSubmitting}
           >
             {copy.swapAction}
           </LinkButton>
         </div>
       </form>
+      {isSignup ? (
+        <TermsDialog
+          open={isTermsOpen}
+          onClose={closeTerms}
+          onAccept={handleAcceptTerms}
+        />
+      ) : null}
     </GlassCard>
   );
 }

@@ -36,7 +36,8 @@ export const REQUIRED_FIELDS = {
   [AUTH_MODES.LOGIN]: ["email", "password"],
   [AUTH_MODES.SIGNUP]: ["username", "email", "password", "confirmPassword"],
 };
-export const TERMS_TEXT = "I agree to the terms of use and privacy policy.";
+export const TERMS_INTRO = "I agree to the";
+export const TERMS_LINK = "terms of use and privacy policy";
 export const ERROR_MESSAGES = {
   required: "This field is required.",
   usernameFormat: "Use 3 to 20 letters, numbers or underscores.",
