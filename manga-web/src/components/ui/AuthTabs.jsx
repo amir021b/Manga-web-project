@@ -16,7 +16,7 @@ function AuthTabs({ mode, onChange }) {
   const isSignup = mode === AUTH_MODES.SIGNUP;
 
   return (
-    <div role="tablist" className="relative grid grid-cols-2 p-1 rounded-xl bg-white/6 border border-white/8 mb-2 margim-2px">
+    <div role="tablist" className="relative grid grid-cols-2 p-1 rounded-xl bg-white/6 border border-white/8 mb-6" >
       <span
         aria-hidden="true"
         className={[

@@ -13,8 +13,8 @@ function Logo({ isFilled = false }) {
     <div className="flex items-center justify-center gap-2.5">
       <div
         className={[
-          "w-[30px] h-[30px] rounded-[9px] grid place-items-center gap-2.5" ,
-          "transition duration-[450ms] shadow-[0_0_18px_rgba(255,255,255,0.25)] gap-2.5" ,
+          "w-[30px] h-[30px] rounded-[9px] grid place-items-center",
+          "transition duration-[450ms] shadow-[0_0_18px_rgba(255,255,255,0.25)] " ,
           isFilled
             ? "bg-black border border-white/45 text-white"
             : "bg-[#f2f2f2] border border-transparent text-black",
