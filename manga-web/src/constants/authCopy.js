@@ -45,5 +45,6 @@ export const ERROR_MESSAGES = {
   passwordLength: "Password needs at least 8 characters.",
   passwordMismatch: "Passwords don’t match.",
   termsRequired: "Accept the terms to create an account.",
+  email_exists: "This email is already registered.",
 };
 export const FORGOT_PASSWORD_TEXT = "Forgot password?";

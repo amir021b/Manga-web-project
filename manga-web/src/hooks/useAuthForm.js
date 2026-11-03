@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { AUTH_MODES, AUTH_COPY, REQUIRED_FIELDS, STATUS } from '../constants/authCopy';
 import { validateForm } from '../utils/validators';
 import { submitAuth } from '../services/authApi';
@@ -12,7 +13,13 @@ const INITIAL_VALUES = {
 };
 
 export function useAuthForm() {
-  const [mode, setMode] = useState(AUTH_MODES.LOGIN);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const mode = location.pathname.includes('signup')
+    ? AUTH_MODES.SIGNUP
+    : AUTH_MODES.LOGIN;
+
   const [values, setValues] = useState({ ...INITIAL_VALUES });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -40,6 +47,30 @@ export function useAuthForm() {
       successRef.current.focus();
     }
   }, [isSuccess]);
+
+  // Reset form whenever the mode (URL) changes.
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setValues({ ...INITIAL_VALUES });
+    setErrors({});
+    setShowPassword(false);
+    setShowConfirm(false);
+    setStatus(STATUS.IDLE);
+    setIsTermsOpen(false);
+    submittingRef.current = false;
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [mode]);
+
+  // After a successful auth, wait 1.5s then navigate home.
+  useEffect(() => {
+    if (!isSuccess) return;
+    const timer = setTimeout(() => {
+      if (isMountedRef.current) {
+        navigate('/');
+      }
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [isSuccess, navigate]);
 
   const copy = AUTH_COPY[mode];
   const isSignup = mode === AUTH_MODES.SIGNUP;
@@ -91,6 +122,14 @@ export function useAuthForm() {
       if (isMountedRef.current) {
         setStatus(STATUS.SUCCESS);
       }
+    }).catch((error) => {
+      submittingRef.current = false;
+      if (isMountedRef.current) {
+        if (error && error.code === 'email_exists') {
+          setErrors((prev) => ({ ...prev, email: 'email_exists' }));
+        }
+        setStatus(STATUS.IDLE);
+      }
     });
   };
 
@@ -100,9 +139,9 @@ export function useAuthForm() {
     setShowPassword(false);
     setShowConfirm(false);
     setStatus(STATUS.IDLE);
-    setMode(AUTH_MODES.LOGIN);
     setIsTermsOpen(false);
     submittingRef.current = false;
+    navigate('/login');
     requestAnimationFrame(() => {
       const el = document.getElementById('email');
       if (el && typeof el.focus === 'function') el.focus();
@@ -125,9 +164,8 @@ export function useAuthForm() {
 
   const switchMode = (newMode) => {
     if (isSubmitting) return;
-    setMode(newMode);
-    setErrors({});
-    setIsTermsOpen(false);
+    const path = newMode === AUTH_MODES.SIGNUP ? '/signup' : '/login';
+    navigate(path);
   };
 
   const isFilled = REQUIRED_FIELDS[mode].every((key) => {
