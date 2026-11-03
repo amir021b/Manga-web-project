@@ -46,5 +46,6 @@ export const ERROR_MESSAGES = {
   passwordMismatch: "Passwords don’t match.",
   termsRequired: "Accept the terms to create an account.",
   email_exists: "This email is already registered.",
+  invalid_credentials: "Incorrect email or password.",
 };
 export const FORGOT_PASSWORD_TEXT = "Forgot password?";

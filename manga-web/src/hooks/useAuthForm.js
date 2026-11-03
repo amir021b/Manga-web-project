@@ -127,6 +127,8 @@ export function useAuthForm() {
       if (isMountedRef.current) {
         if (error && error.code === 'email_exists') {
           setErrors((prev) => ({ ...prev, email: 'email_exists' }));
+        } else if (error && error.code === 'invalid_credentials') {
+          setErrors((prev) => ({ ...prev, email: 'invalid_credentials' }));
         }
         setStatus(STATUS.IDLE);
       }

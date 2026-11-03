@@ -69,6 +69,7 @@ function AuthCard() {
         <Collapse open={isSignup}>
           <div className="pb-5">
             <FloatingInput
+              key={mode}
               id="username"
               name="username"
               label="Username"
@@ -85,6 +86,7 @@ function AuthCard() {
 
         <div className="pb-5">
           <FloatingInput
+            key={mode}
             id="email"
             name="email"
             label="Email"
@@ -100,6 +102,7 @@ function AuthCard() {
 
         <div className={isSignup ? "pb-5" : "pb-2"}>
           <FloatingInput
+            key={mode}
             id="password"
             name="password"
             label="Password"
@@ -123,6 +126,7 @@ function AuthCard() {
         <Collapse open={isSignup}>
           <div className="pb-5">
             <FloatingInput
+              key={mode}
               id="confirmPassword"
               name="confirmPassword"
               label="Confirm password"
@@ -147,6 +151,7 @@ function AuthCard() {
         <Collapse open={isSignup}>
           <div className="pb-5">
             <Checkbox
+              key={mode}
               id="acceptTerms"
               checked={values.acceptTerms}
               onChange={handleChange("acceptTerms")}
