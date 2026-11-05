@@ -1,4 +1,4 @@
-function Logo({ isFilled = false, variant = 'auth' }) {
+﻿function Logo({ isFilled = false, variant = 'auth' }) {
   const isHeader = variant === 'header';
 
   const boxClasses = isHeader
@@ -12,6 +12,8 @@ function Logo({ isFilled = false, variant = 'auth' }) {
       ].join(' ');
 
   const iconSize = isHeader ? 16 : 18;
+  const starFill = isHeader ? 'white' : 'currentColor';
+  const starStroke = isHeader ? 'white' : 'currentColor';
 
   return (
     <div className="flex items-center justify-center gap-2.5">
@@ -19,8 +21,8 @@ function Logo({ isFilled = false, variant = 'auth' }) {
         <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" aria-hidden="true">
           <path
             d="M12 2.5l2.9 6.2 6.8 .8-5 4.7 1.3 6.7L12 17.5l-6 3.4 1.3-6.7-5-4.7 6.8-.8z"
-            fill="currentColor"
-            stroke="currentColor"
+            fill={starFill}
+            stroke={starStroke}
             strokeWidth={1.4}
             strokeLinejoin="round"
           />
@@ -34,4 +36,3 @@ function Logo({ isFilled = false, variant = 'auth' }) {
 }
 
 export default Logo;
-

@@ -120,6 +120,11 @@ export function useAuthForm() {
     submitAuth(mode, values).then(() => {
       submittingRef.current = false;
       if (isMountedRef.current) {
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('currentUser', JSON.stringify({
+          username: values.username || (values.email ? values.email.split('@')[0] : 'Manga Fan'),
+          email: values.email,
+        }));
         setStatus(STATUS.SUCCESS);
       }
     }).catch((error) => {
