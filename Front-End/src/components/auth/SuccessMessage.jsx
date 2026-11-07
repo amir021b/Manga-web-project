@@ -1,8 +1,8 @@
-import Button from "../ui/Button";
+﻿import Button from "../ui/Button";
 
 function SuccessMessage({ title, message, actionLabel, onAction }) {
   return (
-    <div className="flex flex-col items-center text-center gap-4 animate-[fadeIn_200ms_ease-out] motion-reduce:animate-none">
+    <div className="flex flex-col items-center text-center gap-4 ">
       <div
         className="w-14 h-14 rounded-full border border-white/30 bg-white/5 flex items-center justify-center"
         aria-hidden="true"
@@ -34,3 +34,4 @@ function SuccessMessage({ title, message, actionLabel, onAction }) {
 }
 
 export default SuccessMessage;
+
