@@ -1,13 +1,18 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 
+/**
+ * User Schema definition
+ * Defines storage attributes, constraints, and validation rules for users
+ */
+
 const userSchema = new mongoose.Schema(
   {
     username: {
       type: String,
       required: [true, "Username is required!"],
       trim: true,
-      minlength: [3, "Username must be at least 3 characters."],
+      minlength: [4, "Username must be at least 4 characters."],
     },
     email: {
       type: String,
@@ -33,7 +38,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, "Password is required!"],
-      minlength: [6, "Password must be at least 6 characters."],
+      minlength: [8, "Password must be at least 8 characters."],
     },
   },
   {
