@@ -1,14 +1,11 @@
-<<<<<<< HEAD
-﻿import { useState, useRef, useEffect } from 'react';
+﻿import { useRef, useEffect } from 'react';
 import MangaGrid from '../components/manga/MangaGrid';
 import MangaCard from '../components/manga/MangaCard';
-=======
->>>>>>> d84187accf5af6cf5bfadfa0fdaa39fd013d0200
 import { bigThree } from '../data/bigThree';
 import { bestSellers } from '../data/bestSellers';
 import { latestUpdates } from '../data/latestUpdates';
 
-function MarqueeRow({ items }) {
+function MarqueeRow({ items, className }) {
   const containerRef = useRef(null);
   const isDraggingRef = useRef(false);
   const isHoveringRef = useRef(false);
@@ -22,7 +19,7 @@ function MarqueeRow({ items }) {
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    const speed = 40;
+    const speed = 40; // pixels per second
     const step = (ts) => {
       if (lastTimeRef.current == null) lastTimeRef.current = ts;
       const dt = (ts - lastTimeRef.current) / 1000;
@@ -69,7 +66,7 @@ function MarqueeRow({ items }) {
   return (
     <div
       ref={containerRef}
-      className="w-full overflow-x-auto select-none pt-3 pb-4 horizontal-scrollbar"
+      className={`w-full overflow-x-auto select-none pt-3 pb-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden ${className || ''}`}
       onMouseEnter={() => { isHoveringRef.current = true; }}
       onMouseLeave={() => { isHoveringRef.current = false; stopDragging(); }}
       onMouseDown={handleMouseDown}
@@ -93,9 +90,9 @@ function MarqueeRow({ items }) {
   );
 }
 
-function SectionTitle({ children }) {
+function SectionTitle({ children, className }) {
   return (
-    <div className="flex w-full items-center gap-4">
+    <div className={`flex w-full items-center gap-4 ${className || ''}`}>
       <span className="h-[1px] flex-1 bg-white/30" />
       <p className="shrink-0 text-xs font-normal uppercase tracking-[0.4em] text-white/80 sm:text-sm">
         {children}
@@ -105,9 +102,9 @@ function SectionTitle({ children }) {
   );
 }
 
-function SectionHeader({ title, subtitle }) {
+function SectionHeader({ title, subtitle, className }) {
   return (
-    <div className="flex w-full max-w-md flex-col items-center gap-3 text-center">
+    <div className={`flex w-full max-w-md flex-col items-center gap-3 text-center ${className || ''}`}>
       <div className="flex w-full items-center gap-4">
         <span className="h-[1px] flex-1 bg-white/30" />
         <p className="shrink-0 text-xs font-normal uppercase tracking-[0.4em] text-white/80 sm:text-sm">
@@ -124,15 +121,16 @@ function SectionHeader({ title, subtitle }) {
   );
 }
 
-<<<<<<< HEAD
-function HomePage({ backgroundImage = null }) {
-  const [mangaItems] = useState(bigThree);
+const bundlePool = [...bigThree, ...bestSellers, ...latestUpdates];
+const bundleShuffled = bundlePool.slice();
+for (let i = bundleShuffled.length - 1; i > 0; i -= 1) {
+  const j = Math.floor(Math.random() * (i + 1));
+  [bundleShuffled[i], bundleShuffled[j]] = [bundleShuffled[j], bundleShuffled[i]];
+}
+const bundleItems = bundleShuffled.slice(0, 3);
 
-  const [bundleItems] = useState(() => {
-    const pool = [...bigThree, ...bestSellers, ...latestUpdates];
-    const shuffled = [...pool].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, 3);
-  });
+function HomePage({ backgroundImage = null }) {
+  const mangaItems = bigThree;
 
   return (
     <section
@@ -152,26 +150,6 @@ function HomePage({ backgroundImage = null }) {
           />
         </>
       )}
-=======
-function HomePage() {
-  return (
-    <section className="relative min-h-screen w-full overflow-hidden bg-gradient-to-b from-[#050505] via-[#0d0d0d] to-[#000000]">
-      {/* Large background character placeholders */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-0 flex items-center justify-between px-4 opacity-[0.07] sm:px-10"
-      >
-        <span className="text-[16vw] font-black leading-none tracking-tighter">
-          GUTS
-        </span>
-        <span className="text-[16vw] font-black leading-none tracking-tighter">
-          THORFINN
-        </span>
-        <span className="text-[16vw] font-black leading-none tracking-tighter">
-          MUSASHI
-        </span>
-      </div>
->>>>>>> d84187accf5af6cf5bfadfa0fdaa39fd013d0200
 
       <div
         aria-hidden="true"
@@ -179,86 +157,84 @@ function HomePage() {
       />
 
       <div className="relative z-10 flex min-h-screen flex-col items-center justify-center gap-10 px-4 pb-16 pt-24">
-<<<<<<< HEAD
         <MangaGrid>
           {mangaItems.map((item) => (
             <MangaCard
-=======
-        {/* Floating glass cards */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          {bigThree.map((item) => (
-            <article
->>>>>>> d84187accf5af6cf5bfadfa0fdaa39fd013d0200
               key={item.id}
-              className="group w-[170px] rounded-2xl border border-white/10 bg-white/5 p-3 backdrop-blur-md transition hover:-translate-y-1 hover:bg-white/10 sm:w-[190px]"
-            >
-              <div className="mb-3 aspect-[3/4] rounded-xl bg-gradient-to-br from-white/10 via-white/5 to-black/40" />
-              <h3 className="text-sm font-semibold text-white/90">{item.title}</h3>
-              <p className="mb-2 text-xs text-white/50">{item.genre}</p>
-              <button
-                type="button"
-                className="text-xs text-white/70 transition hover:text-white"
-              >
-                View Details →
-              </button>
-            </article>
+              id={item.id}
+              title={item.title}
+              genre={item.genre}
+              posterUrl={item.posterUrl}
+            />
           ))}
-        </div>
+        </MangaGrid>
 
-<<<<<<< HEAD
         <div className="flex w-full max-w-md flex-col items-center gap-3 text-center">
           <div className="flex w-full items-center gap-4">
             <span className="h-[1px] flex-1 bg-white/30" />
             <p className="shrink-0 text-xs font-normal uppercase tracking-[0.4em] text-white/80 sm:text-sm">
               T H E   B I G   T H R E E
-=======
-        {/* Caption with decorative lines */}
-        <div className="flex items-center gap-4">
-          <span className="h-px w-12 bg-white/20 sm:w-20" />
-          <div className="text-center">
-            <p className="text-xs tracking-[0.35em] text-white/40">THE BIG THREE</p>
-            <p className="mt-2 text-lg font-semibold text-white/90 sm:text-xl">
-              Three Masterpieces. One Legacy.
->>>>>>> d84187accf5af6cf5bfadfa0fdaa39fd013d0200
             </p>
+            <span className="h-[1px] flex-1 bg-white/30" />
           </div>
-          <span className="h-px w-12 bg-white/20 sm:w-20" />
+          <p className="text-sm italic tracking-wide text-white/60 sm:text-base">
+            Three Masterpieces. One Legacy.
+          </p>
         </div>
 
-        <div className="flex w-full max-w-7xl flex-col items-center gap-6 pt-4">
+        <>
           <SectionTitle>Best Sellers</SectionTitle>
-          <MarqueeRow items={bestSellers} />
-        </div>
+          <MarqueeRow items={bestSellers} className="pt-4" />
+        </>
 
-        <div className="flex w-full max-w-7xl flex-col items-center gap-6 pt-4">
+        <>
           <SectionTitle>Latest Updates</SectionTitle>
-          <MarqueeRow items={latestUpdates} />
-        </div>
+          <MarqueeRow items={latestUpdates} className="pt-4" />
+        </>
 
-        <div className="flex w-full max-w-7xl flex-col items-center gap-6 pt-6">
+        <>
+          <SectionHeader
+            title="— T H E   B I G   T H R E E —"
+            subtitle="three masterpieces. one legacy."
+            className="pt-6"
+          />
+          <MangaGrid>
+            {bigThree.map((item) => (
+              <MangaCard
+                key={item.id}
+                id={item.id}
+                title={item.title}
+                genre={item.genre}
+                posterUrl={item.posterUrl}
+              />
+            ))}
+          </MangaGrid>
+        </>
+
+        <>
           <SectionHeader
             title="— N E W   U S E R   S P E C I A L —"
             subtitle="exclusive bundle for new members."
+            className="pt-6"
           />
           <MangaGrid>
             {bundleItems.map((item) => (
-              <div key={item.id} className="relative">
-                <MangaCard
-                  id={item.id}
-                  title={item.title}
-                  genre={item.genre}
-                  posterUrl={item.posterUrl}
-                  hideSaveButton={true}
-                  badge={
-                    <span className="relative flex items-center justify-center rounded-full border border-red-400/40 bg-red-500/20 px-3 py-1 text-xs font-bold uppercase tracking-wide text-red-200">
-                      50% OFF
-                    </span>
-                  }
-                />
-              </div>
+              <MangaCard
+                key={item.id}
+                id={item.id}
+                title={item.title}
+                genre={item.genre}
+                posterUrl={item.posterUrl}
+                showSaveButton={false}
+                badge={
+                  <span className="absolute top-3 right-3 z-20 rounded-full border border-red-400/40 bg-red-500/20 px-3 py-1 text-xs font-bold uppercase tracking-wide text-red-200 backdrop-blur-md shadow-[0_0_20px_rgba(239,68,68,0.25)]">
+                    50% OFF
+                  </span>
+                }
+              />
             ))}
           </MangaGrid>
-        </div>
+        </>
       </div>
     </section>
   );

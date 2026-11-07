@@ -1,10 +1,10 @@
-<<<<<<< HEAD
-﻿import { useBackpack } from '../../context/BackpackContext';
+import { useBackpack } from '../../context/BackpackContext';
 import { useToast } from '../../context/ToastContext';
+import { Link } from 'react-router-dom';
 
 function MangaCard({ id, title, genre, posterUrl, to, hoverLift = true, hoverLiftClass = 'hover:-translate-y-2', showSaveButton = true, badge = null }) {
   const { addToBackpack, removeFromBackpack, isInBackpack } = useBackpack();
-  const { addToast } = useToast();
+  const { showToast } = useToast();
   const saved = isInBackpack(id);
   const destination = to || (id != null ? `/manga/${id}` : '#');
   const hasPoster = Boolean(posterUrl);
@@ -16,7 +16,7 @@ function MangaCard({ id, title, genre, posterUrl, to, hoverLift = true, hoverLif
       removeFromBackpack(id);
     } else {
       addToBackpack({ id, title, genre, posterUrl });
-      addToast('Added to your backpack!');
+      showToast('Added to your backpack!');
     }
   };
 
@@ -33,15 +33,15 @@ function MangaCard({ id, title, genre, posterUrl, to, hoverLift = true, hoverLif
         style={hasPoster ? { backgroundImage: `url(${posterUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 z-10 p-4">
+      <div className="absolute inset-x-0 bottom-0 z-10 p-4 text-left">
         <h3 className="text-base font-bold uppercase tracking-wide text-white/95">{title}</h3>
         <p className="mb-2 text-xs text-white/60">{genre}</p>
-        <a
-          href={destination}
+        <Link
+          to={destination}
           className="inline-block text-xs text-white/70 opacity-80 transition-all duration-300 group-hover:opacity-100 hover:text-white"
         >
           View Details →
-        </a>
+        </Link>
       </div>
       {showSaveButton && (
         <button
@@ -59,11 +59,3 @@ function MangaCard({ id, title, genre, posterUrl, to, hoverLift = true, hoverLif
 }
 
 export default MangaCard;
-
-=======
-function MangaCard() {
-  return <h1>MangaCard</h1>
-}
-
-export default MangaCard
->>>>>>> d84187accf5af6cf5bfadfa0fdaa39fd013d0200

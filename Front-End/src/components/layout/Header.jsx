@@ -1,9 +1,18 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams, NavLink } from 'react-router-dom';
+import { useState } from 'react';
 import { Search, User } from 'lucide-react';
 import Logo from '../ui/Logo';
 
 function Header() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [query, setQuery] = useState(searchParams.get('q') || '');
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (!query.trim()) return;
+    navigate(`/search?q=${encodeURIComponent(query.trim())}`);
+  };
 
   return (
     <header className="fixed top-4 left-1/2 z-50 w-[min(1200px,calc(100%-2rem))] -translate-x-1/2">
@@ -12,20 +21,48 @@ function Header() {
         <Logo variant="header" />
 
         {/* Navigation */}
-        <nav className="hidden md:flex items-center gap-4 text-sm text-white/70">
-          <button type="button" className="transition hover:text-white">Home</button>
-          <button type="button" className="transition hover:text-white">Explore</button>
-          <button type="button" className="transition hover:text-white">Genres</button>
+        <nav className="hidden md:flex items-center gap-4 text-sm">
+          <NavLink
+            to="/"
+            end
+            className={({ isActive }) =>
+              `transition ${isActive ? 'text-white font-semibold border-b-2 border-white' : 'text-[#9a9a9a] hover:text-white'}`
+            }
+          >
+            Home
+          </NavLink>
+          <NavLink
+            to="/explore"
+            end
+            className={({ isActive }) =>
+              `transition ${isActive ? 'text-white font-semibold border-b-2 border-white' : 'text-[#9a9a9a] hover:text-white'}`
+            }
+          >
+            Explore
+          </NavLink>
+          <NavLink
+            to="/genres"
+            end
+            className={({ isActive }) =>
+              `transition ${isActive ? 'text-white font-semibold border-b-2 border-white' : 'text-[#9a9a9a] hover:text-white'}`
+            }
+          >
+            Genres
+          </NavLink>
         </nav>
 
         {/* Search */}
         <div className="relative ml-auto flex-1 max-w-xs">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
-          <input
-            type="text"
-            placeholder="Search manga..."
-            className="w-full rounded-full border border-white/10 bg-white/5 py-1.5 pl-9 pr-4 text-sm text-white placeholder:text-white/40 outline-none transition focus:border-white/30 focus:bg-white/10"
-          />
+          <form onSubmit={handleSearch} className="flex items-center">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search manga..."
+              className="w-full rounded-full border border-white/10 bg-white/5 py-1.5 pl-9 pr-4 text-sm text-white placeholder:text-white/40 outline-none transition focus:border-white/30 focus:bg-white/10"
+            />
+          </form>
         </div>
 
         {/* Profile */}

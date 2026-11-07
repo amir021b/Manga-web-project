@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-﻿import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MangaCard from '../components/manga/MangaCard';
 import MangaGrid from '../components/manga/MangaGrid';
@@ -37,9 +36,15 @@ function ProfilePage() {
   const panStart = useRef({ x: 0, y: 0, cropX: 0, cropY: 0 });
 
   useEffect(() => {
-    if (localStorage.getItem('isLoggedIn') !== 'true') {
-      navigate('/login', { replace: true });
-    }
+    const checkAuth = () => {
+      if (localStorage.getItem('isLoggedIn') !== 'true') {
+        navigate('/login', { replace: true });
+      }
+    };
+    checkAuth();
+    const handleStorage = () => checkAuth();
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
   }, [navigate]);
 
   useEffect(() => {
@@ -211,13 +216,13 @@ function ProfilePage() {
 
       <div className="mt-8">
         {activeTab === 'backpack' && (
-          <div className="flex flex-col items-center gap-3 rounded-2xl border border-white/10 bg-white/5 py-16 text-center backdrop-blur-md">
-            {backpack.length === 0 ? (
-              <div>
-                <Bookmark className="h-8 w-8 text-white/40" />
-                <p className="mt-2 text-sm text-white/60">Your Backpack is empty.</p>
-              </div>
-            ) : (
+          <div className="flex flex-col items-center justify-center min-h-[300px] gap-3 rounded-2xl border border-white/10 bg-white/5 text-center backdrop-blur-md">
+              {backpack.length === 0 ? (
+                <>
+                  <Bookmark className="h-8 w-8 text-white/40" />
+                  <p className="mt-2 text-sm text-white/60">Your Backpack is empty.</p>
+                </>
+              ) : (
               <MangaGrid className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
                 {backpack.map((item) => (
                   <MangaCard
@@ -262,7 +267,7 @@ function ProfilePage() {
 
       {isEditOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm"
+          className="fixed inset-0 z-60 flex items-center justify-center bg-black/80 px-4 backdrop-blur-sm"
           onClick={closeEdit}
         >
           <div
@@ -381,10 +386,4 @@ function ProfilePage() {
 }
 
 export default ProfilePage;
-=======
-function ProfilePage() {
-  return <h1>ProfilePage</h1>
-}
 
-export default ProfilePage
->>>>>>> d84187accf5af6cf5bfadfa0fdaa39fd013d0200

@@ -62,7 +62,7 @@ function AuthCard() {
       </div>
       <AuthTabs mode={mode} onChange={switchMode} disabled={isSubmitting} />
       <div>
-        <h1 className="text-2xl font-bold mb-1.5">{copy.title}</h1>
+        <h1 className="text-2xl font-bold text-white mb-1.5">{copy.title}</h1>
         <p className="text-sm text-[#9a9a9a] mb-6">{copy.subtitle}</p>
       </div>
       <form noValidate onSubmit={handleSubmit}>

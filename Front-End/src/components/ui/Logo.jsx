@@ -2,7 +2,7 @@
   const isHeader = variant === 'header';
 
   const boxClasses = isHeader
-    ? 'w-[26px] h-[26px] rounded-[8px] grid place-items-center bg-white/10 border border-white/20 text-white'
+    ? 'w-[26px] h-[26px] rounded-full grid place-items-center bg-black border border-transparent text-white'
     : [
         'w-[30px] h-[30px] rounded-[9px] grid place-items-center',
         'transition duration-[450ms] shadow-[0_0_18px_rgba(255,255,255,0.25)]',
