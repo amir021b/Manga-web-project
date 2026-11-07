@@ -22,19 +22,26 @@ const signToken = (id) => {
 
 exports.signup = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { username, email, password } = req.body || {};
 
     if (!username || !email || !password) {
       return res.status(400).json({
-        status: false,
+        status: "error",
         message: "Please provide username, email, and password.",
+      });
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({
+        status: "error",
+        message: "Password must be at least 8 characters.",
       });
     }
 
     const existingUser = await User.findOne({ email: email });
     if (existingUser) {
       return res.status(400).json({
-        status: false,
+        status: "error",
         message: "This email is already registered!",
       });
     }
@@ -52,17 +59,22 @@ exports.signup = async (req, res) => {
     console.log("✅ New user saved in MongoDB:", newUser.email);
 
     res.status(201).json({
-      status: true,
-      token,
-      user: {
-        id: newUser._id,
-        username: newUser.username,
-        email: newUser.email,
+      status: "success",
+      message: "Sign up successful",
+      data: {
+        token,
+        user: {
+          id: newUser._id,
+          username: newUser.username,
+          email: newUser.email,
+        },
       },
     });
   } catch (error) {
     console.error("Signup Error:", error);
-    res.status(500).json({ status: false, message: "Internal server error!" });
+    res
+      .status(500)
+      .json({ status: "error", message: "Internal server error!" });
   }
 };
 
@@ -78,7 +90,7 @@ exports.login = async (req, res) => {
 
     if (!email || !password) {
       return res.status(400).json({
-        status: false,
+        status: "error",
         message: "Please provide email and password.",
       });
     }
@@ -86,7 +98,7 @@ exports.login = async (req, res) => {
     const user = await User.findOne({ email: email });
     if (!user) {
       return res.status(401).json({
-        status: false,
+        status: "error",
         message: "Email or password is INCORRECT.",
       });
     }
@@ -94,7 +106,7 @@ exports.login = async (req, res) => {
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (!isPasswordCorrect) {
       return res.status(401).json({
-        status: false,
+        status: "error",
         message: "Email or password is INCORRECT.",
       });
     }
@@ -104,16 +116,21 @@ exports.login = async (req, res) => {
     console.log("🔓 User logged in from MongoDB:", user.email);
 
     res.status(200).json({
-      status: true,
-      token,
-      user: {
-        id: user._id,
-        username: user.username,
-        email: user.email,
+      status: "success",
+      message: "Login successful",
+      data: {
+        token,
+        user: {
+          id: user._id,
+          username: user.username,
+          email: user.email,
+        },
       },
     });
   } catch (error) {
     console.error("Login Error:", error);
-    res.status(500).json({ status: false, message: "Internal server error!" });
+    res
+      .status(500)
+      .json({ status: "error", message: "Internal server error!" });
   }
 };

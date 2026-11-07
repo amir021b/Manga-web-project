@@ -22,7 +22,7 @@ exports.protect = async (req, res, next) => {
 
     if (!token) {
       return res.status(401).json({
-        status: "fail",
+        status: "error",
         message: "you are not logged in! Please log in to get access.",
       });
     }
@@ -32,7 +32,7 @@ exports.protect = async (req, res, next) => {
     const currentUser = await User.findById(decoded.id).select("-password");
     if (!currentUser) {
       return res.status(401).json({
-        status: "fail",
+        status: "error",
         message: "the user belonging to this token no longer exists.",
       });
     }
@@ -43,20 +43,19 @@ exports.protect = async (req, res, next) => {
   } catch (err) {
     if (err.name === "JsonWebTokenError") {
       return res.status(401).json({
-        status: "fail",
+        status: "error",
         message: "invalid token. please log in again.",
       });
     }
     if (err.name === "TokenExpiredError") {
       return res.status(401).json({
-        status: "fail",
+        status: "error",
         message: "the token has expired. please log in again.",
       });
     }
     res.status(500).json({
       status: "error",
       message: "Authentication error occurred.",
-      error: err.message,
     });
   }
 };

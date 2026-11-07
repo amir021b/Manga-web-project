@@ -10,6 +10,7 @@ exports.getMe = async (req, res) => {
   try {
     res.status(200).json({
       status: "success",
+      message: "User profile retrieved successfully",
       data: {
         user: req.user,
       },
@@ -18,7 +19,6 @@ exports.getMe = async (req, res) => {
     res.status(500).json({
       status: "error",
       message: "failed to get user profile",
-      error: err.message,
     });
   }
 };
