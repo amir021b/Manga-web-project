@@ -1,5 +1,10 @@
 const mongoose = require("mongoose");
-const validator = require("validator"); // ۱. ایمپورت کردن پکیج اعتبارسنجی
+const validator = require("validator");
+
+/**
+ * User Schema definition
+ * Defines storage attributes, constraints, and validation rules for users
+ */
 
 const userSchema = new mongoose.Schema(
   {
@@ -7,7 +12,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Username is required!"],
       trim: true,
-      minlength: [3, "Username must be at least 3 characters."],
+      minlength: [4, "Username must be at least 4 characters."],
     },
     email: {
       type: String,
@@ -17,10 +22,8 @@ const userSchema = new mongoose.Schema(
       trim: true,
       validate: {
         validator: function (val) {
-          // ۱. اول چک میکنه فرمت کلی ایمیل درست باشه
           if (!validator.isEmail(val)) return false;
 
-          // ۲. جلوگیری از غلط‌های املایی رایج مثل .comm یا .con
           const commonTypos = [".comm", ".con", ".cmo", ".ocm"];
           if (commonTypos.some((typo) => val.endsWith(typo))) {
             return false;
@@ -35,7 +38,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, "Password is required!"],
-      minlength: [6, "Password must be at least 6 characters."],
+      minlength: [8, "Password must be at least 8 characters."],
     },
   },
   {

@@ -2,11 +2,23 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 
+/**
+ * Generate signed JSON Web Token
+ * @param {string} id - Database ObjectId of target user
+ * @returns {string} Signed JWT token valid for 7 days
+ */
+
 const signToken = (id) => {
   return jwt.sign({ id: id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
+
+/**
+ * Register a new user account
+ * @route   POST /api/auth/signup
+ * @access  Public
+ */
 
 exports.signup = async (req, res) => {
   try {
@@ -53,6 +65,12 @@ exports.signup = async (req, res) => {
     res.status(500).json({ status: false, message: "Internal server error!" });
   }
 };
+
+/**
+ * Authenticate existing user and issue token
+ * @route   POST /api/auth/login
+ * @access  Public
+ */
 
 exports.login = async (req, res) => {
   try {

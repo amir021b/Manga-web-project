@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MangaCard from '../components/manga/MangaCard';
@@ -380,3 +381,10 @@ function ProfilePage() {
 }
 
 export default ProfilePage;
+=======
+function ProfilePage() {
+  return <h1>ProfilePage</h1>
+}
+
+export default ProfilePage
+>>>>>>> d84187accf5af6cf5bfadfa0fdaa39fd013d0200

@@ -1,6 +1,15 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 
+/**
+ * Protect middleware: Restricts route access to authenticated users
+ * Validates JWT bearer token and attaches user document to request object
+ *
+ * @param {import('express').Request} req - Express request object
+ * @param {import('express').Response} res - Express response object
+ * @param {import('express').NextFunction} next - Express next middleware function
+ */
+
 exports.protect = async (req, res, next) => {
   try {
     let token;
@@ -20,7 +29,7 @@ exports.protect = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const currentUser = await User.findById(decoded.id);
+    const currentUser = await User.findById(decoded.id).select("-password");
     if (!currentUser) {
       return res.status(401).json({
         status: "fail",

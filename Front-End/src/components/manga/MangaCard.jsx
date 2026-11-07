@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿import { useBackpack } from '../../context/BackpackContext';
 import { useToast } from '../../context/ToastContext';
 
@@ -59,3 +60,10 @@ function MangaCard({ id, title, genre, posterUrl, to, hoverLift = true, hoverLif
 
 export default MangaCard;
 
+=======
+function MangaCard() {
+  return <h1>MangaCard</h1>
+}
+
+export default MangaCard
+>>>>>>> d84187accf5af6cf5bfadfa0fdaa39fd013d0200
