@@ -1,24 +1,9 @@
-export function submitAuth(mode, values) {
-  return new Promise((resolve, reject) => {
+export function submitAuth() {
+  return new Promise((resolve) => {
     setTimeout(() => {
-      // ----- Sign up: ایمیل تکراری -----
-      if (mode === 'signup' && values.email.toLowerCase() === 'test@test.com') {
-        reject({ code: 'email_exists' });
-        return;
-      }
-
-      // ----- Login: ایمیل یا رمز اشتباه -----
-      if (mode === 'login') {
-        const isCorrectEmail = values.email.toLowerCase() === 'user@example.com';
-        const isCorrectPassword = values.password === '12345678';
-
-        if (!isCorrectEmail || !isCorrectPassword) {
-          reject({ code: 'invalid_credentials' });
-          return;
-        }
-      }
-
-      // در حالت درست، موفق می‌شه
+      // Accept any valid input for both signup and login.
+      // Error codes (email_exists, invalid_credentials) are preserved so a real
+      // backend API can reject with the same shape and the UI will display them.
       resolve({ ok: true });
     }, 1200);
   });

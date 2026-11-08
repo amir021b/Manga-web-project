@@ -16,12 +16,13 @@ function FloatingInput({ id, label, type = "text", value, onChange, placeholder,
           className={[
             "peer h-full w-full rounded-[11px] border-0 outline-none",
             endAdornment ? "pl-[14px] pr-16" : "px-[14px]",
-            "bg-[#050505] text-[#f5f5f5] text-[15px]",
-            "placeholder-[#9a9a9a] placeholder:opacity-0",
+            "bg-[var(--mh-input-bg)] text-[var(--mh-input-text)] text-[15px]",
+            "placeholder-[var(--mh-input-placeholder)] placeholder:opacity-0",
             "focus:placeholder:opacity-100",
-            "peer-focus:bg-[#050505] peer-[:not(:placeholder-shown)]:bg-[#050505] peer-[:autofill]:bg-[#050505] peer-[:-webkit-autofill]:bg-[#050505]",
+            "peer-focus:bg-[var(--mh-input-bg)] peer-[:not(:placeholder-shown)]:bg-[var(--mh-input-bg)] peer-[:autofill]:bg-[var(--mh-input-bg)] peer-[:-webkit-autofill]:bg-[var(--mh-input-bg)]",
             "transition-all duration-200 motion-reduce:transition-none",
             "disabled:opacity-100",
+            error ? "border border-dashed border-white/55" : "border border-solid border-white/16",
           ].join(" ")}
         />
         {endAdornment && (
@@ -36,7 +37,7 @@ function FloatingInput({ id, label, type = "text", value, onChange, placeholder,
             "text-[#9a9a9a] text-[15px]",
             "pointer-events-none",
             "transition-all duration-200 motion-reduce:transition-none",
-            "peer-focus:text-[#f5f5f5] peer-[:not(:placeholder-shown)]:text-[#f5f5f5] peer-[:autofill]:text-[#f5f5f5] peer-[:-webkit-autofill]:text-[#f5f5f5]",
+            "peer-focus:text-[var(--mh-input-text)] peer-[:not(:placeholder-shown)]:text-[var(--mh-input-text)] peer-[:autofill]:text-[var(--mh-input-text)] peer-[:-webkit-autofill]:text-[var(--mh-input-text)]",
             "peer-focus:top-0 peer-focus:left-[12px] peer-focus:-translate-y-1/2 peer-focus:text-[12px]",
             "peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:left-[12px] peer-[:not(:placeholder-shown)]:-translate-y-1/2 peer-[:not(:placeholder-shown)]:text-[12px]",
             "peer-[:autofill]:top-0 peer-[:autofill]:left-[12px] peer-[:autofill]:-translate-y-1/2 peer-[:autofill]:text-[12px] peer-[:-webkit-autofill]:top-0 peer-[:-webkit-autofill]:left-[12px] peer-[:-webkit-autofill]:-translate-y-1/2 peer-[:-webkit-autofill]:text-[12px]",
@@ -50,10 +51,10 @@ function FloatingInput({ id, label, type = "text", value, onChange, placeholder,
             "absolute top-[-6px] left-0 right-0 bottom-0 m-0 p-0",
             "rounded-[11px] pointer-events-none",
             error
-              ? "border border-dashed border-white/55"
-              : "border border-solid border-white/16",
+              ? "border border-dashed border-[var(--mh-border)]"
+              : "border border-solid border-[var(--mh-border)]",
             "px-2 min-w-0",
-            "peer-focus:border-white/60 peer-[:not(:placeholder-shown)]:border-white/60 peer-[:autofill]:border-white/60 peer-[:-webkit-autofill]:border-white/60",
+            "peer-focus:border-[var(--mh-border)] peer-[:not(:placeholder-shown)]:border-[var(--mh-border)] peer-[:autofill]:border-[var(--mh-border)] peer-[:-webkit-autofill]:border-[var(--mh-border)]",
             "peer-focus:shadow-[0_0_0_3px_rgba(255,255,255,0.14)]",
             "transition-all duration-200 motion-reduce:transition-none",
           ].join(" ")}

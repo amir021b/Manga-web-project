@@ -1,5 +1,46 @@
 @import "tailwindcss";
 
+:root,
+[data-theme="dark"] {
+  --mh-bg: #0a0a0a;
+  --mh-surface: rgba(255, 255, 255, 0.04);
+  --mh-surface-strong: rgba(255, 255, 255, 0.07);
+  --mh-text: #f5f5f5;
+  --mh-text-secondary: #9a9a9a;
+  --mh-text-muted: rgba(255, 255, 255, 0.5);
+  --mh-border: rgba(255, 255, 255, 0.16);
+  --mh-border-soft: rgba(255, 255, 255, 0.1);
+  --mh-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --mh-shadow-strong: 0 30px 80px rgba(0, 0, 0, 0.75);
+  --mh-gradient-bg: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.07) 0%,
+    rgba(255, 255, 255, 0.015) 45%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  --mh-input-bg: #050505;
+  --mh-input-text: #f5f5f5;
+  --mh-input-placeholder: #9a9a9a;
+  --mh-card-bg: rgba(255, 255, 255, 0.09);
+  --mh-star-bg: #050505;
+}
+
+[data-accent='red'] {
+  --mh-accent: #ef4444;
+  --mh-accent-soft: rgba(239, 68, 68, 0.15);
+  --mh-accent-hover: #dc2626;
+}
+[data-accent='purple'] {
+  --mh-accent: #a855f7;
+  --mh-accent-soft: rgba(168, 85, 247, 0.15);
+  --mh-accent-hover: #9333ea;
+}
+[data-accent='blue'] {
+  --mh-accent: #22d3ee;
+  --mh-accent-soft: rgba(34, 211, 238, 0.15);
+  --mh-accent-hover: #0891b2;
+}
+
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -12,11 +53,25 @@ select:-webkit-autofill,
 select:-webkit-autofill:hover,
 select:-webkit-autofill:focus,
 select:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px #0a0a0a inset !important;
-  box-shadow: 0 0 0 30px #0a0a0a inset !important;
-  -webkit-text-fill-color: #ffffff !important;
-  caret-color: #ffffff !important;
-  background-color: #0a0a0a !important;
-  border-color: rgba(255, 255, 255, 0.16) !important;
+  -webkit-box-shadow: 0 0 0 30px var(--mh-input-bg) inset !important;
+  box-shadow: 0 0 0 30px var(--mh-input-bg) inset !important;
+  -webkit-text-fill-color: var(--mh-input-text) !important;
+  caret-color: var(--mh-input-text) !important;
+  background-color: var(--mh-input-bg) !important;
+  border-color: var(--mh-border) !important;
   transition: background-color 5000s ease-in-out 0s;
+}
+
+@keyframes smoothZoom {
+  0% { transform: scale(1) translateZ(0); }
+  50% { transform: scale(1.06) translateZ(0); }
+  100% { transform: scale(1) translateZ(0); }
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }

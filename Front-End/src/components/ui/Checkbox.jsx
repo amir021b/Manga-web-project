@@ -19,9 +19,9 @@ function Checkbox({ id, checked, onChange, label, labelAction, error, disabled =
           <div
             className={[
               "relative flex items-center justify-center w-[18px] h-[18px] shrink-0 mt-[2px]",
-              "rounded-[5px] border border-white/30 bg-white/4",
-              "peer-checked:bg-white peer-checked:border-white",
-              "peer-focus-visible:ring-2 peer-focus-visible:ring-white/60 peer-focus-visible:ring-offset-2",
+              "rounded-[5px] border border-[var(--mh-border-soft)] bg-[var(--mh-surface)]",
+              "peer-checked:bg-[var(--mh-accent)] peer-checked:border-[var(--mh-accent)]",
+              "peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--mh-accent)]/60 peer-focus-visible:ring-offset-2",
               "transition-all duration-200 motion-reduce:transition-none",
             ].join(" ")}
           >
@@ -41,10 +41,10 @@ function Checkbox({ id, checked, onChange, label, labelAction, error, disabled =
               </svg>
             )}
           </div>
-          <span className="text-[13px] text-[#9a9a9a]">{label}</span>
+          <span className="text-[13px] text-[var(--mh-text-secondary)]">{label}</span>
         </label>
         {labelAction ? (
-          <span className="text-[13px] text-[#9a9a9a]">{labelAction}</span>
+          <span className="text-[13px] text-[var(--mh-text-secondary)]">{labelAction}</span>
         ) : null}
       </div>
       {error ? (

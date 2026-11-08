@@ -2,13 +2,13 @@
   const isHeader = variant === 'header';
 
   const boxClasses = isHeader
-    ? 'w-[26px] h-[26px] rounded-full grid place-items-center bg-black border border-transparent text-white'
+    ? 'w-[26px] h-[26px] rounded-full grid place-items-center bg-[var(--mh-surface)] border border-[var(--mh-border)] text-[var(--mh-text)]'
     : [
         'w-[30px] h-[30px] rounded-[9px] grid place-items-center',
-        'transition duration-[450ms] shadow-[0_0_18px_rgba(255,255,255,0.25)]',
+        'transition duration-[450ms] shadow-[0_0_18px_rgba(0,0,0,0.25)]',
         isFilled
-          ? 'bg-black border border-white/45 text-white'
-          : 'bg-[#f2f2f2] border border-transparent text-black',
+          ? 'bg-[var(--mh-surface)] border border-[var(--mh-border)] text-[var(--mh-text)]'
+          : 'bg-[var(--mh-surface-strong)] border border-transparent text-[var(--mh-text-secondary)]',
       ].join(' ');
 
   const iconSize = isHeader ? 16 : 18;
@@ -28,7 +28,7 @@
           />
         </svg>
       </div>
-      <span className="font-bold text-base tracking-wide text-white/90">
+      <span className="font-bold text-base tracking-wide text-[var(--mh-text)]">
         MangaHub
       </span>
     </div>

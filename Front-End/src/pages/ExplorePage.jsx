@@ -21,15 +21,15 @@ function ExplorePage() {
   }, [selectedGenre]);
 
   return (
-    <section className="min-h-screen w-full bg-gradient-to-b from-[#050505] via-[#0d0d0d] to-[#000000] px-4 pt-24 pb-8">
+    <section className="min-h-screen w-full bg-transparent px-4 pt-24 pb-8">
       <div className="max-w-5xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-1">Explore</h1>
-            <p className="text-sm text-[#9a9a9a]">Browse manga by genre</p>
+            <h1 className="text-3xl font-bold text-[var(--mh-text)] mb-1">Explore</h1>
+            <p className="text-sm text-[var(--mh-text-secondary)]">Browse manga by genre</p>
           </div>
 
-          <div className="flex flex-wrap gap-2 overflow-x-auto pb-1">
+          <div className="flex flex-wrap gap-2 overflow-x-auto pb-1 no-scrollbar">
             {GENRES.map((genre) => {
               const isActive = selectedGenre === genre;
               return (
@@ -39,8 +39,8 @@ function ExplorePage() {
                   onClick={() => setSelectedGenre(genre)}
                   className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
                     isActive
-                      ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.3)]'
-                      : 'bg-white/5 border border-white/10 text-[#9a9a9a] hover:bg-white/10 hover:text-white'
+                      ? 'bg-[var(--mh-accent)] text-black shadow-[0_0_20px_var(--mh-accent-soft)]'
+                      : 'bg-[var(--mh-surface)] border border-[var(--mh-border)] text-[var(--mh-text-secondary)] hover:bg-[var(--mh-surface-strong)] hover:text-[var(--mh-text)]'
                   }`}
                 >
                   {genre}
@@ -50,7 +50,7 @@ function ExplorePage() {
           </div>
         </div>
 
-        <p className="text-xs uppercase tracking-widest text-white/50 mb-4">
+        <p className="text-xs uppercase tracking-widest text-[var(--mh-text-secondary)] mb-4">
           {filteredManga.length} result{filteredManga.length !== 1 ? 's' : ''}
         </p>
 

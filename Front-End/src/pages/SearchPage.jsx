@@ -15,11 +15,11 @@ function SearchPage() {
     : allManga;
 
   return (
-    <section className="min-h-screen w-full bg-gradient-to-b from-[#050505] via-[#0d0d0d] to-[#000000] px-4 pt-24 pb-8">
+    <section className="min-h-screen w-full bg-[var(--mh-bg)] px-4 pt-24 pb-8">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-2xl font-bold text-white mb-6">Search Results</h1>
-        <p className="text-sm text-white/60 mb-8">
-          Showing results for <span className="text-white font-medium">{debouncedQuery || 'all manga'}</span>
+        <h1 className="text-2xl font-bold text-[var(--mh-text)] mb-6">Search Results</h1>
+        <p className="text-sm text-[var(--mh-text-secondary)] mb-8">
+          Showing results for <span className="text-[var(--mh-text)] font-medium">{debouncedQuery || 'all manga'}</span>
         </p>
         <MangaGrid className="grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
           {results.map((item) => (

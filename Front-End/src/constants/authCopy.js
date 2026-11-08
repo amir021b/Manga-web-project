@@ -40,7 +40,7 @@ export const TERMS_INTRO = "I agree to the";
 export const TERMS_LINK = "terms of use and privacy policy";
 export const ERROR_MESSAGES = {
   required: "This field is required.",
-  usernameFormat: "Use 3 to 20 letters, numbers or underscores.",
+  usernameFormat: "Use 4 to 20 letters, numbers or underscores.",
   emailFormat: "Enter a valid email address.",
   passwordLength: "Password needs at least 8 characters.",
   passwordMismatch: "Passwords don’t match.",

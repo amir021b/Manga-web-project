@@ -23,32 +23,55 @@ function MangaCard({ id, title, genre, posterUrl, to, hoverLift = true, hoverLif
   return (
     <article
       className={[
-        'group relative aspect-[3/4] min-h-[260px] w-full overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/90 transition-all duration-300',
+        'group relative aspect-[3/4] min-h-[260px] w-full overflow-hidden rounded-2xl border border-[var(--mh-border)] bg-[var(--mh-card-bg)] transition-all duration-300',
         hoverLift ? hoverLiftClass : '',
-        'hover:border-white/20 hover:shadow-[0_0_40px_rgba(255,255,255,0.1)] hover:brightness-110',
+        'hover:border-[var(--mh-border-soft)] hover:shadow-[0_0_40px_rgba(0,0,0,0.15)] hover:brightness-105',
       ].join(' ')}
     >
       <div
-        className={hasPoster ? 'absolute inset-0 bg-cover bg-center' : 'absolute inset-0 bg-zinc-900'}
+        className={[
+          'absolute inset-0',
+          hasPoster ? 'bg-cover bg-center' : 'bg-[var(--mh-surface)] flex items-center justify-center',
+        ].join(' ')}
         style={hasPoster ? { backgroundImage: `url(${posterUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 z-10 p-4 text-left">
-        <h3 className="text-base font-bold uppercase tracking-wide text-white/95">{title}</h3>
-        <p className="mb-2 text-xs text-white/60">{genre}</p>
-        <Link
-          to={destination}
-          className="inline-block text-xs text-white/70 opacity-80 transition-all duration-300 group-hover:opacity-100 hover:text-white"
-        >
-          View Details →
-        </Link>
+      >
+        {!hasPoster && (
+          <div className="flex flex-col items-center justify-center gap-2 p-8 text-[var(--mh-text-secondary)]/80">
+            <svg
+              className="w-12 h-12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            <span className="text-xs font-medium uppercase tracking-widest">No Poster Yet</span>
+          </div>
+        )}
       </div>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
+      {hasPoster && (
+        <div className="absolute inset-x-0 bottom-0 z-10 p-4 text-left">
+          <h3 className="text-base font-bold uppercase tracking-wide text-[var(--mh-text)]">{title}</h3>
+          <p className="mb-2 text-xs text-[var(--mh-text-secondary)]">{genre}</p>
+          <Link
+            to={destination}
+            className="inline-block text-xs text-[var(--mh-text-secondary)] opacity-80 transition-all duration-300 group-hover:opacity-100 hover:text-[var(--mh-text)]"
+          >
+            View Details →
+          </Link>
+        </div>
+      )}
       {showSaveButton && (
         <button
           type="button"
           onClick={handleSave}
           aria-label={saved ? 'Remove from backpack' : 'Add to backpack'}
-          className="absolute top-3 right-3 z-20 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-white transition hover:bg-white/10 hover:text-white"
+          className="absolute top-3 right-3 z-20 rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface)] px-3 py-2 text-xs font-semibold text-[var(--mh-text)] transition hover:bg-[var(--mh-surface-strong)] hover:text-[var(--mh-text)]"
         >
           {saved ? 'Remove' : 'Save'}
         </button>

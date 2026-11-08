@@ -2,9 +2,11 @@ import { useNavigate, useSearchParams, NavLink } from 'react-router-dom';
 import { useState } from 'react';
 import { Search, User } from 'lucide-react';
 import Logo from '../ui/Logo';
+import { useUser } from '../../context/UserContext';
 
 function Header() {
   const navigate = useNavigate();
+  const { user } = useUser();
   const [searchParams] = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') || '');
 
@@ -16,7 +18,9 @@ function Header() {
 
   return (
     <header className="fixed top-4 left-1/2 z-50 w-[min(1200px,calc(100%-2rem))] -translate-x-1/2">
-      <div className="flex items-center gap-3 sm:gap-5 rounded-full border border-white/10 bg-white/5 px-4 py-2.5 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+      <div
+        className="flex items-center gap-3 sm:gap-5 rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface-strong)] px-4 py-2.5 backdrop-blur-md shadow-[var(--mh-shadow)]"
+      >
         {/* Logo */}
         <Logo variant="header" />
 
@@ -26,7 +30,7 @@ function Header() {
             to="/"
             end
             className={({ isActive }) =>
-              `transition ${isActive ? 'text-white font-semibold border-b-2 border-white' : 'text-[#9a9a9a] hover:text-white'}`
+              `transition ${isActive ? 'text-[var(--mh-text)] font-semibold border-b-2 border-[var(--mh-text)]' : 'text-[var(--mh-text-secondary)] hover:text-[var(--mh-text)]'}`
             }
           >
             Home
@@ -35,49 +39,62 @@ function Header() {
             to="/explore"
             end
             className={({ isActive }) =>
-              `transition ${isActive ? 'text-white font-semibold border-b-2 border-white' : 'text-[#9a9a9a] hover:text-white'}`
+              `transition ${isActive ? 'text-[var(--mh-text)] font-semibold border-b-2 border-[var(--mh-text)]' : 'text-[var(--mh-text-secondary)] hover:text-[var(--mh-text)]'}`
             }
           >
             Explore
-          </NavLink>
-          <NavLink
-            to="/genres"
-            end
-            className={({ isActive }) =>
-              `transition ${isActive ? 'text-white font-semibold border-b-2 border-white' : 'text-[#9a9a9a] hover:text-white'}`
-            }
-          >
-            Genres
           </NavLink>
         </nav>
 
         {/* Search */}
         <div className="relative ml-auto flex-1 max-w-xs">
           <form onSubmit={handleSearch} className="flex items-center">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
+            <Search
+              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--mh-text-muted)]"
+            />
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search manga..."
-              className="w-full rounded-full border border-white/10 bg-white/5 py-1.5 pl-9 pr-4 text-sm text-white placeholder:text-white/40 outline-none transition focus:border-white/30 focus:bg-white/10"
+              className="w-full rounded-full border border-[var(--mh-border)] bg-[var(--mh-input-bg)] py-1.5 pl-9 pr-4 text-sm text-[var(--mh-input-text)] placeholder:[var(--mh-input-placeholder)] outline-none transition focus:border-[var(--mh-accent)] focus:bg-[var(--mh-input-bg)]"
             />
           </form>
         </div>
 
         {/* Profile */}
-        <button
-          type="button"
-          onClick={() => navigate('/profile')}
-          aria-label="Profile"
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/10 bg-white/5 text-white/80 transition hover:bg-white/10 hover:text-white"
-        >
-          <User strokeWidth={0.75} className="h-5 w-5" />
-        </button>
+        {user ? (
+          <>
+            <div className="hidden sm:flex items-center gap-2 text-sm text-[var(--mh-text-secondary)]">
+              <span>{user.username}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate('/profile')}
+              aria-label="Profile"
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface-strong)] text-[var(--mh-text)] transition hover:bg-[var(--mh-surface)] hover:text-[var(--mh-text)]"
+            >
+              {user.avatar ? (
+                <img src={user.avatar} alt="avatar" className="w-full h-full rounded-full object-cover" />
+              ) : (
+                <User strokeWidth={0.75} className="h-5 w-5" />
+              )}
+            </button>
+          </>
+        ) : (
+          <button
+            type="button"
+            onClick={() => navigate('/login')}
+            aria-label="Login"
+            className="inline-flex items-center gap-1.5 rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface-strong)] px-3 py-1.5 text-xs text-[var(--mh-text)] transition hover:bg-[var(--mh-surface)] hover:text-[var(--mh-text)]"
+          >
+            <User strokeWidth={0.75} className="h-3.5 w-3.5" />
+            Login
+          </button>
+        )}
       </div>
     </header>
   );
 }
 
 export default Header;
-

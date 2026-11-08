@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { AUTH_MODES, AUTH_COPY, REQUIRED_FIELDS, STATUS } from '../constants/authCopy';
 import { validateForm } from '../utils/validators';
 import { submitAuth } from '../services/authApi';
+import { useUser } from '../context/UserContext';
 
 const INITIAL_VALUES = {
   username: '',
@@ -31,7 +32,6 @@ export function useAuthForm() {
   const isSuccess = status === STATUS.SUCCESS;
 
   const isMountedRef = useRef(true);
-  const successRef = useRef(null);
   const submittingRef = useRef(false);
 
   useEffect(() => {
@@ -41,12 +41,6 @@ export function useAuthForm() {
       submittingRef.current = false;
     };
   }, []);
-
-  useEffect(() => {
-    if (isSuccess && successRef.current) {
-      successRef.current.focus();
-    }
-  }, [isSuccess]);
 
   // Reset form whenever the mode (URL) changes.
   useEffect(() => {
@@ -100,6 +94,8 @@ export function useAuthForm() {
     });
   };
 
+  const { setCurrentUser } = useUser();
+
   const handleSubmit = (event) => {
     if (event && typeof event.preventDefault === 'function') event.preventDefault();
     if (isSubmitting || submittingRef.current) return;
@@ -117,14 +113,13 @@ export function useAuthForm() {
     }
     setStatus(STATUS.SUBMITTING);
     submittingRef.current = true;
-    submitAuth(mode, values).then(() => {
+    submitAuth().then(() => {
       submittingRef.current = false;
       if (isMountedRef.current) {
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('currentUser', JSON.stringify({
+        setCurrentUser({
           username: values.username || (values.email ? values.email.split('@')[0] : 'Manga Fan'),
           email: values.email,
-        }));
+        });
         setStatus(STATUS.SUCCESS);
       }
     }).catch((error) => {
@@ -180,7 +175,7 @@ export function useAuthForm() {
     return typeof v === 'boolean' ? v : String(v).trim() !== '';
   });
 
-  return {
+    return {
     mode,
     values,
     showPassword,
@@ -201,7 +196,6 @@ export function useAuthForm() {
     closeTerms,
     handleAcceptTerms,
     switchMode,
-    successRef,
   };
 }
 

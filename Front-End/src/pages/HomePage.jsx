@@ -93,11 +93,11 @@ function MarqueeRow({ items, className }) {
 function SectionTitle({ children, className }) {
   return (
     <div className={`flex w-full items-center gap-4 ${className || ''}`}>
-      <span className="h-[1px] flex-1 bg-white/30" />
-      <p className="shrink-0 text-xs font-normal uppercase tracking-[0.4em] text-white/80 sm:text-sm">
+      <span className="h-[1px] flex-1 bg-[var(--mh-border-soft)]" />
+      <p className="shrink-0 text-xs font-normal uppercase tracking-[0.4em] text-[var(--mh-text-secondary)] sm:text-sm">
         {children}
       </p>
-      <span className="h-[1px] flex-1 bg-white/30" />
+      <span className="h-[1px] flex-1 bg-[var(--mh-border-soft)]" />
     </div>
   );
 }
@@ -106,14 +106,14 @@ function SectionHeader({ title, subtitle, className }) {
   return (
     <div className={`flex w-full max-w-md flex-col items-center gap-3 text-center ${className || ''}`}>
       <div className="flex w-full items-center gap-4">
-        <span className="h-[1px] flex-1 bg-white/30" />
-        <p className="shrink-0 text-xs font-normal uppercase tracking-[0.4em] text-white/80 sm:text-sm">
+        <span className="h-[1px] flex-1 bg-[var(--mh-border-soft)]" />
+        <p className="shrink-0 text-xs font-normal uppercase tracking-[0.4em] text-[var(--mh-text-secondary)] sm:text-sm">
           {title}
         </p>
-        <span className="h-[1px] flex-1 bg-white/30" />
+        <span className="h-[1px] flex-1 bg-[var(--mh-border-soft)]" />
       </div>
       {subtitle && (
-        <p className="text-sm italic tracking-wide text-white/60 sm:text-base">
+        <p className="text-sm italic tracking-wide text-[var(--mh-text-secondary)] sm:text-base">
           {subtitle}
         </p>
       )}
@@ -134,7 +134,7 @@ function HomePage({ backgroundImage = null }) {
 
   return (
     <section
-      className="relative min-h-screen w-full overflow-hidden bg-gradient-to-b from-[#050505] via-[#0d0d0d] to-[#000000]"
+      className="relative min-h-screen w-full overflow-hidden bg-transparent"
       style={{ '--hero-bg': backgroundImage ? `url(${backgroundImage})` : undefined }}
     >
       {backgroundImage && (
@@ -157,29 +157,42 @@ function HomePage({ backgroundImage = null }) {
       />
 
       <div className="relative z-10 flex min-h-screen flex-col items-center justify-center gap-10 px-4 pb-16 pt-24">
-        <MangaGrid>
-          {mangaItems.map((item) => (
-            <MangaCard
-              key={item.id}
-              id={item.id}
-              title={item.title}
-              genre={item.genre}
-              posterUrl={item.posterUrl}
-            />
-          ))}
-        </MangaGrid>
-
-        <div className="flex w-full max-w-md flex-col items-center gap-3 text-center">
-          <div className="flex w-full items-center gap-4">
-            <span className="h-[1px] flex-1 bg-white/30" />
-            <p className="shrink-0 text-xs font-normal uppercase tracking-[0.4em] text-white/80 sm:text-sm">
-              T H E   B I G   T H R E E
-            </p>
-            <span className="h-[1px] flex-1 bg-white/30" />
+        <div className="relative overflow-hidden [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden rounded-2xl border border-white/10 shadow-2xl w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 will-change-transform">
+          <div
+            className="absolute inset-0 z-0 bg-cover bg-center transform-gpu translate-z-0 backface-hidden will-change-transform"
+            style={{
+              backgroundImage: `url('/Monochrome Manga Warriors in Mist.png')`,
+              animation: 'smoothZoom 18s ease-in-out infinite alternate',
+            }}
+          />
+          <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/40 via-black/20 to-transparent" />
+          <div className="relative z-10 text-center">
+            <div className="flex justify-center">
+              <MangaGrid className="max-w-[768px] w-full mx-auto">
+                {mangaItems.map((item) => (
+                  <MangaCard
+                    key={item.id}
+                    id={item.id}
+                    title={item.title}
+                    genre={item.genre}
+                    posterUrl={item.posterUrl}
+                  />
+                ))}
+              </MangaGrid>
+            </div>
+            <div className="mt-10">
+              <div className="flex w-full items-center gap-4">
+                <span className="h-[1px] flex-1 bg-[var(--mh-border-soft)]" />
+                <p className="shrink-0 text-xs font-normal uppercase tracking-[0.4em] text-[var(--mh-text-secondary)] sm:text-sm">
+                  T H E   B I G   T H R E E
+                </p>
+                <span className="h-[1px] flex-1 bg-[var(--mh-border-soft)]" />
+              </div>
+              <p className="mt-2 text-sm italic tracking-wide text-[var(--mh-text-secondary)] sm:text-base">
+                Three Masterpieces. One Legacy.
+              </p>
+            </div>
           </div>
-          <p className="text-sm italic tracking-wide text-white/60 sm:text-base">
-            Three Masterpieces. One Legacy.
-          </p>
         </div>
 
         <>
