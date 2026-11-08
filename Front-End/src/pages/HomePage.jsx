@@ -80,6 +80,16 @@ function MarqueeRow({ items, className }) {
               id={item.id}
               title={item.title}
               genre={item.genre}
+              posterUrl={item.posterUrl}
+              badge={
+                item.badge ? (
+                  <span className="absolute top-3 left-3 z-20 rounded-full border border-yellow-400/40 bg-yellow-500/20 px-3 py-1 text-xs font-bold uppercase tracking-wide text-yellow-200 backdrop-blur-md shadow-[0_0_20px_rgba(234,179,8,0.25)]">
+                    {item.badge}
+                  </span>
+                ) : null
+              }
+              synopsis={item.synopsis || null}
+              rating={item.rating || null}
               hoverLift={true}
               hoverLiftClass="hover:-translate-y-1"
             />
@@ -196,7 +206,7 @@ function HomePage({ backgroundImage = null }) {
         </div>
 
         <>
-          <SectionTitle>Best Sellers</SectionTitle>
+          <SectionTitle>Most Popular</SectionTitle>
           <MarqueeRow items={bestSellers} className="pt-4" />
         </>
 
@@ -238,9 +248,8 @@ function HomePage({ backgroundImage = null }) {
                 title={item.title}
                 genre={item.genre}
                 posterUrl={item.posterUrl}
-                showSaveButton={false}
                 badge={
-                  <span className="absolute top-3 right-3 z-20 rounded-full border border-red-400/40 bg-red-500/20 px-3 py-1 text-xs font-bold uppercase tracking-wide text-red-200 backdrop-blur-md shadow-[0_0_20px_rgba(239,68,68,0.25)]">
+                  <span className="absolute top-3 left-3 z-20 rounded-full border border-red-400/40 bg-red-500/20 px-3 py-1 text-xs font-bold uppercase tracking-wide text-red-200 backdrop-blur-md shadow-[0_0_20px_rgba(239,68,68,0.25)]">
                     50% OFF
                   </span>
                 }

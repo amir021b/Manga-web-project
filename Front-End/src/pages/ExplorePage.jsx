@@ -9,6 +9,7 @@ const allManga = [...bigThree, ...bestSellers, ...latestUpdates];
 
 const GENRES = [
   'All',
+  'Best Sellers',
   ...Array.from(new Set(allManga.map((m) => m.genre))).sort(),
 ];
 
@@ -17,6 +18,9 @@ function ExplorePage() {
 
   const filteredManga = useMemo(() => {
     if (selectedGenre === 'All') return allManga;
+    if (selectedGenre === 'Best Sellers') {
+      return allManga.filter((m) => m.badge === 'Best Seller');
+    }
     return allManga.filter((m) => m.genre === selectedGenre);
   }, [selectedGenre]);
 
@@ -62,6 +66,13 @@ function ExplorePage() {
                 title={item.title}
                 genre={item.genre}
                 posterUrl={item.posterUrl}
+                badge={
+                  item.badge ? (
+                    <span className="absolute top-3 left-3 z-20 rounded-full border border-yellow-400/40 bg-yellow-500/20 px-3 py-1 text-xs font-bold uppercase tracking-wide text-yellow-200 backdrop-blur-md shadow-[0_0_20px_rgba(234,179,8,0.25)]">
+                      {item.badge}
+                    </span>
+                  ) : null
+                }
               />
             </div>
           ))}
