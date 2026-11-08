@@ -1,15 +1,28 @@
+<<<<<<< HEAD
 import { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AUTH_MODES, AUTH_COPY, REQUIRED_FIELDS, STATUS } from '../constants/authCopy';
 import { validateForm } from '../utils/validators';
 import { submitAuth } from '../services/authApi';
 import { useUser } from '../context/UserContext';
+=======
+import { useState, useRef, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import {
+  AUTH_MODES,
+  AUTH_COPY,
+  REQUIRED_FIELDS,
+  STATUS,
+} from "../constants/authCopy";
+import { validateForm } from "../utils/validators";
+import { submitAuth } from "../services/authApi";
+>>>>>>> 9144595f03b312a8e9e24066661c8244036e6794
 
 const INITIAL_VALUES = {
-  username: '',
-  email: '',
-  password: '',
-  confirmPassword: '',
+  username: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
   acceptTerms: false,
 };
 
@@ -17,7 +30,7 @@ export function useAuthForm() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const mode = location.pathname.includes('signup')
+  const mode = location.pathname.includes("signup")
     ? AUTH_MODES.SIGNUP
     : AUTH_MODES.LOGIN;
 
@@ -60,7 +73,7 @@ export function useAuthForm() {
     if (!isSuccess) return;
     const timer = setTimeout(() => {
       if (isMountedRef.current) {
-        navigate('/');
+        navigate("/");
       }
     }, 1500);
     return () => clearTimeout(timer);
@@ -71,14 +84,14 @@ export function useAuthForm() {
 
   const handleChange = (name) => (event) => {
     const { type, value, checked } = event.target;
-    const newValue = type === 'checkbox' ? checked : value;
+    const newValue = type === "checkbox" ? checked : value;
     setValues((prev) => ({ ...prev, [name]: newValue }));
     setErrors((prev) => {
       const next = { ...prev };
       if (next[name]) {
         delete next[name];
       }
-      if (name === 'password' && prev.confirmPassword) {
+      if (name === "password" && prev.confirmPassword) {
         const confirmValue = values.confirmPassword;
         if (confirmValue === newValue) {
           delete next.confirmPassword;
@@ -97,22 +110,24 @@ export function useAuthForm() {
   const { setCurrentUser } = useUser();
 
   const handleSubmit = (event) => {
-    if (event && typeof event.preventDefault === 'function') event.preventDefault();
+    if (event && typeof event.preventDefault === "function")
+      event.preventDefault();
     if (isSubmitting || submittingRef.current) return;
     const nextErrors = validateForm(values, mode);
     setErrors(nextErrors);
     const fieldOrder = isSignup
-      ? ['username', 'email', 'password', 'confirmPassword', 'acceptTerms']
-      : ['email', 'password'];
+      ? ["username", "email", "password", "confirmPassword", "acceptTerms"]
+      : ["email", "password"];
     const firstInvalid = fieldOrder.find((name) => nextErrors[name]);
     if (firstInvalid) {
       const form = event && event.currentTarget ? event.currentTarget : null;
       const el = form ? form.elements[firstInvalid] : null;
-      if (el && typeof el.focus === 'function') el.focus();
+      if (el && typeof el.focus === "function") el.focus();
       return;
     }
     setStatus(STATUS.SUBMITTING);
     submittingRef.current = true;
+<<<<<<< HEAD
     submitAuth().then(() => {
       submittingRef.current = false;
       if (isMountedRef.current) {
@@ -129,10 +144,27 @@ export function useAuthForm() {
           setErrors((prev) => ({ ...prev, email: 'email_exists' }));
         } else if (error && error.code === 'invalid_credentials') {
           setErrors((prev) => ({ ...prev, email: 'invalid_credentials' }));
+=======
+    submitAuth(mode, values)
+      .then((response) => {
+        submittingRef.current = false;
+        if (isMountedRef.current) {
+          const { token, user } = response.data;
+          localStorage.setItem("token", token);
+          localStorage.setItem("isLoggedIn", "true");
+          localStorage.setItem("currentUser", JSON.stringify(user));
+          setStatus(STATUS.SUCCESS);
+>>>>>>> 9144595f03b312a8e9e24066661c8244036e6794
         }
-        setStatus(STATUS.IDLE);
-      }
-    });
+      })
+      .catch((error) => {
+        submittingRef.current = false;
+        if (isMountedRef.current) {
+          const code = error && error.code ? error.code : "server_error";
+          setErrors((prev) => ({ ...prev, email: code }));
+          setStatus(STATUS.IDLE);
+        }
+      });
   };
 
   const handleReset = () => {
@@ -143,10 +175,10 @@ export function useAuthForm() {
     setStatus(STATUS.IDLE);
     setIsTermsOpen(false);
     submittingRef.current = false;
-    navigate('/login');
+    navigate("/login");
     requestAnimationFrame(() => {
-      const el = document.getElementById('email');
-      if (el && typeof el.focus === 'function') el.focus();
+      const el = document.getElementById("email");
+      if (el && typeof el.focus === "function") el.focus();
     });
   };
 
@@ -166,13 +198,13 @@ export function useAuthForm() {
 
   const switchMode = (newMode) => {
     if (isSubmitting) return;
-    const path = newMode === AUTH_MODES.SIGNUP ? '/signup' : '/login';
+    const path = newMode === AUTH_MODES.SIGNUP ? "/signup" : "/login";
     navigate(path);
   };
 
   const isFilled = REQUIRED_FIELDS[mode].every((key) => {
     const v = values[key];
-    return typeof v === 'boolean' ? v : String(v).trim() !== '';
+    return typeof v === "boolean" ? v : String(v).trim() !== "";
   });
 
     return {

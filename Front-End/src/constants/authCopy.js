@@ -15,7 +15,8 @@ export const AUTH_COPY = {
     swapText: "New here?",
     swapAction: "Create an account",
     successTitle: "You’re in",
-    successMessage: "Welcome back. This is a design preview, so nothing was saved.",
+    successMessage:
+      "Welcome back. This is a design preview, so nothing was saved.",
     successAction: "Back to the form",
   },
   [AUTH_MODES.SIGNUP]: {
@@ -27,7 +28,8 @@ export const AUTH_COPY = {
     swapText: "Already have an account?",
     swapAction: "Log in",
     successTitle: "Account created",
-    successMessage: "Your account is ready. This is a design preview, so nothing was saved.",
+    successMessage:
+      "Your account is ready. This is a design preview, so nothing was saved.",
     successAction: "Back to the form",
   },
 };
@@ -47,5 +49,7 @@ export const ERROR_MESSAGES = {
   termsRequired: "Accept the terms to create an account.",
   email_exists: "This email is already registered.",
   invalid_credentials: "Incorrect email or password.",
+  network_error: "Cannot reach the server. Make sure the backend is running.",
+  server_error: "Something went wrong. Please try again.",
 };
 export const FORGOT_PASSWORD_TEXT = "Forgot password?";
