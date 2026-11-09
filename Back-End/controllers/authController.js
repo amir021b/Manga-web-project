@@ -71,6 +71,10 @@ exports.signup = async (req, res) => {
       },
     });
   } catch (error) {
+    if (error.name === "ValidationError") {
+      const message = Object.values(error.errors)[0].message;
+      return res.status(400).json({ status: "error", message });
+    }
     console.error("Signup Error:", error);
     res
       .status(500)
@@ -86,7 +90,7 @@ exports.signup = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body || {};
 
     if (!email || !password) {
       return res.status(400).json({
