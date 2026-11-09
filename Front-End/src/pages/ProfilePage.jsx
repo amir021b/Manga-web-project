@@ -1,30 +1,37 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import MangaCard from '../components/manga/MangaCard';
-import MangaGrid from '../components/manga/MangaGrid';
-import SettingsTab from '../components/settings/SettingsTab';
-import EditProfileModal from '../components/profile/EditProfileModal';
-import { useBackpack } from '../context/BackpackContext';
-import { useUser } from '../context/UserContext';
-import { fetchProfile } from '../services/userApi';
-import { User, Pencil, Bookmark, History, Settings as SettingsIcon, LogOut } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import MangaCard from "../components/manga/MangaCard";
+import MangaGrid from "../components/manga/MangaGrid";
+import SettingsTab from "../components/settings/SettingsTab";
+import EditProfileModal from "../components/profile/EditProfileModal";
+import { useBackpack } from "../context/BackpackContext";
+import { useUser } from "../context/UserContext";
+import { fetchProfile } from "../services/userApi";
+import {
+  User,
+  Pencil,
+  Bookmark,
+  History,
+  Settings as SettingsIcon,
+  LogOut,
+} from "lucide-react";
 
 const TABS = [
-  { id: 'backpack', label: 'Backpack', icon: Bookmark },
-  { id: 'history', label: 'History', icon: History },
-  { id: 'settings', label: 'Settings', icon: SettingsIcon },
+  { id: "backpack", label: "Backpack", icon: Bookmark },
+  { id: "history", label: "History", icon: History },
+  { id: "settings", label: "Settings", icon: SettingsIcon },
 ];
 
 function ProfilePage() {
   const navigate = useNavigate();
   const { backpack } = useBackpack();
   const { user, setCurrentUser, logout, isLoggedIn } = useUser();
-  const [activeTab, setActiveTab] = useState('backpack');
+  const [activeTab, setActiveTab] = useState("backpack");
   const [isEditOpen, setIsEditOpen] = useState(false);
 
   useEffect(() => {
     if (!isLoggedIn) {
-      navigate('/login', { replace: true });
+      navigate("/login", { replace: true });
     }
   }, [isLoggedIn, navigate]);
 
@@ -34,29 +41,56 @@ function ProfilePage() {
       if (!isLoggedIn) return;
       try {
         const data = await fetchProfile();
+
         if (mounted && data) setCurrentUser(data);
       } catch {
-        // Keep existing session user if the profile fetch fails.
+        // Keep existing session
       }
     };
     loadProfile();
     return () => {
       mounted = false;
     };
-  }, [isLoggedIn, setCurrentUser]);
+  }, [isLoggedIn]);
 
-  const handleSave = (next) => {
+  const handleSave = async (next) => {
     setCurrentUser(next);
-  };
+    localStorage.setItem("mangahub_user", JSON.stringify(next));
 
+    const token = localStorage.getItem("mangahub_token");
+    if (!token) return;
+
+    try {
+      const res = await fetch("http://localhost:5000/api/users/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          username: next.username,
+          bio: next.bio,
+          avatar: next.avatar,
+        }),
+      });
+
+      const result = await res.json();
+      if (res.ok && result.data?.user) {
+        setCurrentUser(result.data.user);
+        localStorage.setItem("mangahub_user", JSON.stringify(result.data.user));
+      }
+    } catch (err) {
+      console.error("Failed to update profile:", err);
+    }
+  };
   const handleLogout = () => {
     logout();
-    navigate('/login', { replace: true });
+    navigate("/login", { replace: true });
   };
 
-  const username = user?.username || 'Manga Fan';
-  const email = user?.email || 'user@mangahub.com';
-  const bio = user?.bio || 'Avid manga reader and collector.';
+  const username = user?.username || "Manga Fan";
+  const email = user?.email || "user@mangahub.com";
+  const bio = user?.bio || "Avid manga reader and collector.";
 
   const openEdit = () => setIsEditOpen(true);
   const closeEdit = () => setIsEditOpen(false);
@@ -81,8 +115,12 @@ function ProfilePage() {
           </div>
 
           <div className="flex-1 text-center sm:text-left">
-            <h1 className="text-2xl font-bold text-[var(--mh-text)]">{username}</h1>
-            <p className="mt-1 text-sm text-[var(--mh-text-secondary)]">{email}</p>
+            <h1 className="text-2xl font-bold text-[var(--mh-text)]">
+              {username}
+            </h1>
+            <p className="mt-1 text-sm text-[var(--mh-text-secondary)]">
+              {email}
+            </p>
             <p className="mt-2 text-xs text-[var(--mh-text-muted)]">{bio}</p>
           </div>
 
@@ -106,7 +144,7 @@ function ProfilePage() {
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className={`relative flex items-center gap-2 pb-2 transition ${isActive ? 'text-[var(--mh-text)]' : ''}`}
+              className={`relative flex items-center gap-2 pb-2 transition ${isActive ? "text-[var(--mh-text)]" : ""}`}
             >
               <Icon className="h-4 w-4" />
               {tab.label}
@@ -119,13 +157,15 @@ function ProfilePage() {
       </nav>
 
       <div className="mt-8">
-        {activeTab === 'backpack' && (
+        {activeTab === "backpack" && (
           <div key="backpack" className="tab-content-in">
             <div className="flex flex-col items-center justify-center min-h-[300px] gap-3 rounded-2xl border border-[var(--mh-border)] bg-[var(--mh-surface)] text-center backdrop-blur-md">
               {backpack.length === 0 ? (
                 <>
                   <Bookmark className="h-8 w-8 text-[var(--mh-text-secondary)]" />
-                  <p className="mt-2 text-sm text-[var(--mh-text-secondary)]">Your Backpack is empty.</p>
+                  <p className="mt-2 text-sm text-[var(--mh-text-secondary)]">
+                    Your Backpack is empty.
+                  </p>
                 </>
               ) : (
                 <MangaGrid className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -145,16 +185,18 @@ function ProfilePage() {
           </div>
         )}
 
-        {activeTab === 'history' && (
+        {activeTab === "history" && (
           <div key="history" className="tab-content-in">
             <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-[var(--mh-border)] bg-[var(--mh-surface)] py-16 text-center backdrop-blur-md">
               <History className="h-8 w-8 text-[var(--mh-text-secondary)]" />
-              <p className="text-sm text-[var(--mh-text-secondary)]">No reading history yet.</p>
+              <p className="text-sm text-[var(--mh-text-secondary)]">
+                No reading history yet.
+              </p>
             </div>
           </div>
         )}
 
-        {activeTab === 'settings' && (
+        {activeTab === "settings" && (
           <div key="settings" className="tab-content-in">
             <SettingsTab />
           </div>

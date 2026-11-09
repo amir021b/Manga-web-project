@@ -1,41 +1,58 @@
-const API_BASE = import.meta.env.VITE_API_BASE || '';
-const BACKPACK_ENDPOINT = `${API_BASE}/api/backpack`;
-
-const authHeaders = () => {
-  const token = sessionStorage.getItem('mangahub_token');
-  return token ? { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } : {};
-};
-
-const handleResponse = async (res) => {
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || 'Request failed');
-  }
-  const text = await res.text();
-  return text ? JSON.parse(text) : null;
-};
+const API_URL = "http://localhost:5000/api/users/backpack";
 
 export async function fetchBackpack() {
-  const res = await fetch(BACKPACK_ENDPOINT, {
-    method: 'GET',
-    headers: authHeaders(),
-  });
-  return handleResponse(res);
+  const token = localStorage.getItem("mangahub_token");
+  if (!token) return [];
+
+  try {
+    const res = await fetch(API_URL, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) return [];
+    const result = await res.json();
+    return result.data?.backpack || [];
+  } catch (err) {
+    console.error("Failed to fetch backpack:", err);
+    return [];
+  }
 }
 
-export async function addToBackpack(mangaId) {
-  const res = await fetch(BACKPACK_ENDPOINT, {
-    method: 'POST',
-    headers: authHeaders(),
-    body: JSON.stringify({ mangaId }),
+export async function toggleBackpackItem(mangaId) {
+  const token = localStorage.getItem("mangahub_token");
+  if (!token) return;
+
+  const res = await fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ mangaId: String(mangaId) }),
   });
-  return handleResponse(res);
+
+  const result = await res.json();
+  if (!res.ok) throw new Error(result.message || "Failed to update backpack");
+  return result.data;
 }
 
-export async function removeFromBackpack(mangaId) {
-  const res = await fetch(`${BACKPACK_ENDPOINT}/${encodeURIComponent(mangaId)}`, {
-    method: 'DELETE',
-    headers: authHeaders(),
-  });
-  return handleResponse(res);
+export async function addToBackpack(itemOrId) {
+  const id =
+    typeof itemOrId === "object" && itemOrId !== null ? itemOrId.id : itemOrId;
+  return toggleBackpackItem(id);
 }
+
+export async function removeFromBackpack(itemOrId) {
+  const id =
+    typeof itemOrId === "object" && itemOrId !== null ? itemOrId.id : itemOrId;
+  return toggleBackpackItem(id);
+}
+
+export default {
+  fetchBackpack,
+  toggleBackpackItem,
+  addToBackpack,
+  removeFromBackpack,
+};

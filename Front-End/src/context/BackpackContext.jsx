@@ -1,126 +1,96 @@
-﻿/* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import {
-  fetchBackpack as apiFetchBackpack,
-  addToBackpack as apiAddToBackpack,
-  removeFromBackpack as apiRemoveFromBackpack,
-} from '../services/backpackApi';
+﻿import { createContext, useContext, useState, useEffect } from "react";
+import { fetchBackpack, toggleBackpackItem } from "../services/backpackApi";
+import { bigThree, bestSellers, latestUpdates } from "../data";
 
-const BackpackContext = createContext(null);
+const BackpackContext = createContext();
 
-const getToken = () => {
-  try {
-    return sessionStorage.getItem('mangahub_token');
-  } catch {
-    return null;
-  }
-};
-
-const loadLocal = () => {
-  try {
-    const saved = localStorage.getItem('mangahub_backpack');
-    return saved ? JSON.parse(saved) : [];
-  } catch {
-    return [];
-  }
-};
-
-const saveLocal = (items) => {
-  try {
-    localStorage.setItem('mangahub_backpack', JSON.stringify(items));
-  } catch {
-    // Intentionally empty: localStorage may be unavailable.
-  }
-};
+const allManga = [...bigThree, ...bestSellers, ...latestUpdates];
 
 export function BackpackProvider({ children }) {
-  const [backpack, setBackpack] = useState(loadLocal);
+  const [backpack, setBackpack] = useState([]);
 
-  const isAuthenticated = useCallback(() => !!getToken(), []);
-
-  // Fetch from backend on mount / auth state change.
+  // ۱. واکشی اولیه کوله‌پشتی از دیتابیس بک‌اند
   useEffect(() => {
     let mounted = true;
-    const load = async () => {
-      if (!isAuthenticated()) return;
+
+    async function loadBackpack() {
+      const token = localStorage.getItem("mangahub_token");
+      if (!token) return;
+
       try {
-        const data = await apiFetchBackpack();
-        const items = Array.isArray(data) ? data : (data && data.backpack ? data.backpack : []);
-        if (mounted) setBackpack(items);
-      } catch {
-        // Keep existing local state if the API is unavailable.
+        const ids = await fetchBackpack();
+        if (mounted && Array.isArray(ids)) {
+          // تطبیق آی‌دی‌های دیتابیس با دیتای کامل مانگاها برای نمایش در فرانت
+          const matchedManga = ids
+            .map((id) => allManga.find((m) => String(m.id) === String(id)))
+            .filter(Boolean);
+
+          setBackpack(matchedManga);
+        }
+      } catch (err) {
+        console.error("Failed to load backpack from API:", err);
       }
-    };
-    load();
+    }
+
+    loadBackpack();
     return () => {
       mounted = false;
     };
-  }, [isAuthenticated]);
-
-  // React to login/logout dispatched by UserContext.
-  useEffect(() => {
-    const handleUserUpdated = (e) => {
-      if (e.detail) {
-        apiFetchBackpack()
-          .then((data) => {
-            const items = Array.isArray(data) ? data : (data && data.backpack ? data.backpack : []);
-            setBackpack(items);
-          })
-          .catch(() => {});
-      } else {
-        setBackpack([]);
-        saveLocal([]);
-      }
-    };
-    window.addEventListener('user-updated', handleUserUpdated);
-    return () => {
-      window.removeEventListener('user-updated', handleUserUpdated);
-    };
   }, []);
 
-  const addToBackpack = useCallback(async (itemOrId) => {
-    const id = typeof itemOrId === 'object' && itemOrId !== null ? itemOrId.id : itemOrId;
-    const localItem = typeof itemOrId === 'object' && itemOrId !== null ? itemOrId : { id };
+  // ۲. افزودن به کوله‌پشتی و همگام‌سازی با بک‌اند
+  const addToBackpack = async (manga) => {
+    const mangaId = typeof manga === "object" ? manga.id : manga;
+    const mangaObj =
+      typeof manga === "object"
+        ? manga
+        : allManga.find((m) => String(m.id) === String(mangaId)) || {
+            id: Number(mangaId),
+          };
 
+    // آپدیت سریع فرانت‌اند
     setBackpack((prev) => {
-      if (prev.some((m) => String(m.id) === String(id))) return prev;
-      const next = [...prev, localItem];
-      if (!getToken()) saveLocal(next);
-      return next;
+      if (prev.some((item) => String(item.id) === String(mangaId))) return prev;
+      return [...prev, mangaObj];
     });
 
-    if (getToken()) {
-      try {
-        await apiAddToBackpack(id);
-      } catch {
-        // API failed; local optimistic state is preserved.
-      }
+    // ارسال درخواست POST به سرور
+    try {
+      await toggleBackpackItem(mangaId);
+    } catch (err) {
+      console.error("Failed to sync addToBackpack with backend:", err);
     }
-  }, []);
+  };
 
-  const removeFromBackpack = useCallback(async (id) => {
-    setBackpack((prev) => {
-      const next = prev.filter((m) => String(m.id) !== String(id));
-      if (!getToken()) saveLocal(next);
-      return next;
-    });
+  // ۳. حذف از کوله‌پشتی و همگام‌سازی با بک‌اند
+  const removeFromBackpack = async (itemOrId) => {
+    const mangaId = typeof itemOrId === "object" ? itemOrId.id : itemOrId;
 
-    if (getToken()) {
-      try {
-        await apiRemoveFromBackpack(id);
-      } catch {
-        // API failed; local optimistic state is preserved.
-      }
+    // آپدیت سریع فرانت‌اند
+    setBackpack((prev) =>
+      prev.filter((item) => String(item.id) !== String(mangaId)),
+    );
+
+    // ارسال درخواست POST به سرور جهت حذف
+    try {
+      await toggleBackpackItem(mangaId);
+    } catch (err) {
+      console.error("Failed to sync removeFromBackpack with backend:", err);
     }
-  }, []);
+  };
 
-  const isInBackpack = useCallback((id) => {
-    return backpack.some((m) => String(m.id) === String(id));
-  }, [backpack]);
+  const isInBackpack = (id) => {
+    return backpack.some((item) => String(item.id) === String(id));
+  };
 
   return (
     <BackpackContext.Provider
-      value={{ backpack, setBackpack, addToBackpack, removeFromBackpack, isInBackpack }}
+      value={{
+        backpack,
+        addToBackpack,
+        removeFromBackpack,
+        isInBackpack,
+      }}
     >
       {children}
     </BackpackContext.Provider>
@@ -130,9 +100,7 @@ export function BackpackProvider({ children }) {
 export function useBackpack() {
   const context = useContext(BackpackContext);
   if (!context) {
-    throw new Error('useBackpack must be used within a BackpackProvider');
+    throw new Error("useBackpack must be used within a BackpackProvider");
   }
   return context;
 }
-
-export default BackpackProvider;

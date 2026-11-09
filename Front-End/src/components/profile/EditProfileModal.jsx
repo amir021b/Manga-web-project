@@ -1,16 +1,19 @@
-import { useState, useEffect } from 'react';
-import { X, User, Camera, ZoomIn } from 'lucide-react';
-import FloatingInput from '../ui/FloatingInput';
-import Button from '../ui/Button';
-import useAvatarCrop from '../../hooks/useAvatarCrop';
-import { updateProfile } from '../../services/userApi';
-import { useToast } from '../../context/ToastContext';
+import { useState, useEffect } from "react";
+import { X, User, Camera, ZoomIn } from "lucide-react";
+import FloatingInput from "../ui/FloatingInput";
+import Button from "../ui/Button";
+import useAvatarCrop from "../../hooks/useAvatarCrop";
 
 function EditProfileModal({ user, onSave, onClose }) {
-  const [form, setForm] = useState({ username: '', email: '', bio: '' });
+  // ۱. مقداردهی اولیه اینپوت‌ها با اطلاعات فعلی کاربر
+  const [form, setForm] = useState({
+    username: user?.username || "",
+    bio: user?.bio || "",
+  });
+
   const [isExiting, setIsExiting] = useState(false);
   const [saving, setSaving] = useState(false);
-  const { addToast } = useToast();
+
   const {
     avatarFile,
     setAvatarFile,
@@ -23,8 +26,18 @@ function EditProfileModal({ user, onSave, onClose }) {
     handlePanMove,
     handlePanEnd,
     handleZoom,
+    cropImage,
     transform,
   } = useAvatarCrop(user?.avatar);
+
+  useEffect(() => {
+    if (user) {
+      setForm({
+        username: user.username || "",
+        bio: user.bio || "",
+      });
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!isExiting) return;
@@ -39,27 +52,42 @@ function EditProfileModal({ user, onSave, onClose }) {
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
+
     try {
-      const updated = await updateProfile({
+      let avatar = user?.avatar || null;
+      if (avatarFile) {
+        const cropped = await cropImage();
+        avatar = cropped || avatarPreview;
+      } else if (avatarPreview && avatarPreview !== user?.avatar) {
+        const cropped = await cropImage();
+        if (cropped) avatar = cropped;
+      }
+
+      // ارسال مستقیم اطلاعات کامل به تابع handleSave در ProfilePage
+      await onSave({
+        username: form.username.trim() || user?.username,
         bio: form.bio,
-        avatar: avatarFile,
+        avatar,
       });
-      onSave(updated);
-      addToast('Profile updated', 'Your changes have been saved.');
-    } catch (err) {
-      addToast('Update failed', err.message || 'Could not save changes.');
-    } finally {
-      setSaving(false);
+
       if (avatarPreview && avatarFile) URL.revokeObjectURL(avatarPreview);
       setAvatarFile(null);
       setAvatarPreview(null);
       resetCrop();
       handleClose();
+    } catch (err) {
+      console.error("Failed to save profile:", err);
+    } finally {
+      setSaving(false);
     }
   };
 
-  const backdropClass = `fixed inset-0 z-60 flex items-center justify-center px-4 backdrop-blur-sm ${isExiting ? 'backdrop-fade-out' : 'backdrop-fade-in'}`;
-  const modalClass = `relative w-full max-w-md overflow-hidden rounded-[22px] border border-[var(--mh-border)] bg-[var(--mh-gradient-bg)] p-6 backdrop-blur-[5px] backdrop-saturate-[130%] backdrop-brightness-[1.4] shadow-[var(--mh-shadow-strong)] sm:p-8 ${isExiting ? 'modal-fade-out' : 'modal-fade-in'}`;
+  const backdropClass = `fixed inset-0 z-60 flex items-center justify-center px-4 backdrop-blur-sm ${
+    isExiting ? "backdrop-fade-out" : "backdrop-fade-in"
+  }`;
+  const modalClass = `relative w-full max-w-md overflow-hidden rounded-[22px] border border-[var(--mh-border)] bg-[var(--mh-gradient-bg)] p-6 backdrop-blur-[5px] backdrop-saturate-[130%] backdrop-brightness-[1.4] shadow-[var(--mh-shadow-strong)] sm:p-8 ${
+    isExiting ? "modal-fade-out" : "modal-fade-in"
+  }`;
 
   return (
     <div className={backdropClass} onClick={handleClose}>
@@ -75,7 +103,8 @@ function EditProfileModal({ user, onSave, onClose }) {
 
         <form onSubmit={handleSave} className="mt-6 space-y-4">
           <div className="flex flex-col items-center gap-3">
-            <div className="relative h-40 w-40 cursor-grab overflow-hidden rounded-full border-2 border-[var(--mh-border)] bg-[var(--mh-surface)] shadow-[0_0_24px_rgba(0,0,0,0.15)] active:cursor-grabbing"
+            <div
+              className="relative h-40 w-40 cursor-grab overflow-hidden rounded-full border-2 border-[var(--mh-border)] bg-[var(--mh-surface)] shadow-[0_0_24px_rgba(0,0,0,0.15)] active:cursor-grabbing"
               onMouseDown={handlePanStart}
               onMouseMove={handlePanMove}
               onMouseUp={handlePanEnd}
@@ -130,7 +159,9 @@ function EditProfileModal({ user, onSave, onClose }) {
             label="Username"
             type="text"
             value={form.username}
-            onChange={(e) => setForm((f) => ({ ...f, username: e.target.value }))}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, username: e.target.value }))
+            }
             placeholder="yourname"
           />
           <FloatingInput
@@ -152,7 +183,9 @@ function EditProfileModal({ user, onSave, onClose }) {
               Cancel
             </button>
             <div className="flex-1">
-              <Button type="submit" loading={saving} loadingLabel="Saving…">Save Changes</Button>
+              <Button type="submit" loading={saving} loadingLabel="Saving…">
+                Save Changes
+              </Button>
             </div>
           </div>
         </form>

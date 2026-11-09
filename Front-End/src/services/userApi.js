@@ -1,38 +1,43 @@
-const API_BASE = import.meta.env.VITE_API_BASE || '';
-const PROFILE_ENDPOINT = `${API_BASE}/api/user/profile`;
-
-const authHeaders = () => {
-  const token = sessionStorage.getItem('mangahub_token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
-
-const handleResponse = async (res) => {
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || 'Request failed');
-  }
-  const text = await res.text();
-  return text ? JSON.parse(text) : null;
-};
+const API_URL = "http://localhost:5000/api/users";
 
 export async function fetchProfile() {
-  const res = await fetch(PROFILE_ENDPOINT, {
-    method: 'GET',
-    headers: authHeaders(),
-  });
-  return handleResponse(res);
+  const token = localStorage.getItem("mangahub_token");
+  if (!token) return null;
+
+  try {
+    const res = await fetch(`${API_URL}/profile`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) return null;
+    const result = await res.json();
+    return result.data?.user || result.data;
+  } catch (err) {
+    console.error("Failed to fetch profile:", err);
+    return null;
+  }
 }
 
-export async function updateProfile({ bio, avatar }) {
-  const formData = new FormData();
-  if (bio !== undefined) formData.append('bio', bio);
-  if (avatar) formData.append('avatar', avatar);
+export async function updateProfile(userData) {
+  const token = localStorage.getItem("mangahub_token");
+  if (!token) throw new Error("No token found");
 
-  const res = await fetch(PROFILE_ENDPOINT, {
-    method: 'PUT',
-    headers: authHeaders(),
-    body: formData,
+  const res = await fetch(`${API_URL}/profile`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      username: userData.username,
+      bio: userData.bio,
+      avatar: userData.avatar,
+    }),
   });
 
-  return handleResponse(res);
+  const result = await res.json();
+  if (!res.ok) throw new Error(result.message || "Failed to update profile");
+  return result.data?.user || result.data;
 }
