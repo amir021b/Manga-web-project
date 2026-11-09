@@ -10,7 +10,7 @@ function Layout({ children }) {
   const showHeader = !HIDDEN_HEADER_PATHS.includes(pathname);
 
   return (
-    <div className="relative min-h-screen flex flex-col">
+    <div className="relative min-h-screen flex flex-col bg-[var(--mh-bg)] text-[var(--mh-text)] transition-colors duration-300">
       <StarBackground />
       {showHeader && <Header />}
       <main className="relative z-10 grid min-h-screen place-items-center px-4 pt-24 pb-8 flex-grow">

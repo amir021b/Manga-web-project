@@ -9,7 +9,7 @@ import Button from '../ui/Button';
 import Checkbox from '../ui/Checkbox';
 import LinkButton from '../ui/LinkButton';
 import Collapse from '../ui/Collapse';
-import SuccessMessage from './SuccessMessage';
+import StarBackground from '../layout/StarBackground';
 import TermsDialog from './TermsDialog';
 
 function AuthCard() {
@@ -29,29 +29,22 @@ function AuthCard() {
     isFilled,
     handleChange,
     handleSubmit,
-    handleReset,
     openTerms,
     closeTerms,
     handleAcceptTerms,
     switchMode,
-    successRef,
   } = useAuthForm();
 
   if (isSuccess) {
     return (
-      <GlassCard>
-        <div className="mb-6">
-          <Logo isFilled={true} />
+      <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm">
+        <StarBackground />
+        <div className="relative z-10 flex flex-col items-center justify-center px-6 text-center">
+          <Logo isFilled={true} className="mb-6 animate-pulse" />
+          <h2 className="text-2xl font-bold text-white mb-2">Welcome to MangaHub</h2>
+          <p className="text-sm text-[#9a9a9a]">Redirecting you home...</p>
         </div>
-        <div ref={successRef} tabIndex={-1} className="outline-none">
-          <SuccessMessage
-            title={copy.successTitle}
-            message={copy.successMessage}
-            actionLabel={copy.successAction}
-            onAction={handleReset}
-          />
-        </div>
-      </GlassCard>
+      </div>
     );
   }
 

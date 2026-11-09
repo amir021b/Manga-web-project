@@ -8,8 +8,8 @@ const ToastContext = createContext(null);
 export const ToastProvider = ({ children }) => {
   const [toastMessage, setToastMessage] = useState(null);
 
-  const addToast = useCallback((message) => {
-    setToastMessage(message);
+  const addToast = useCallback((title, message = '') => {
+    setToastMessage({ title, message });
   }, []);
 
   const hideToast = useCallback(() => {
@@ -19,7 +19,9 @@ export const ToastProvider = ({ children }) => {
   return (
     <ToastContext.Provider value={{ addToast, hideToast }}>
       {children}
-      {toastMessage && <Toast message={toastMessage} onClose={hideToast} />}
+      {toastMessage && (
+        <Toast title={toastMessage.title} message={toastMessage.message} onClose={hideToast} />
+      )}
     </ToastContext.Provider>
   );
 };

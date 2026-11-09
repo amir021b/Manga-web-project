@@ -3,7 +3,7 @@ import { AUTH_MODES } from "../constants/authCopy";
 export function validateUsername(value) {
   const v = (value || "").trim();
   if (v === "") return "required";
-  if (v.length < 3 || v.length > 20) return "usernameFormat";
+  if (v.length < 4 || v.length > 20) return "usernameFormat";
   if (!/^[A-Za-z0-9_]+$/.test(v)) return "usernameFormat";
   return "";
 }
