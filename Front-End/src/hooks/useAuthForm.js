@@ -42,6 +42,8 @@ export function useAuthForm() {
     };
   }, []);
 
+  const { setCurrentUser } = useUser();
+
   // Reset form whenever the mode (URL) changes.
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
@@ -54,17 +56,6 @@ export function useAuthForm() {
     submittingRef.current = false;
     /* eslint-enable react-hooks/set-state-in-effect */
   }, [mode]);
-
-  // After a successful auth, wait 1.5s then navigate home.
-  useEffect(() => {
-    if (!isSuccess) return;
-    const timer = setTimeout(() => {
-      if (isMountedRef.current) {
-        navigate('/');
-      }
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, [isSuccess, navigate]);
 
   const copy = AUTH_COPY[mode];
   const isSignup = mode === AUTH_MODES.SIGNUP;
@@ -94,8 +85,6 @@ export function useAuthForm() {
     });
   };
 
-  const { setCurrentUser } = useUser();
-
   const handleSubmit = (event) => {
     if (event && typeof event.preventDefault === 'function') event.preventDefault();
     if (isSubmitting || submittingRef.current) return;
@@ -120,7 +109,14 @@ export function useAuthForm() {
           username: values.username || (values.email ? values.email.split('@')[0] : 'Manga Fan'),
           email: values.email,
         });
+        // Persist session and show welcome screen briefly, then navigate home.
         setStatus(STATUS.SUCCESS);
+        setTimeout(() => {
+          if (isMountedRef.current) {
+            setStatus(STATUS.IDLE);
+            navigate('/', { replace: true });
+          }
+        }, 1500);
       }
     }).catch((error) => {
       submittingRef.current = false;

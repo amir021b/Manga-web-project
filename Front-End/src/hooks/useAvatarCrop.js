@@ -1,8 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 
+const VIEWPORT = 160;
+
 function useAvatarCrop(initialAvatar = null) {
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(initialAvatar);
+  const [imgDims, setImgDims] = useState(null);
   const [crop, setCrop] = useState({ zoom: 1, x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
   const panStart = useRef({ x: 0, y: 0, cropX: 0, cropY: 0 });
@@ -13,7 +16,28 @@ function useAvatarCrop(initialAvatar = null) {
     };
   }, [avatarPreview, avatarFile]);
 
-  const resetCrop = () => setCrop({ zoom: 1, x: 0, y: 0 });
+  // Load image dimensions on avatar change and set initial fit scale so the
+  // entire image fits within the circular viewport instead of appearing zoomed in.
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => {
+      setImgDims({ width: img.naturalWidth, height: img.naturalHeight });
+      const fs = Math.min(VIEWPORT / img.naturalWidth, VIEWPORT / img.naturalHeight);
+      setCrop({ zoom: fs, x: 0, y: 0 });
+    };
+    img.onerror = () => {
+      setImgDims(null);
+      setCrop({ zoom: 1, x: 0, y: 0 });
+    };
+    img.src = avatarPreview || '';
+  }, [avatarPreview]);
+
+  const resetCrop = () => {
+    const fs = imgDims
+      ? Math.min(VIEWPORT / imgDims.width, VIEWPORT / imgDims.height)
+      : 1;
+    setCrop({ zoom: fs, x: 0, y: 0 });
+  };
 
   const handleAvatarChange = (e) => {
     const file = e.target.files?.[0];
@@ -21,7 +45,6 @@ function useAvatarCrop(initialAvatar = null) {
     if (avatarPreview && avatarFile) URL.revokeObjectURL(avatarPreview);
     setAvatarFile(file);
     setAvatarPreview(URL.createObjectURL(file));
-    resetCrop();
   };
 
   const handlePanStart = (e) => {
@@ -54,7 +77,6 @@ function useAvatarCrop(initialAvatar = null) {
   };
 
   const cropImage = () => {
-    const VIEWPORT = 160;
     return new Promise((resolve) => {
       if (!avatarPreview) return resolve(null);
       const img = new Image();

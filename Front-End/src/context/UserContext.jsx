@@ -5,15 +5,41 @@ const UserContext = createContext(null);
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
   const setCurrentUser = useCallback((nextUser) => {
+    try {
+      sessionStorage.setItem('mangahub_user', JSON.stringify(nextUser));
+    } catch {
+      // Intentionally empty: sessionStorage may be unavailable in some environments.
+    }
     setUser(nextUser);
     window.dispatchEvent(new CustomEvent('user-updated', { detail: nextUser }));
   }, []);
 
   const logout = useCallback(() => {
+    try {
+      sessionStorage.removeItem('mangahub_user');
+      sessionStorage.removeItem('mangahub_token');
+    } catch {
+      // Intentionally empty: sessionStorage may be unavailable in some environments.
+    }
     setUser(null);
     window.dispatchEvent(new CustomEvent('user-updated', { detail: null }));
+  }, []);
+
+  useEffect(() => {
+    const restoreSession = () => {
+      try {
+        const saved = sessionStorage.getItem('mangahub_user');
+        setUser(saved ? JSON.parse(saved) : null);
+      } catch {
+        setUser(null);
+      } finally {
+        setIsLoadingAuth(false);
+      }
+    };
+    restoreSession();
   }, []);
 
   useEffect(() => {
@@ -26,7 +52,7 @@ export function UserProvider({ children }) {
     };
   }, []);
 
-  const value = { user, setCurrentUser, logout, isLoggedIn: !!user };
+  const value = { user, setCurrentUser, logout, setIsLoadingAuth, isLoadingAuth, isLoggedIn: !!user };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }

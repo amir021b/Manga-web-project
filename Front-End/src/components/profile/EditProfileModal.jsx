@@ -107,7 +107,7 @@ function EditProfileModal({ user, onSave, onClose }) {
                 <ZoomIn className="h-4 w-4 shrink-0 text-[var(--mh-text-secondary)]/60" />
                 <input
                   type="range"
-                  min="1"
+                  min="0.1"
                   max="3"
                   step="0.01"
                   value={crop.zoom}
