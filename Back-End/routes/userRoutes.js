@@ -19,11 +19,9 @@ router.put(
   userController.updateUserSettings,
 );
 
-// روت‌های اصلی کوله‌پشتی
 router.get("/backpack", authMiddleware.protect, userController.getBackpack);
 router.post("/backpack", authMiddleware.protect, userController.toggleBackpack);
 
-// جهت اطمینان از عدم دریافت ارور 404 در صورت ارسال نام قدیمی
 router.get("/bookmarks", authMiddleware.protect, userController.getBackpack);
 router.post(
   "/bookmarks",
