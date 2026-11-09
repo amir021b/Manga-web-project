@@ -102,37 +102,45 @@ function ProfilePage() {
 
       <div className="mt-8">
         {activeTab === 'backpack' && (
-          <div className="flex flex-col items-center justify-center min-h-[300px] gap-3 rounded-2xl border border-[var(--mh-border)] bg-[var(--mh-surface)] text-center backdrop-blur-md">
-            {backpack.length === 0 ? (
-              <>
-                <Bookmark className="h-8 w-8 text-[var(--mh-text-secondary)]" />
-                <p className="mt-2 text-sm text-[var(--mh-text-secondary)]">Your Backpack is empty.</p>
-              </>
-            ) : (
-              <MangaGrid className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
-                {backpack.map((item) => (
-                  <MangaCard
-                    key={item.id}
-                    id={item.id}
-                    title={item.title}
-                    genre={item.genre}
-                    posterUrl={item.posterUrl}
-                    hoverLift={false}
-                  />
-                ))}
-              </MangaGrid>
-            )}
+          <div key="backpack" className="tab-content-in">
+            <div className="flex flex-col items-center justify-center min-h-[300px] gap-3 rounded-2xl border border-[var(--mh-border)] bg-[var(--mh-surface)] text-center backdrop-blur-md">
+              {backpack.length === 0 ? (
+                <>
+                  <Bookmark className="h-8 w-8 text-[var(--mh-text-secondary)]" />
+                  <p className="mt-2 text-sm text-[var(--mh-text-secondary)]">Your Backpack is empty.</p>
+                </>
+              ) : (
+                <MangaGrid className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
+                  {backpack.map((item) => (
+                    <MangaCard
+                      key={item.id}
+                      id={item.id}
+                      title={item.title}
+                      genre={item.genre}
+                      posterUrl={item.posterUrl}
+                      hoverLift={false}
+                    />
+                  ))}
+                </MangaGrid>
+              )}
+            </div>
           </div>
         )}
 
         {activeTab === 'history' && (
-          <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-[var(--mh-border)] bg-[var(--mh-surface)] py-16 text-center backdrop-blur-md">
-            <History className="h-8 w-8 text-[var(--mh-text-secondary)]" />
-            <p className="text-sm text-[var(--mh-text-secondary)]">No reading history yet.</p>
+          <div key="history" className="tab-content-in">
+            <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-[var(--mh-border)] bg-[var(--mh-surface)] py-16 text-center backdrop-blur-md">
+              <History className="h-8 w-8 text-[var(--mh-text-secondary)]" />
+              <p className="text-sm text-[var(--mh-text-secondary)]">No reading history yet.</p>
+            </div>
           </div>
         )}
 
-        {activeTab === 'settings' && <SettingsTab />}
+        {activeTab === 'settings' && (
+          <div key="settings" className="tab-content-in">
+            <SettingsTab />
+          </div>
+        )}
       </div>
 
       <div className="mt-12 flex justify-center">

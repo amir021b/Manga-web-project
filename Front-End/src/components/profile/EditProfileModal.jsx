@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, User, Camera, ZoomIn } from 'lucide-react';
 import FloatingInput from '../ui/FloatingInput';
 import Button from '../ui/Button';
@@ -6,6 +6,7 @@ import useAvatarCrop from '../../hooks/useAvatarCrop';
 
 function EditProfileModal({ user, onSave, onClose }) {
   const [form, setForm] = useState({ username: '', email: '', bio: '' });
+  const [isExiting, setIsExiting] = useState(false);
   const {
     avatarFile,
     setAvatarFile,
@@ -21,6 +22,16 @@ function EditProfileModal({ user, onSave, onClose }) {
     cropImage,
     transform,
   } = useAvatarCrop(user?.avatar);
+
+  useEffect(() => {
+    if (!isExiting) return;
+    const timer = setTimeout(() => onClose(), 220);
+    return () => clearTimeout(timer);
+  }, [isExiting, onClose]);
+
+  const handleClose = () => {
+    setIsExiting(true);
+  };
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -38,21 +49,18 @@ function EditProfileModal({ user, onSave, onClose }) {
     setAvatarFile(null);
     setAvatarPreview(null);
     resetCrop();
-    onClose();
+    handleClose();
   };
 
+  const backdropClass = `fixed inset-0 z-60 flex items-center justify-center px-4 backdrop-blur-sm ${isExiting ? 'backdrop-fade-out' : 'backdrop-fade-in'}`;
+  const modalClass = `relative w-full max-w-md overflow-hidden rounded-[22px] border border-[var(--mh-border)] bg-[var(--mh-gradient-bg)] p-6 backdrop-blur-[5px] backdrop-saturate-[130%] backdrop-brightness-[1.4] shadow-[var(--mh-shadow-strong)] sm:p-8 ${isExiting ? 'modal-fade-out' : 'modal-fade-in'}`;
+
   return (
-    <div
-      className="fixed inset-0 z-60 flex items-center justify-center bg-black/80 px-4 backdrop-blur-sm"
-      onClick={onClose}
-    >
-      <div
-        className="relative w-full max-w-md overflow-hidden rounded-[22px] border border-[var(--mh-border)] bg-[var(--mh-gradient-bg)] p-6 backdrop-blur-[5px] backdrop-saturate-[130%] backdrop-brightness-[1.4] shadow-[var(--mh-shadow-strong)] sm:p-8"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <div className={backdropClass} onClick={handleClose}>
+      <div className={modalClass} onClick={(e) => e.stopPropagation()}>
         <button
           type="button"
-          onClick={onClose}
+          onClick={handleClose}
           aria-label="Close"
           className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface)] text-[var(--mh-text-secondary)] transition hover:bg-[var(--mh-surface-strong)] hover:text-[var(--mh-text)]"
         >
@@ -132,7 +140,7 @@ function EditProfileModal({ user, onSave, onClose }) {
           <div className="flex gap-3 pt-2">
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               className="flex-1 rounded-[11px] border border-[var(--mh-border)] bg-[var(--mh-surface)] px-4 py-3 text-sm font-semibold text-[var(--mh-text)] transition hover:bg-[var(--mh-surface-strong)] hover:text-[var(--mh-text)]"
             >
               Cancel

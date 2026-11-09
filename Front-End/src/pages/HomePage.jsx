@@ -48,14 +48,16 @@ function HomePage({ backgroundImage = null }) {
           <div className="relative z-10 text-center">
             <div className="flex justify-center">
               <MangaGrid className="max-w-[768px] w-full mx-auto">
-                {mangaItems.map((item) => (
-                  <MangaCard
-                    key={item.id}
-                    id={item.id}
-                    title={item.title}
-                    genre={item.genre}
-                    posterUrl={item.posterUrl}
-                  />
+                {mangaItems.map((item, idx) => (
+                  <div key={item.id} className="fade-up" style={{ animationDelay: `${idx * 100}ms` }}>
+                    <MangaCard
+                      key={item.id}
+                      id={item.id}
+                      title={item.title}
+                      genre={item.genre}
+                      posterUrl={item.posterUrl}
+                    />
+                  </div>
                 ))}
               </MangaGrid>
             </div>
@@ -91,14 +93,16 @@ function HomePage({ backgroundImage = null }) {
             className="pt-6"
           />
           <MangaGrid>
-            {bigThree.map((item) => (
-              <MangaCard
-                key={item.id}
-                id={item.id}
-                title={item.title}
-                genre={item.genre}
-                posterUrl={item.posterUrl}
-              />
+            {bigThree.map((item, idx) => (
+              <div key={item.id} className="fade-up" style={{ animationDelay: `${idx * 100}ms` }}>
+                <MangaCard
+                  key={item.id}
+                  id={item.id}
+                  title={item.title}
+                  genre={item.genre}
+                  posterUrl={item.posterUrl}
+                />
+              </div>
             ))}
           </MangaGrid>
         </>
@@ -110,19 +114,21 @@ function HomePage({ backgroundImage = null }) {
             className="pt-6"
           />
           <MangaGrid>
-            {newUserBundle.map((item) => (
-              <MangaCard
-                key={item.id}
-                id={item.id}
-                title={item.title}
-                genre={item.genre}
-                posterUrl={item.posterUrl}
-                badge={
-                  <span className="absolute top-3 left-3 z-20 rounded-full border border-red-400/40 bg-red-500/20 px-3 py-1 text-xs font-bold uppercase tracking-wide text-red-200 backdrop-blur-md shadow-[0_0_20px_rgba(239,68,68,0.25)]">
-                    50% OFF
-                  </span>
-                }
-              />
+            {newUserBundle.map((item, idx) => (
+              <div key={item.id} className="fade-up" style={{ animationDelay: `${idx * 100}ms` }}>
+                <MangaCard
+                  key={item.id}
+                  id={item.id}
+                  title={item.title}
+                  genre={item.genre}
+                  posterUrl={item.posterUrl}
+                  badge={
+                    <span className="absolute top-3 left-3 z-20 rounded-full border border-red-400/40 bg-red-500/20 px-3 py-1 text-xs font-bold uppercase tracking-wide text-red-200 backdrop-blur-md shadow-[0_0_20px_rgba(239,68,68,0.25)]">
+                      50% OFF
+                    </span>
+                  }
+                />
+              </div>
             ))}
           </MangaGrid>
         </>

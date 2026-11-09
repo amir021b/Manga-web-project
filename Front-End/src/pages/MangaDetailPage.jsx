@@ -65,7 +65,7 @@ function MangaDetailPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02),transparent_70%)]" />
 
         {/* Vertical Poster Card (centered vertically inside banner) */}
-        <div className="absolute left-8 top-1/2 -translate-y-1/2 z-40 w-[180px]">
+        <div className="fade-up absolute left-8 top-1/2 -translate-y-1/2 z-40 w-[180px]" style={{ animationDelay: '80ms' }}>
           <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-[var(--mh-border)] bg-[var(--mh-surface)] shadow-[var(--mh-shadow-strong)]">
             <div
               className="absolute inset-0 bg-cover bg-center"
@@ -85,56 +85,62 @@ function MangaDetailPage() {
         {/* Title, Metadata & Actions (right of poster, over banner background) */}
         <div className="absolute inset-0 z-30 flex flex-col items-start px-6 md:px-8 pt-16 pb-24 pl-56 md:pl-64">
           <div className="w-full flex-1">
-            <h2 className="text-[10px] font-bold uppercase tracking-widest text-[var(--mh-accent)] mb-1">
-              Manga
-            </h2>
-            <h1 className="text-4xl md:text-5xl font-bold text-[var(--mh-text)] tracking-tight leading-[1.1] mb-3">
-              {manga.title}
-            </h1>
-            <p className="text-[11px] font-medium italic text-[var(--mh-text-secondary)]/70 mb-6 md:mb-8 max-w-md">
-              {detail.synopsis ? detail.synopsis.split('. ').slice(0, 2).join('. ') + '.' : 'A dark fantasy masterpiece.'}
-            </p>
-
-            <div className="flex flex-wrap items-center gap-3 md:gap-5 mb-6 md:mb-8">
-              <span
-                className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface)] text-xs font-bold text-[var(--mh-text-secondary)]"
-              >
-                {detail.rating || '—'}
-              </span>
-              <span
-                className="px-2.5 py-0.5 rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface)] text-xs text-[var(--mh-text-secondary)]"
-              >
-                {detail.author || 'Unknown Author'}
-              </span>
-              <span
-                className="px-2.5 py-0.5 rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface)] text-xs text-[var(--mh-text-secondary)]"
-              >
-                {detail.status || '—'}
-              </span>
-              {genreTags.map((tag, i) => (
-                <span
-                  key={i}
-                  className="px-2.5 py-0.5 rounded-full border border-[var(--mh-border-soft)] bg-[var(--mh-surface-strong)]/50 text-xs font-medium uppercase tracking-wider text-[var(--mh-text-secondary)]"
-                >
-                  {tag}
-                </span>
-              ))}
+            <div className="fade-up" style={{ animationDelay: '160ms' }}>
+              <h2 className="text-[10px] font-bold uppercase tracking-widest text-[var(--mh-accent)] mb-1">
+                Manga
+              </h2>
+              <h1 className="text-4xl md:text-5xl font-bold text-[var(--mh-text)] tracking-tight leading-[1.1] mb-3">
+                {manga.title}
+              </h1>
+              <p className="text-[11px] font-medium italic text-[var(--mh-text-secondary)]/70 mb-6 md:mb-8 max-w-md">
+                {detail.synopsis ? detail.synopsis.split('. ').slice(0, 2).join('. ') + '.' : 'A dark fantasy masterpiece.'}
+              </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Link
-                to={`/manga/${mangaId}/chapter/1`}
-                className="w-full sm:w-auto flex-1 h-12 rounded-[11px] bg-[#f2f2f2] text-black font-bold text-[15px] flex items-center justify-center shadow-[0_6px_24px_rgba(255,255,255,0.12)] transition-all duration-200 hover:bg-white hover:shadow-[0_6px_24px_rgba(255,255,255,0.25)] active:translate-y-[1px] text-center"
-              >
-                Start Reading
-              </Link>
-              <button
-                onClick={handleSave}
-                aria-label={saved ? 'Remove from backpack' : 'Add to backpack'}
-                className="w-full sm:w-auto flex-1 h-12 rounded-[11px] border border-[var(--mh-border)] bg-[var(--mh-surface)] text-[var(--mh-text)] font-bold text-[15px] transition-all duration-200 hover:bg-[var(--mh-surface-strong)] active:translate-y-[1px] text-center"
-              >
-                {saved ? 'Remove from Backpack' : 'Save to Backpack'}
-              </button>
+            <div className="fade-up" style={{ animationDelay: '240ms' }}>
+              <div className="flex flex-wrap items-center gap-3 md:gap-5 mb-6 md:mb-8">
+                <span
+                  className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface)] text-xs font-bold text-[var(--mh-text-secondary)]"
+                >
+                  {detail.rating || '—'}
+                </span>
+                <span
+                  className="px-2.5 py-0.5 rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface)] text-xs text-[var(--mh-text-secondary)]"
+                >
+                  {detail.author || 'Unknown Author'}
+                </span>
+                <span
+                  className="px-2.5 py-0.5 rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface)] text-xs text-[var(--mh-text-secondary)]"
+                >
+                  {detail.status || '—'}
+                </span>
+                {genreTags.map((tag, i) => (
+                  <span
+                    key={i}
+                    className="px-2.5 py-0.5 rounded-full border border-[var(--mh-border-soft)] bg-[var(--mh-surface-strong)]/50 text-xs font-medium uppercase tracking-wider text-[var(--mh-text-secondary)]"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="fade-up" style={{ animationDelay: '300ms' }}>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link
+                  to={`/manga/${mangaId}/chapter/1`}
+                  className="w-full sm:w-auto flex-1 h-12 rounded-[11px] bg-[#f2f2f2] text-black font-bold text-[15px] flex items-center justify-center shadow-[0_6px_24px_rgba(255,255,255,0.12)] transition-all duration-200 hover:bg-white hover:shadow-[0_6px_24px_rgba(255,255,255,0.25)] active:translate-y-[1px] text-center"
+                >
+                  Start Reading
+                </Link>
+                <button
+                  onClick={handleSave}
+                  aria-label={saved ? 'Remove from backpack' : 'Add to backpack'}
+                  className="w-full sm:w-auto flex-1 h-12 rounded-[11px] border border-[var(--mh-border)] bg-[var(--mh-surface)] text-[var(--mh-text)] font-bold text-[15px] transition-all duration-200 hover:bg-[var(--mh-surface-strong)] active:translate-y-[1px] text-center"
+                >
+                  {saved ? 'Remove from Backpack' : 'Save to Backpack'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -143,7 +149,7 @@ function MangaDetailPage() {
       <div className="max-w-5xl mx-auto mt-16">
         {/* Synopsis */}
         {detail.synopsis && (
-          <section className="mb-16">
+          <section className="fade-up mb-16" style={{ animationDelay: '390ms' }}>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold uppercase tracking-widest text-[var(--mh-text-secondary)] border-b border-[var(--mh-border)] pb-3">
                 Synopsis
@@ -156,7 +162,7 @@ function MangaDetailPage() {
         )}
 
         {/* Chapter List */}
-        <section className="mb-8 w-full">
+        <section className="fade-up mb-8 w-full" style={{ animationDelay: '450ms' }}>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold uppercase tracking-widest text-[var(--mh-text-secondary)] border-b border-[var(--mh-border)] pb-3">
               Chapters ({chapters.length})

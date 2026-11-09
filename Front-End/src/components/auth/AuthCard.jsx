@@ -49,156 +49,157 @@ function AuthCard() {
   }
 
   return (
-    <GlassCard>
-      <div className="mb-6">
-        <Logo isFilled={isFilled} />
-      </div>
-      <AuthTabs mode={mode} onChange={switchMode} disabled={isSubmitting} />
-      <div>
-        <h1 className="text-2xl font-bold text-white mb-1.5">{copy.title}</h1>
-        <p className="text-sm text-[#9a9a9a] mb-6">{copy.subtitle}</p>
-      </div>
-      <form noValidate onSubmit={handleSubmit}>
-        <Collapse open={isSignup}>
-          <div className="pb-5">
-            <FloatingInput
-              key={mode}
-              id="username"
-              name="username"
-              label="Username"
-              type="text"
-              value={values.username}
-              onChange={handleChange("username")}
-              placeholder="yourname"
-              autoComplete="nickname"
-              disabled={isSubmitting || !isSignup}
-              error={errors.username ? ERROR_MESSAGES[errors.username] : undefined}
-            />
-          </div>
-        </Collapse>
-
-        <div className="pb-5">
-          <FloatingInput
-            key={mode}
-            id="email"
-            name="email"
-            label="Email"
-            type="email"
-            value={values.email}
-            onChange={handleChange("email")}
-            placeholder="you@example.com"
-            autoComplete={isSignup ? "email" : "username"}
-            disabled={isSubmitting}
-            error={errors.email ? ERROR_MESSAGES[errors.email] : undefined}
-          />
+    <div className="auth-card-in">
+      <GlassCard>
+        <div className="fade-up mb-6" style={{ animationDelay: '80ms' }}>
+          <Logo isFilled={isFilled} />
         </div>
-
-        <div className={isSignup ? "pb-5" : "pb-2"}>
-          <FloatingInput
-            key={mode}
-            id="password"
-            name="password"
-            label="Password"
-            type={showPassword ? "text" : "password"}
-            value={values.password}
-            onChange={handleChange("password")}
-            placeholder="At least 8 characters"
-            autoComplete={isSignup ? "new-password" : "current-password"}
-            disabled={isSubmitting}
-            endAdornment={
-              <PasswordToggle
-                visible={showPassword}
-                onToggle={() => setShowPassword((prev) => !prev)}
-                disabled={isSubmitting}
-              />
-            }
-            error={errors.password ? ERROR_MESSAGES[errors.password] : undefined}
-          />
+        <div className="fade-up mb-6" style={{ animationDelay: '120ms' }}>
+          <AuthTabs mode={mode} onChange={switchMode} disabled={isSubmitting} />
         </div>
-
-        <Collapse open={isSignup}>
-          <div className="pb-5">
-            <FloatingInput
-              key={mode}
-              id="confirmPassword"
-              name="confirmPassword"
-              label="Confirm password"
-              type={showConfirm ? "text" : "password"}
-              value={values.confirmPassword}
-              onChange={handleChange("confirmPassword")}
-              placeholder="At least 8 characters"
-              autoComplete="new-password"
-              disabled={isSubmitting || !isSignup}
-              endAdornment={
-                <PasswordToggle
-                  visible={showConfirm}
-                  onToggle={() => setShowConfirm((prev) => !prev)}
-                  disabled={isSubmitting}
+        <div key={mode} className="fade-up" style={{ animationDelay: '160ms' }}>
+          <h1 className="text-2xl font-bold text-white mb-1.5">{copy.title}</h1>
+          <p className="text-sm text-[#9a9a9a] mb-6">{copy.subtitle}</p>
+          <form noValidate onSubmit={handleSubmit} className="fade-up" style={{ animationDelay: '200ms' }}>
+            <Collapse open={isSignup}>
+              <div className="pb-5 fade-up" style={{ animationDelay: '220ms' }}>
+                <FloatingInput
+                  id="username"
+                  name="username"
+                  label="Username"
+                  type="text"
+                  value={values.username}
+                  onChange={handleChange("username")}
+                  placeholder="yourname"
+                  autoComplete="nickname"
+                  disabled={isSubmitting || !isSignup}
+                  error={errors.username ? ERROR_MESSAGES[errors.username] : undefined}
                 />
-              }
-              error={errors.confirmPassword ? ERROR_MESSAGES[errors.confirmPassword] : undefined}
-            />
-          </div>
-        </Collapse>
+              </div>
+            </Collapse>
 
-        <Collapse open={isSignup}>
-          <div className="pb-5">
-            <Checkbox
-              key={mode}
-              id="acceptTerms"
-              checked={values.acceptTerms}
-              onChange={handleChange("acceptTerms")}
-              label={TERMS_INTRO}
-              labelAction={
-                <>
-                  <LinkButton type="button" onClick={openTerms} disabled={isSubmitting}>
-                    {TERMS_LINK}
+            <div className="pb-5 fade-up" style={{ animationDelay: '260ms' }}>
+              <FloatingInput
+                id="email"
+                name="email"
+                label="Email"
+                type="email"
+                value={values.email}
+                onChange={handleChange("email")}
+                placeholder="you@example.com"
+                autoComplete={isSignup ? "email" : "username"}
+                disabled={isSubmitting}
+                error={errors.email ? ERROR_MESSAGES[errors.email] : undefined}
+              />
+            </div>
+
+            <div className={`fade-up ${isSignup ? "pb-5" : "pb-2"}`} style={{ animationDelay: '300ms' }}>
+              <FloatingInput
+                id="password"
+                name="password"
+                label="Password"
+                type={showPassword ? "text" : "password"}
+                value={values.password}
+                onChange={handleChange("password")}
+                placeholder="At least 8 characters"
+                autoComplete={isSignup ? "new-password" : "current-password"}
+                disabled={isSubmitting}
+                endAdornment={
+                  <PasswordToggle
+                    visible={showPassword}
+                    onToggle={() => setShowPassword((prev) => !prev)}
+                    disabled={isSubmitting}
+                  />
+                }
+                error={errors.password ? ERROR_MESSAGES[errors.password] : undefined}
+              />
+            </div>
+
+            <Collapse open={isSignup}>
+              <div className="pb-5 fade-up" style={{ animationDelay: '340ms' }}>
+                <FloatingInput
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  label="Confirm password"
+                  type={showConfirm ? "text" : "password"}
+                  value={values.confirmPassword}
+                  onChange={handleChange("confirmPassword")}
+                  placeholder="At least 8 characters"
+                  autoComplete="new-password"
+                  disabled={isSubmitting || !isSignup}
+                  endAdornment={
+                    <PasswordToggle
+                      visible={showConfirm}
+                      onToggle={() => setShowConfirm((prev) => !prev)}
+                      disabled={isSubmitting}
+                    />
+                  }
+                  error={errors.confirmPassword ? ERROR_MESSAGES[errors.confirmPassword] : undefined}
+                />
+              </div>
+            </Collapse>
+
+            <Collapse open={isSignup}>
+              <div className="pb-5 fade-up" style={{ animationDelay: '380ms' }}>
+                <Checkbox
+                  id="acceptTerms"
+                  checked={values.acceptTerms}
+                  onChange={handleChange("acceptTerms")}
+                  label={TERMS_INTRO}
+                  labelAction={
+                    <>
+                      <LinkButton type="button" onClick={openTerms} disabled={isSubmitting}>
+                        {TERMS_LINK}
+                      </LinkButton>
+                      .
+                    </>
+                  }
+                  disabled={isSubmitting}
+                  error={errors.acceptTerms ? ERROR_MESSAGES[errors.acceptTerms] : undefined}
+                />
+              </div>
+            </Collapse>
+
+            <Collapse open={!isSignup}>
+              <div className="pb-5 fade-up" style={{ animationDelay: '380ms' }}>
+                <div className="text-right">
+                  <LinkButton onClick={() => {}} disabled={isSubmitting}>
+                    {FORGOT_PASSWORD_TEXT}
                   </LinkButton>
-                  .
-                </>
-              }
-              disabled={isSubmitting}
-              error={errors.acceptTerms ? ERROR_MESSAGES[errors.acceptTerms] : undefined}
-            />
-          </div>
-        </Collapse>
+                </div>
+              </div>
+            </Collapse>
 
-        <Collapse open={!isSignup}>
-          <div className="pb-5">
-            <div className="text-right">
-              <LinkButton onClick={() => {}} disabled={isSubmitting}>
-                {FORGOT_PASSWORD_TEXT}
+            <Button
+              type="submit"
+              loading={isSubmitting}
+              loadingLabel={copy.loadingLabel}
+              className="fade-up mt-2"
+              style={{ animationDelay: '420ms' }}
+            >
+              {copy.submitLabel}
+            </Button>
+
+            <div className="text-center mt-5 fade-up" style={{ animationDelay: '460ms' }}>
+              <span className="text-[#9a9a9a] text-[13.5px]">{copy.swapText}</span>{" "}
+              <LinkButton
+                onClick={() => switchMode(isSignup ? AUTH_MODES.LOGIN : AUTH_MODES.SIGNUP)}
+                disabled={isSubmitting}
+              >
+                {copy.swapAction}
               </LinkButton>
             </div>
-          </div>
-        </Collapse>
-
-        <Button
-          type="submit"
-          loading={isSubmitting}
-          loadingLabel={copy.loadingLabel}
-        >
-          {copy.submitLabel}
-        </Button>
-
-        <div className="text-center mt-5">
-          <span className="text-[#9a9a9a] text-[13.5px]">{copy.swapText}</span>{" "}
-          <LinkButton
-            onClick={() => switchMode(isSignup ? AUTH_MODES.LOGIN : AUTH_MODES.SIGNUP)}
-            disabled={isSubmitting}
-          >
-            {copy.swapAction}
-          </LinkButton>
+          </form>
         </div>
-      </form>
-      {isSignup ? (
-        <TermsDialog
-          open={isTermsOpen}
-          onClose={closeTerms}
-          onAccept={handleAcceptTerms}
-        />
-      ) : null}
-    </GlassCard>
+        {isSignup ? (
+          <TermsDialog
+            open={isTermsOpen}
+            onClose={closeTerms}
+            onAccept={handleAcceptTerms}
+          />
+        ) : null}
+      </GlassCard>
+    </div>
   );
 }
 
