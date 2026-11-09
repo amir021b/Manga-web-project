@@ -6,6 +6,7 @@ import SettingsTab from '../components/settings/SettingsTab';
 import EditProfileModal from '../components/profile/EditProfileModal';
 import { useBackpack } from '../context/BackpackContext';
 import { useUser } from '../context/UserContext';
+import { fetchProfile } from '../services/userApi';
 import { User, Pencil, Bookmark, History, Settings as SettingsIcon, LogOut } from 'lucide-react';
 
 const TABS = [
@@ -26,6 +27,23 @@ function ProfilePage() {
       navigate('/login', { replace: true });
     }
   }, [isLoggedIn, navigate]);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadProfile = async () => {
+      if (!isLoggedIn) return;
+      try {
+        const data = await fetchProfile();
+        if (mounted && data) setCurrentUser(data);
+      } catch {
+        // Keep existing session user if the profile fetch fails.
+      }
+    };
+    loadProfile();
+    return () => {
+      mounted = false;
+    };
+  }, [isLoggedIn, setCurrentUser]);
 
   const handleSave = (next) => {
     setCurrentUser(next);

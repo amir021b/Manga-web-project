@@ -4,12 +4,27 @@ import Button from '../ui/Button';
 import FloatingInput from '../ui/FloatingInput';
 import PasswordToggle from '../ui/PasswordToggle';
 import usePasswordForm from '../../hooks/usePasswordForm';
+import { changePassword, updateEmail } from '../../services/settingsApi';
+import { useToast } from '../../context/ToastContext';
 
-function AccountSection({ user, setCurrentUser, addToast, setBackpack, navigate }) {
+function AccountSection({ user, setCurrentUser, setBackpack, navigate }) {
   const [newEmail, setNewEmail] = useState('');
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const { addToast } = useToast();
 
   const email = user?.email || 'user@mangahub.com';
+
+  const handlePasswordSave = async () => {
+    try {
+      await changePassword({
+        currentPassword: passwords.current,
+        newPassword: passwords.new,
+      });
+      addToast('Password updated');
+    } catch (err) {
+      addToast('Password update failed', err.message || 'Could not update password.');
+    }
+  };
 
   const {
     passwords,
@@ -18,9 +33,9 @@ function AccountSection({ user, setCurrentUser, addToast, setBackpack, navigate 
     handleSubmit,
     handleChange,
     toggleVisibility,
-  } = usePasswordForm({ onSave: () => addToast('Password updated') });
+  } = usePasswordForm({ onSave: handlePasswordSave });
 
-  const handleUpdateEmail = (e) => {
+  const handleUpdateEmail = async (e) => {
     e.preventDefault();
     e.stopPropagation();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -28,10 +43,14 @@ function AccountSection({ user, setCurrentUser, addToast, setBackpack, navigate 
       addToast('Invalid email', 'Please enter a valid email address');
       return;
     }
-    const nextUser = { ...user, email: newEmail };
-    setCurrentUser(nextUser);
-    addToast('Email updated');
-    setNewEmail('');
+    try {
+      await updateEmail({ email: newEmail });
+      setCurrentUser({ ...user, email: newEmail });
+      addToast('Email updated');
+      setNewEmail('');
+    } catch (err) {
+      addToast('Email update failed', err.message || 'Could not update email.');
+    }
   };
 
   const handleDeleteAccount = () => {

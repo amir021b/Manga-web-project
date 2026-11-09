@@ -3,10 +3,14 @@ import { X, User, Camera, ZoomIn } from 'lucide-react';
 import FloatingInput from '../ui/FloatingInput';
 import Button from '../ui/Button';
 import useAvatarCrop from '../../hooks/useAvatarCrop';
+import { updateProfile } from '../../services/userApi';
+import { useToast } from '../../context/ToastContext';
 
 function EditProfileModal({ user, onSave, onClose }) {
   const [form, setForm] = useState({ username: '', email: '', bio: '' });
   const [isExiting, setIsExiting] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const { addToast } = useToast();
   const {
     avatarFile,
     setAvatarFile,
@@ -19,7 +23,6 @@ function EditProfileModal({ user, onSave, onClose }) {
     handlePanMove,
     handlePanEnd,
     handleZoom,
-    cropImage,
     transform,
   } = useAvatarCrop(user?.avatar);
 
@@ -35,21 +38,24 @@ function EditProfileModal({ user, onSave, onClose }) {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    let avatar = user?.avatar || null;
-    if (avatarFile) {
-      const cropped = await cropImage();
-      avatar = cropped || avatarPreview;
-    } else if (avatarPreview && avatarPreview !== user?.avatar) {
-      const cropped = await cropImage();
-      if (cropped) avatar = cropped;
+    setSaving(true);
+    try {
+      const updated = await updateProfile({
+        bio: form.bio,
+        avatar: avatarFile,
+      });
+      onSave(updated);
+      addToast('Profile updated', 'Your changes have been saved.');
+    } catch (err) {
+      addToast('Update failed', err.message || 'Could not save changes.');
+    } finally {
+      setSaving(false);
+      if (avatarPreview && avatarFile) URL.revokeObjectURL(avatarPreview);
+      setAvatarFile(null);
+      setAvatarPreview(null);
+      resetCrop();
+      handleClose();
     }
-    const next = { ...(user || {}), username: form.username, email: form.email, bio: form.bio, avatar };
-    onSave(next);
-    if (avatarPreview && avatarFile) URL.revokeObjectURL(avatarPreview);
-    setAvatarFile(null);
-    setAvatarPreview(null);
-    resetCrop();
-    handleClose();
   };
 
   const backdropClass = `fixed inset-0 z-60 flex items-center justify-center px-4 backdrop-blur-sm ${isExiting ? 'backdrop-fade-out' : 'backdrop-fade-in'}`;
@@ -146,7 +152,7 @@ function EditProfileModal({ user, onSave, onClose }) {
               Cancel
             </button>
             <div className="flex-1">
-              <Button type="submit">Save Changes</Button>
+              <Button type="submit" loading={saving} loadingLabel="Saving…">Save Changes</Button>
             </div>
           </div>
         </form>
