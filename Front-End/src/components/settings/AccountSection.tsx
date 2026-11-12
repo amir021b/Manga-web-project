@@ -11,12 +11,17 @@ import { useToast } from '../../context/ToastContext';
 import type { UserData } from '../../context/UserContext';
 import type { MangaItem } from '../../data/bigThree';
 
+interface Router {
+  push: (href: string) => void;
+  replace: (href: string) => void;
+}
+
 interface AccountSectionProps {
   user: UserData | null | undefined;
   setCurrentUser: (nextUser: UserData | null) => void;
   setBackpack: (backpack: MangaItem[]) => void;
   addToast: (title: string, message?: string) => void;
-  router: any;
+  router: Router;
 }
 
 function AccountSection({ user, setCurrentUser, setBackpack, router }: AccountSectionProps) {
@@ -33,8 +38,9 @@ function AccountSection({ user, setCurrentUser, setBackpack, router }: AccountSe
         newPassword: passwords.new,
       });
       addToast('Password updated');
-    } catch (err: any) {
-      addToast('Password update failed', err.message || 'Could not update password.');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Could not update password.';
+      addToast('Password update failed', message);
     }
   };
 
@@ -60,8 +66,9 @@ function AccountSection({ user, setCurrentUser, setBackpack, router }: AccountSe
       setCurrentUser({ ...user, email: newEmail } as UserData);
       addToast('Email updated');
       setNewEmail('');
-    } catch (err: any) {
-      addToast('Email update failed', err.message || 'Could not update email.');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Could not update email.';
+      addToast('Email update failed', message);
     }
   };
 

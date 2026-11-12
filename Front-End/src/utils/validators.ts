@@ -34,7 +34,7 @@ export function validateTerms(accepted: boolean) {
   return accepted ? "" : "termsRequired";
 }
 
-export function validateForm(values: Record<string, any>, mode: string) {
+export function validateForm(values: { username?: string; email: string; password: string; confirmPassword?: string; acceptTerms?: boolean }, mode: string) {
   const errors: Record<string, string> = {};
   if (mode === AUTH_MODES.LOGIN) {
     const emailErr = validateEmail(values.email);
@@ -42,15 +42,15 @@ export function validateForm(values: Record<string, any>, mode: string) {
     const pwd = values.password || "";
     if (pwd.trim() === "") errors.password = "required";
   } else {
-    const usernameErr = validateUsername(values.username);
+    const usernameErr = validateUsername(values.username || '');
     if (usernameErr) errors.username = usernameErr;
     const emailErr = validateEmail(values.email);
     if (emailErr) errors.email = emailErr;
     const passwordErr = validatePassword(values.password);
     if (passwordErr) errors.password = passwordErr;
-    const confirmErr = validateConfirmPassword(values.confirmPassword, values.password);
+    const confirmErr = validateConfirmPassword(values.confirmPassword || '', values.password);
     if (confirmErr) errors.confirmPassword = confirmErr;
-    const termsErr = validateTerms(values.acceptTerms);
+    const termsErr = validateTerms(values.acceptTerms === true);
     if (termsErr) errors.acceptTerms = termsErr;
   }
   return errors;

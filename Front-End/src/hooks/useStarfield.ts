@@ -43,10 +43,33 @@ function createShootingStar(width: number, height: number) {
   }
 }
 
+interface Star {
+  x: number
+  y: number
+  radius: number
+  alpha: number
+  brightness: number
+  isBig: boolean
+  speed: number
+  phase: number
+  speedFactor: number
+}
+
+interface ShootingStar {
+  x: number
+  y: number
+  dirX: number
+  dirY: number
+  speed: number
+  length: number
+  life: number
+  maxLife: number
+}
+
 export function useStarfield(canvasRef: React.RefObject<HTMLCanvasElement>) {
   const frameRef = useRef<number | null>(null)
-  const starsRef = useRef<any[]>([])
-  const shootersRef = useRef<any[]>([])
+  const starsRef = useRef<Star[]>([])
+  const shootersRef = useRef<ShootingStar[]>([])
   const nextShooterRef = useRef(0)
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import type { MangaItem } from './bigThree';
+
 
 interface Chapter {
   chapterId: number;

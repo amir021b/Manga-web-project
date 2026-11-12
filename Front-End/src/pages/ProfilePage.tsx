@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import MangaCard from "@/components/manga/MangaCard";
 import MangaGrid from "@/components/manga/MangaGrid";
 import SettingsTab from "@/components/settings/SettingsTab";
@@ -55,7 +56,7 @@ function ProfilePage() {
     return () => {
       mounted = false;
     };
-  }, [isLoggedIn]);
+  }, [isLoggedIn, setCurrentUser]);
 
   const handleSave = async (next: { username: string; bio: string; avatar: string | null }) => {
     setCurrentUser(next as UserData);
@@ -106,10 +107,15 @@ function ProfilePage() {
           <div className="relative shrink-0">
             <div className="grid h-24 w-24 place-items-center overflow-hidden rounded-full border-2 border-[var(--mh-border)] bg-[var(--mh-surface)] text-[var(--mh-text)] shadow-[0_0_24px_rgba(0,0,0,0.25)]">
               {user?.avatar ? (
-                <img
+                <Image
                   src={user.avatar}
                   alt="avatar"
+                  width={96}
+                  height={96}
                   className="h-full w-full object-cover"
+                  fill
+                  sizes="96px"
+                  style={{ objectFit: 'cover' }}
                 />
               ) : (
                 <User strokeWidth={1.25} className="h-12 w-12" />

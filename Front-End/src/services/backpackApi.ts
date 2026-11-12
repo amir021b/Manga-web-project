@@ -27,9 +27,9 @@ export async function fetchBackpack(): Promise<string[]> {
   }
 }
 
-export async function toggleBackpackItem(mangaId: string | number): Promise<any> {
+export async function toggleBackpackItem(mangaId: string | number): Promise<BackpackItem[]> {
   const token = localStorage.getItem("mangahub_token");
-  if (!token) return;
+  if (!token) return [];
 
   const res = await fetch(API_URL, {
     method: "POST",
@@ -57,9 +57,11 @@ export async function removeFromBackpack(itemOrId: BackpackItem | string | numbe
   return toggleBackpackItem(id);
 }
 
-export default {
+const backpackApi = {
   fetchBackpack,
   toggleBackpackItem,
   addToBackpack,
   removeFromBackpack,
 };
+
+export default backpackApi;

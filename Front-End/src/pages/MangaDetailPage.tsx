@@ -34,7 +34,7 @@ function MangaDetailPage({ id: idProp }: MangaDetailPageProps) {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-[var(--mh-text)]">Manga not found</h1>
           <p className="text-[var(--mh-text-secondary)] mt-2">
-            The manga you're looking for doesn't exist.
+            The manga you&#39;re looking for doesn&#39;t exist.
           </p>
           <Link
             href="/"

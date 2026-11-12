@@ -1,14 +1,24 @@
+import type { UserData } from "../context/UserContext";
+
 const API_URL = "http://localhost:5000/api/auth";
+
+export interface AuthValues {
+  username?: string;
+  email: string;
+  password: string;
+  confirmPassword?: string;
+  acceptTerms?: boolean;
+}
 
 export interface AuthResponse {
   data?: {
     token?: string;
-    user?: any;
+    user?: UserData;
   };
   message?: string;
 }
 
-export async function submitAuth(values: Record<string, any>, mode: string): Promise<any> {
+export async function submitAuth(values: AuthValues, mode: string): Promise<AuthResponse> {
   const endpoint = mode === "signup" ? `${API_URL}/signup` : `${API_URL}/login`;
 
   const payload =

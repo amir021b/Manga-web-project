@@ -27,7 +27,7 @@ export async function fetchProfile(): Promise<UserData | null> {
   }
 }
 
-export async function updateProfile(userData: UserData): Promise<any> {
+export async function updateProfile(userData: UserData): Promise<UserData | null> {
   const token = localStorage.getItem("mangahub_token");
   if (!token) throw new Error("No token found");
 

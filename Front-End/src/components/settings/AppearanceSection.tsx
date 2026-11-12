@@ -1,5 +1,5 @@
 import type { AccentOption, DensityOption } from '../../context/ThemeContext';
-import type { MangaItem } from '../../data/bigThree';
+
 
 interface AppearanceSectionProps {
   accent: string;

@@ -7,6 +7,8 @@ interface TermsDialogProps {
 }
 
 function TermsDialog({ open, onClose, onAccept }: TermsDialogProps) {
+  void open;
+  void onAccept;
   return (
     <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm">
       <div className="relative z-10 flex flex-col items-center justify-center px-6 text-center">

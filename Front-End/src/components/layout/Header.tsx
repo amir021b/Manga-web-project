@@ -1,18 +1,22 @@
 "use client";
 
 import { useRouter, usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Search, User } from 'lucide-react';
 import Logo from '../ui/Logo';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useUser } from '../../context/UserContext';
 
 function NavLink({ href, children, isActive }: { href: string; children: React.ReactNode; isActive?: boolean }) {
   const active = isActive ?? false;
   return (
-<Link href={href} className={`transition ${active ? '...' : '...'}`}>
-  {children}
-</Link>
+    <Link
+      href={href}
+      className={`transition ${active ? 'text-[var(--mh-text)] font-semibold border-b-2 border-[var(--mh-accent)]' : 'text-[var(--mh-text-muted)] hover:text-[var(--mh-text)]'}`}
+    >
+      {children}
+    </Link>
   );
 }
 
@@ -20,14 +24,13 @@ function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useUser();
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(() => {
+    if (typeof window === 'undefined') return '';
+    return new URLSearchParams(window.location.search).get('q') || '';
+  });
 
   // Hide header on authentication pages
   if (pathname === '/login' || pathname === '/signup') return null;
-
-  useEffect(() => {
-    setQuery(typeof window !== 'undefined' ? (new URLSearchParams(window.location.search).get('q') || '') : '');
-  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,8 +46,8 @@ function Header() {
         <Logo variant="header" />
 
         <nav className="hidden md:flex items-center gap-4 text-sm">
-          <NavLink href="/" isActive={pathname === '/'} >Home</NavLink>
-          <NavLink href="/explore" isActive={pathname === '/explore'} >Explore</NavLink>
+          <NavLink href="/" isActive={pathname === '/'}>Home</NavLink>
+          <NavLink href="/explore" isActive={pathname === '/explore'}>Explore</NavLink>
         </nav>
 
         <div className="relative ml-auto flex-1 max-w-xs">
@@ -74,7 +77,16 @@ function Header() {
               className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface-strong)] text-[var(--mh-text)] transition hover:bg-[var(--mh-surface)] hover:text-[var(--mh-text)]"
             >
               {user.avatar ? (
-                <img src={user.avatar} alt="avatar" className="w-full h-full rounded-full object-cover" />
+                <Image
+                  src={user.avatar}
+                  alt="avatar"
+                  width={36}
+                  height={36}
+                  className="w-full h-full rounded-full object-cover"
+                  fill
+                  sizes="36px"
+                  style={{ objectFit: 'cover' }}
+                />
               ) : (
                 <User strokeWidth={0.75} className="h-5 w-5" />
               )}

@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from 'next/image';
 import { X, User, Camera, ZoomIn } from "lucide-react";
-import { useBackpack } from '../../context/BackpackContext';
-import { useToast } from '../../context/ToastContext';
-import type { MangaItem } from '../../data/bigThree';
+
 import FloatingInput from "../ui/FloatingInput";
 import Button from "../ui/Button";
 import useAvatarCrop from "../../hooks/useAvatarCrop";
@@ -39,15 +38,6 @@ function EditProfileModal({ user, onSave, onClose }: EditProfileModalProps) {
     cropImage,
     transform,
   } = useAvatarCrop(user?.avatar ?? null);
-
-  useEffect(() => {
-    if (user) {
-      setForm({
-        username: user.username || "",
-        bio: user.bio || "",
-      });
-    }
-  }, [user]);
 
   useEffect(() => {
     if (!isExiting) return;
@@ -120,12 +110,13 @@ function EditProfileModal({ user, onSave, onClose }: EditProfileModalProps) {
               onMouseLeave={handlePanEnd}
             >
               {avatarPreview ? (
-                <img
+                <Image
                   src={avatarPreview}
                   alt="avatar preview"
-                  draggable={false}
                   className="absolute left-1/2 top-1/2 max-w-none select-none"
-                  style={{ transform }}
+                  fill
+                  sizes="180px"
+                  style={{ transform, objectFit: 'cover' }}
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-[var(--mh-text-secondary)]/60">

@@ -12,7 +12,7 @@ import NotificationsSection from './NotificationsSection';
 import {
   Settings, Palette, Shield, Bell, ChevronDown
 } from 'lucide-react';
-import type { UserData } from '../../context/UserContext';
+import type { SVGProps } from 'react';
 
 const SECTIONS = [
   { id: 'appearance', label: 'Appearance', icon: Palette, hint: 'Theme accent color and UI density' },
@@ -20,14 +20,14 @@ const SECTIONS = [
   { id: 'notifications', label: 'Notifications', icon: Bell, hint: 'Alerts, newsletters, and announcements' },
 ];
 
-const SECTION_ICONS: Record<string, React.ComponentType<any>> = {
+const SECTION_ICONS: Record<string, React.ComponentType<SVGProps<SVGSVGElement>>> = {
   appearance: Palette,
   account: Shield,
   notifications: Bell,
 };
 
 export default function SettingsTab() {
-  const { backpack, setBackpack } = useBackpack();
+  const { setBackpack } = useBackpack();
   const { addToast } = useToast();
   const { accent, setAccent, density, setDensity, ACCENT_OPTIONS, DENSITY_OPTIONS } = useTheme();
   const { user, setCurrentUser } = useUser();
@@ -95,7 +95,7 @@ export default function SettingsTab() {
                     user={user}
                     setCurrentUser={setCurrentUser}
                     addToast={(title, message) => addToast(title, message)}
-                    setBackpack={(b) => setBackpack(b as any)}
+                    setBackpack={(b) => setBackpack(b)}
                     router={{ push: () => {}, replace: () => {} }}
                   />
                 )}

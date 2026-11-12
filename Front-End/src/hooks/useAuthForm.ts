@@ -51,6 +51,7 @@ export function useAuthForm() {
     };
   }, []);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     setValues({ ...INITIAL_VALUES });
     setErrors({});
@@ -60,6 +61,7 @@ export function useAuthForm() {
     setIsTermsOpen(false);
     submittingRef.current = false;
   }, [mode]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const copy = AUTH_COPY[mode as keyof typeof AUTH_COPY];
   const isSignup = mode === AUTH_MODES.SIGNUP;
@@ -125,7 +127,7 @@ export function useAuthForm() {
           }, 1500);
         }
       })
-      .catch((error: any) => {
+      .catch((error: Error & { code?: string }) => {
         submittingRef.current = false;
         if (isMountedRef.current) {
           if (error && error.code === "email_exists") {
