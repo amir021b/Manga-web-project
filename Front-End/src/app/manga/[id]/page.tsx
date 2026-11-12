@@ -1,10 +1,11 @@
 import Layout from '@/components/layout/Layout';
 import MangaDetailPage from '@/pages/MangaDetailPage';
 
-export default function Page({ params }: { params: { id: string } }) {
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   return (
     <Layout>
-      <MangaDetailPage />
+      <MangaDetailPage id={id} />
     </Layout>
   );
 }

@@ -1,3 +1,7 @@
+"use client";
+
+import { useBackpack } from '../../context/BackpackContext';
+import { useToast } from '../../context/ToastContext';
 import type { MangaItem } from '../../data/bigThree';
 
 interface MangaCardProps {
@@ -92,8 +96,5 @@ function MangaCard({ id, title, genre, posterUrl, to, hoverLift = true, hoverLif
     </article>
   );
 }
-
-import { useBackpack } from '../../context/BackpackContext';
-import { useToast } from '../../context/ToastContext';
 
 export default MangaCard;

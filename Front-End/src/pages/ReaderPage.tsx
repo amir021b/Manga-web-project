@@ -1,18 +1,19 @@
+"use client";
+
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import type { MangaItem } from '@/data/bigThree';
 
-function ReaderPage() {
+function ReaderPage({ id, chapterId }: { id: string | number; chapterId: string | number }) {
   const router = useRouter();
-  const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
-  const parts = pathname.split('/');
-  const id = parts[parts.indexOf('manga') + 1];
-  const chapterId = parts[parts.indexOf('chapter') + 1];
 
-  if (!id || !chapterId) {
-    router.push('/');
-    return null;
-  }
+  useEffect(() => {
+    if (!id || !chapterId) {
+      router.push('/');
+    }
+  }, [id, chapterId, router]);
+
+  if (!id || !chapterId) return null;
 
   return (
     <section className="min-h-screen w-full bg-[var(--mh-bg)] px-4 pt-20 pb-8 flex items-center justify-center">

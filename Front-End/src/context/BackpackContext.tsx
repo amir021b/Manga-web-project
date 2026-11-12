@@ -1,3 +1,5 @@
+"use client";
+
 import { createContext, useContext, useState, useEffect } from "react";
 import { fetchBackpack, toggleBackpackItem } from "../services/backpackApi";
 import { bigThree, bestSellers, latestUpdates } from "../data";
@@ -11,7 +13,13 @@ interface BackpackContextValue {
   isInBackpack: (id: string | number) => boolean;
 }
 
-const BackpackContext = createContext<BackpackContextValue | null>(null);
+const BackpackContext = createContext<BackpackContextValue>({
+  backpack: [],
+  setBackpack: () => {},
+  addToBackpack: async () => {},
+  removeFromBackpack: async () => {},
+  isInBackpack: () => false,
+});
 
 const allManga: MangaItem[] = [...bigThree, ...bestSellers, ...latestUpdates];
 
@@ -101,7 +109,7 @@ export function BackpackProvider({ children }: { children: React.ReactNode }) {
 
 export function useBackpack(): BackpackContextValue {
   const context = useContext(BackpackContext);
-  if (!context) {
+  if (!context && typeof window !== 'undefined') {
     throw new Error("useBackpack must be used within a BackpackProvider");
   }
   return context;

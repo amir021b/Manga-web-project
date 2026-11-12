@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from 'react';
 import { Mail, Trash2 } from 'lucide-react';
 import Button from '../ui/Button';
@@ -26,7 +28,6 @@ function AccountSection({ user, setCurrentUser, setBackpack, router }: AccountSe
 
   const handlePasswordSave = async () => {
     try {
-      const { passwords } = usePasswordForm({ onSave: handlePasswordSave });
       await changePassword({
         currentPassword: passwords.current,
         newPassword: passwords.new,

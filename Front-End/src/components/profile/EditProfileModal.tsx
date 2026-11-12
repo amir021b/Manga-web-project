@@ -1,6 +1,13 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { X, User, Camera, ZoomIn } from "lucide-react";
 import { useBackpack } from '../../context/BackpackContext';
 import { useToast } from '../../context/ToastContext';
 import type { MangaItem } from '../../data/bigThree';
+import FloatingInput from "../ui/FloatingInput";
+import Button from "../ui/Button";
+import useAvatarCrop from "../../hooks/useAvatarCrop";
 
 interface EditProfileModalProps {
   user: { username?: string; email?: string; avatar?: string | null; bio?: string } | null | undefined;
@@ -195,11 +202,5 @@ function EditProfileModal({ user, onSave, onClose }: EditProfileModalProps) {
     </div>
   );
 }
-
-import { useState, useEffect } from "react";
-import { X, User, Camera, ZoomIn } from "lucide-react";
-import FloatingInput from "../ui/FloatingInput";
-import Button from "../ui/Button";
-import useAvatarCrop from "../../hooks/useAvatarCrop";
 
 export default EditProfileModal;

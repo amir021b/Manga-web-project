@@ -1,5 +1,7 @@
+"use client";
+
 import { useState, useRef, useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   AUTH_MODES,
   AUTH_COPY,
@@ -19,7 +21,6 @@ const INITIAL_VALUES = {
 };
 
 export function useAuthForm() {
-  const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = typeof window !== "undefined" ? window.location.pathname : "/login";
 

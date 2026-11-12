@@ -1,5 +1,7 @@
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { useState } from 'react';
+"use client";
+
+import { useRouter, usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import { Search, User } from 'lucide-react';
 import Logo from '../ui/Logo';
 import Link from 'next/link';
@@ -8,20 +10,24 @@ import { useUser } from '../../context/UserContext';
 function NavLink({ href, children, isActive }: { href: string; children: React.ReactNode; isActive?: boolean }) {
   const active = isActive ?? false;
   return (
-    <Link href={href}>
-      <a className={`transition ${active ? 'text-[var(--mh-text)] font-semibold border-b-2 border-[var(--mh-text)]' : 'text-[var(--mh-text-secondary)] hover:text-[var(--mh-text)]'}`}>
-        {children}
-      </a>
-    </Link>
+<Link href={href} className={`transition ${active ? '...' : '...'}`}>
+  {children}
+</Link>
   );
 }
 
 function Header() {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const { user } = useUser();
-  const [query, setQuery] = useState(searchParams.get('q') || '');
+  const [query, setQuery] = useState('');
+
+  // Hide header on authentication pages
+  if (pathname === '/login' || pathname === '/signup') return null;
+
+  useEffect(() => {
+    setQuery(typeof window !== 'undefined' ? (new URLSearchParams(window.location.search).get('q') || '') : '');
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,3 +1,5 @@
+"use client";
+
 import { useBackpack } from '@/context/BackpackContext';
 import { useToast } from '@/context/ToastContext';
 import { bigThree, bestSellers, latestUpdates } from '@/data';
@@ -11,12 +13,16 @@ interface Chapter {
   date: string;
 }
 
-function MangaDetailPage() {
+interface MangaDetailPageProps {
+  id: string | number;
+}
+
+function MangaDetailPage({ id: idProp }: MangaDetailPageProps) {
   const { addToBackpack, removeFromBackpack, isInBackpack } = useBackpack();
   const { addToast } = useToast();
 
   const allManga: MangaItem[] = [...bigThree, ...bestSellers, ...latestUpdates];
-  const manga = allManga.find((m) => String(m.id) === String(typeof window !== 'undefined' ? window.location.pathname.split('/').pop() : ''));
+  const manga = allManga.find((m) => String(m.id) === String(idProp));
   const mangaId = manga ? Number(manga.id) : 0;
   const detail = mangaDetails[mangaId] || {};
   const saved = isInBackpack(mangaId);

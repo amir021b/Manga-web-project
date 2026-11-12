@@ -1,3 +1,5 @@
+"use client";
+
 import { useAuthForm } from '@/hooks/useAuthForm';
 import { AUTH_MODES, TERMS_INTRO, TERMS_LINK, FORGOT_PASSWORD_TEXT, ERROR_MESSAGES } from '@/constants/authCopy';
 import GlassCard from '@/components/ui/GlassCard';

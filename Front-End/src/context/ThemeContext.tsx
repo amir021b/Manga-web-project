@@ -1,3 +1,5 @@
+"use client";
+
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from 'react';
 
@@ -31,7 +33,17 @@ interface ThemeContextValue {
   DENSITY_OPTIONS: typeof DENSITY_OPTIONS;
 }
 
-const ThemeContext = createContext<ThemeContextValue | null>(null);
+const ThemeContext = createContext<ThemeContextValue>({
+  theme: 'dark',
+  setTheme: () => {},
+  accent: 'red',
+  setAccent: () => {},
+  density: 'comfortable',
+  setDensity: () => {},
+  THEME_OPTIONS,
+  ACCENT_OPTIONS,
+  DENSITY_OPTIONS,
+});
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState(() => {
@@ -60,7 +72,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 export const useTheme = (): ThemeContextValue => {
   const context = useContext(ThemeContext);
-  if (!context) throw new Error('useTheme must be used within a ThemeProvider');
+  if (!context && typeof window !== 'undefined') {
+    throw new Error('useTheme must be used within a ThemeProvider');
+  }
   return context;
 };
 

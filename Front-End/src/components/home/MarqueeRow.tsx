@@ -1,4 +1,8 @@
+"use client";
+
+import { useRef, useEffect } from 'react';
 import type { MangaItem } from '../../data/bigThree';
+import MangaCard from '../manga/MangaCard';
 
 interface MarqueeRowProps {
   items: MangaItem[];
@@ -99,8 +103,5 @@ function MarqueeRow({ items, className }: MarqueeRowProps) {
     </div>
   );
 }
-
-import { useRef, useEffect } from 'react';
-import MangaCard from '../manga/MangaCard';
 
 export default MarqueeRow;

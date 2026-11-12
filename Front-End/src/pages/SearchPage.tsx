@@ -1,3 +1,5 @@
+"use client";
+
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useDebounce } from '@/hooks/useDebounce';
 import MangaGrid from '@/components/manga/MangaGrid';
@@ -6,9 +8,9 @@ import { bigThree, bestSellers, latestUpdates } from '@/data';
 import type { MangaItem } from '@/data/bigThree';
 
 function SearchPage() {
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const query = searchParams.get('q') || '';
+  const searchParams = useSearchParams();
+  const query = searchParams?.get('q') || '';
   const debouncedQuery = useDebounce(query, 300);
 
   const allManga: MangaItem[] = [...bigThree, ...bestSellers, ...latestUpdates];

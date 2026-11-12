@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
 interface ToastProps {
@@ -54,7 +57,5 @@ function Toast({ title, message, onClose }: ToastProps) {
     </div>
   );
 }
-
-import { useState, useEffect } from 'react';
 
 export default Toast;

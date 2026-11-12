@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from 'react';
 import { useBackpack } from '../../context/BackpackContext';
 import { useToast } from '../../context/ToastContext';

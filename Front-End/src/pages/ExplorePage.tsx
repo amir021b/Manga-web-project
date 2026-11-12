@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useMemo } from 'react';
 import MangaGrid from '@/components/manga/MangaGrid';
 import MangaCard from '@/components/manga/MangaCard';

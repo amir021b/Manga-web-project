@@ -1,3 +1,5 @@
+"use client";
+
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
@@ -17,7 +19,14 @@ interface UserContextValue {
   isLoggedIn: boolean;
 }
 
-const UserContext = createContext<UserContextValue | null>(null);
+const UserContext = createContext<UserContextValue>({
+  user: null,
+  setCurrentUser: () => {},
+  logout: () => {},
+  setIsLoadingAuth: () => {},
+  isLoadingAuth: true,
+  isLoggedIn: false,
+});
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserData | null>(null);
@@ -75,7 +84,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
 export const useUser = (): UserContextValue => {
   const context = useContext(UserContext);
-  if (!context) throw new Error('useUser must be used within a UserProvider');
+  if (!context && typeof window !== 'undefined') {
+    throw new Error('useUser must be used within a UserProvider');
+  }
   return context;
 };
 

@@ -1,3 +1,5 @@
+"use client";
+
 function Logo({ isFilled = false, variant = 'auth', className }: { isFilled?: boolean; variant?: string; className?: string }) {
   const isHeader = variant === 'header';
 

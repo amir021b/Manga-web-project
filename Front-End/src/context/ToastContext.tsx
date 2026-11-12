@@ -1,3 +1,4 @@
+"use client";
 
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useCallback } from 'react';
@@ -14,7 +15,11 @@ interface ToastContextValue {
   showToast: (title: string) => void;
 }
 
-const ToastContext = createContext<ToastContextValue | null>(null);
+const ToastContext = createContext<ToastContextValue>({
+  addToast: () => {},
+  hideToast: () => {},
+  showToast: () => {},
+});
 
 export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
   const [toastMessage, setToastMessage] = useState<ToastMessage | null>(null);
@@ -43,7 +48,7 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useToast = (): ToastContextValue => {
   const context = useContext(ToastContext);
-  if (!context) {
+  if (!context && typeof window !== 'undefined') {
     throw new Error('useToast must be used within a ToastProvider');
   }
   return context;

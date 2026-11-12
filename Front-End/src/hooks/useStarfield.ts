@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useRef } from 'react'
 
 const STAR_DENSITY = 4200

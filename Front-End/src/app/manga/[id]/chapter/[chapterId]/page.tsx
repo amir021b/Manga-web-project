@@ -1,10 +1,11 @@
 import Layout from '@/components/layout/Layout';
 import ReaderPage from '@/pages/ReaderPage';
 
-export default function Page({ params }: { params: { id: string; chapterId: string } }) {
+export default async function Page({ params }: { params: Promise<{ id: string; chapterId: string }> }) {
+  const { id, chapterId } = await params;
   return (
     <Layout>
-      <ReaderPage />
+      <ReaderPage id={id} chapterId={chapterId} />
     </Layout>
   );
 }
