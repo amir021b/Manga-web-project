@@ -24,9 +24,11 @@ export function useAuthForm() {
   const router = useRouter();
   const pathname = usePathname();
 
-const mode = (pathname ?? "").includes("signup")
-  ? AUTH_MODES.SIGNUP
-  : AUTH_MODES.LOGIN;
+  const [mode, setMode] = useState<string>(() => {
+    return (pathname ?? "").includes("signup")
+      ? AUTH_MODES.SIGNUP
+      : AUTH_MODES.LOGIN;
+  });
 
   const [values, setValues] = useState({ ...INITIAL_VALUES });
   const [showPassword, setShowPassword] = useState(false);
@@ -62,6 +64,16 @@ const mode = (pathname ?? "").includes("signup")
     submittingRef.current = false;
   }, [mode]);
   /* eslint-enable react-hooks/set-state-in-effect */
+
+  // Keep the URL in sync with the local mode in the background.
+  // Only navigates when the current pathname doesn't already match the target,
+  // which prevents infinite loops and avoids jarring remounts on tab clicks.
+  useEffect(() => {
+    const targetPath = mode === AUTH_MODES.SIGNUP ? "/signup" : "/login";
+    if (pathname !== targetPath) {
+      router.push(targetPath, { scroll: false });
+    }
+  }, [mode, pathname, router]);
 
   const copy = AUTH_COPY[mode as keyof typeof AUTH_COPY];
   const isSignup = mode === AUTH_MODES.SIGNUP;
@@ -173,8 +185,7 @@ const mode = (pathname ?? "").includes("signup")
 
   const switchMode = (newMode: string) => {
     if (isSubmitting) return;
-    const path = newMode === AUTH_MODES.SIGNUP ? "/signup" : "/login";
-    router.push(path);
+    setMode(newMode);
   };
 
   const isFilled = REQUIRED_FIELDS[mode as keyof typeof REQUIRED_FIELDS].every((key: string) => {

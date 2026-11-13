@@ -59,7 +59,7 @@ function AuthCard() {
         <div className="fade-up mb-6" style={{ animationDelay: '120ms' }}>
           <AuthTabs mode={mode} onChange={switchMode} disabled={isSubmitting} />
         </div>
-        <div key={mode} className="fade-up" style={{ animationDelay: '160ms' }}>
+        <div className="fade-up" style={{ animationDelay: '160ms' }}>
           <h1 className="text-2xl font-bold text-white mb-1.5">{copy.title}</h1>
           <p className="text-sm text-[#9a9a9a] mb-6">{copy.subtitle}</p>
           <form noValidate onSubmit={handleSubmit} className="fade-up" style={{ animationDelay: '200ms' }}>
