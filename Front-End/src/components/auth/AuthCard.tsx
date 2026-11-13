@@ -32,6 +32,7 @@ function AuthCard() {
     handleSubmit,
     openTerms,
     closeTerms,
+    isTermsOpen,
     handleAcceptTerms,
     switchMode,
   } = useAuthForm();
@@ -145,7 +146,14 @@ function AuthCard() {
                 <Checkbox
                   id="acceptTerms"
                   checked={values.acceptTerms}
-                  onChange={() => {}}
+                  onChange={() =>
+                    handleChange("acceptTerms")({
+                      target: {
+                        type: "checkbox",
+                        checked: !values.acceptTerms,
+                      },
+                    } as React.ChangeEvent<HTMLInputElement>)
+                  }
                   label={TERMS_INTRO}
                   labelAction={
                     <>
@@ -191,7 +199,7 @@ function AuthCard() {
         </div>
         {isSignup ? (
           <TermsDialog
-            open={false}
+            open={isTermsOpen}
             onClose={closeTerms}
             onAccept={handleAcceptTerms}
           />

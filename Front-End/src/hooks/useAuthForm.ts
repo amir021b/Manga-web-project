@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   AUTH_MODES,
   AUTH_COPY,
@@ -22,11 +22,11 @@ const INITIAL_VALUES = {
 
 export function useAuthForm() {
   const router = useRouter();
-  const pathname = typeof window !== "undefined" ? window.location.pathname : "/login";
+  const pathname = usePathname();
 
-  const mode = pathname.includes("signup")
-    ? AUTH_MODES.SIGNUP
-    : AUTH_MODES.LOGIN;
+const mode = (pathname ?? "").includes("signup")
+  ? AUTH_MODES.SIGNUP
+  : AUTH_MODES.LOGIN;
 
   const [values, setValues] = useState({ ...INITIAL_VALUES });
   const [showPassword, setShowPassword] = useState(false);

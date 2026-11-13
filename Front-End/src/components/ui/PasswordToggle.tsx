@@ -11,6 +11,7 @@ function PasswordToggle({ visible, onToggle, disabled = false }: PasswordToggleP
     <button
       type="button"
       onClick={onToggle}
+      onMouseDown={(e) => e.preventDefault()}
       disabled={disabled}
       aria-label={visible ? "Hide password" : "Show password"}
       aria-pressed={visible}
