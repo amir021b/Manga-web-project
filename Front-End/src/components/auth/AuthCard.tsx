@@ -13,6 +13,7 @@ import LinkButton from '@/components/ui/LinkButton';
 import Collapse from '@/components/ui/Collapse';
 import StarBackground from '@/components/layout/StarBackground';
 import TermsDialog from './TermsDialog';
+import { User, Mail, Lock } from 'lucide-react';
 
 function AuthCard() {
   const {
@@ -27,7 +28,6 @@ function AuthCard() {
     isSuccess,
     isSignup,
     copy,
-    isFilled,
     handleChange,
     handleSubmit,
     openTerms,
@@ -42,7 +42,7 @@ function AuthCard() {
       <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm">
         <StarBackground />
         <div className="relative z-10 flex flex-col items-center justify-center px-6 text-center">
-          <Logo isFilled={true} className="mb-6 animate-pulse" />
+          <Logo className="mb-6 animate-pulse" />
           <h2 className="text-2xl font-bold text-white mb-2">Welcome to MangaHub</h2>
           <p className="text-sm text-[#9a9a9a]">Redirecting you home...</p>
         </div>
@@ -54,7 +54,7 @@ function AuthCard() {
     <div className="auth-card-in">
       <GlassCard>
         <div className="fade-up mb-6" style={{ animationDelay: '80ms' }}>
-          <Logo isFilled={isFilled} />
+          <Logo />
         </div>
         <div className="fade-up mb-6" style={{ animationDelay: '120ms' }}>
           <AuthTabs mode={mode} onChange={switchMode} disabled={isSubmitting} />
@@ -68,13 +68,13 @@ function AuthCard() {
                 <FloatingInput
                   id="username"
                   name="username"
-                  label="Username"
                   type="text"
                   value={values.username}
                   onChange={handleChange("username") as (e: React.ChangeEvent<HTMLInputElement>) => void}
-                  placeholder="yourname"
+                  placeholder="Username"
                   autoComplete="nickname"
                   disabled={isSubmitting || !isSignup}
+                  leadingIcon={<User className="w-4 h-4" />}
                   error={errors.username ? ERROR_MESSAGES[errors.username as keyof typeof ERROR_MESSAGES] : undefined}
                 />
               </div>
@@ -84,13 +84,13 @@ function AuthCard() {
               <FloatingInput
                 id="email"
                 name="email"
-                label="Email"
                 type="email"
                 value={values.email}
                 onChange={handleChange("email") as (e: React.ChangeEvent<HTMLInputElement>) => void}
-                placeholder="you@example.com"
+                placeholder="Email address"
                 autoComplete={isSignup ? "email" : "username"}
                 disabled={isSubmitting}
+                leadingIcon={<Mail className="w-4 h-4" />}
                 error={errors.email ? ERROR_MESSAGES[errors.email as keyof typeof ERROR_MESSAGES] : undefined}
               />
             </div>
@@ -99,13 +99,13 @@ function AuthCard() {
               <FloatingInput
                 id="password"
                 name="password"
-                label="Password"
                 type={showPassword ? "text" : "password"}
                 value={values.password}
                 onChange={handleChange("password") as (e: React.ChangeEvent<HTMLInputElement>) => void}
-                placeholder="At least 8 characters"
+                placeholder="Password"
                 autoComplete={isSignup ? "new-password" : "current-password"}
                 disabled={isSubmitting}
+                leadingIcon={<Lock className="w-4 h-4" />}
                 endAdornment={
                   <PasswordToggle
                     visible={showPassword}
@@ -122,13 +122,13 @@ function AuthCard() {
                 <FloatingInput
                   id="confirmPassword"
                   name="confirmPassword"
-                  label="Confirm password"
                   type={showConfirm ? "text" : "password"}
                   value={values.confirmPassword}
                   onChange={handleChange("confirmPassword") as (e: React.ChangeEvent<HTMLInputElement>) => void}
-                  placeholder="At least 8 characters"
+                  placeholder="Confirm password"
                   autoComplete="new-password"
                   disabled={isSubmitting || !isSignup}
+                  leadingIcon={<Lock className="w-4 h-4" />}
                   endAdornment={
                     <PasswordToggle
                       visible={showConfirm}
@@ -168,7 +168,7 @@ function AuthCard() {
 
             <Collapse open={!isSignup}>
               <div className="pb-5 fade-up" style={{ animationDelay: '380ms' }}>
-                <div className="text-right">
+                <div className="flex justify-start">
                   <LinkButton onClick={() => {}} disabled={isSubmitting}>
                     {FORGOT_PASSWORD_TEXT}
                   </LinkButton>
@@ -180,11 +180,19 @@ function AuthCard() {
               type="submit"
               loading={isSubmitting}
               loadingLabel={copy.loadingLabel}
-              className="fade-up mt-2"
+              className="fade-up mt-2 rounded-full"
               style={{ animationDelay: '420ms' }}
             >
-              {copy.submitLabel}
+              {copy.submitLabel} →
             </Button>
+
+            <div className="relative my-5 flex items-center fade-up" style={{ animationDelay: '440ms' }}>
+              <div className="flex-grow border-t border-white/10" />
+              <span className="mx-4 bg-[var(--mh-gradient-bg)] px-2 text-xs uppercase tracking-wider text-zinc-400">
+                or
+              </span>
+              <div className="flex-grow border-t border-white/10" />
+            </div>
 
             <div className="text-center mt-5 fade-up" style={{ animationDelay: '460ms' }}>
               <span className="text-[#9a9a9a] text-[13.5px]">{copy.swapText}</span>{" "}

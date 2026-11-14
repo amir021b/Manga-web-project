@@ -8,12 +8,12 @@ function Button({ type = "button", children, disabled, loading = false, loadingL
       onClick={onClick}
       style={style}
       className={[
-        "w-full h-12 rounded-[11px]",
-        "bg-[#f2f2f2] text-black font-bold text-[15px]",
-        "shadow-[0_6px_24px_rgba(255,255,255,0.12)]",
+        "w-full h-12 rounded-2xl",
+        "bg-white text-black font-bold text-[15px]",
+        "shadow-[0_0_25px_rgba(255,255,255,0.25)]",
         "cursor-pointer",
         "transition-all duration-200 motion-reduce:transition-none",
-        "hover:bg-white hover:shadow-[0_6px_24px_rgba(255,255,255,0.25)]",
+        "hover:bg-zinc-100",
         "active:translate-y-[1px]",
         "focus-visible:outline-2 focus-visible:outline-white/60 focus-visible:outline-offset-2",
         isDisabled ? "opacity-50 cursor-not-allowed" : "",

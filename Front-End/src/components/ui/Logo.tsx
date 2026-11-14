@@ -1,14 +1,11 @@
 "use client";
 
-function Logo({ isFilled = false, variant = 'auth', className }: { isFilled?: boolean; variant?: string; className?: string }) {
+function Logo({ variant = 'auth', className }: { variant?: string; className?: string }) {
   const isHeader = variant === 'header';
 
   const boxClasses = isHeader
     ? 'w-[26px] h-[26px] rounded-full grid place-items-center bg-black'
-    : [
-        'w-[30px] h-[30px] rounded-full grid place-items-center transition-colors duration-500',
-        isFilled ? 'bg-black' : 'bg-zinc-700',
-      ].join(' ');
+    : 'w-[30px] h-[30px] rounded-full grid place-items-center bg-black';
 
   const iconSize = isHeader ? 22 : 24;
 
