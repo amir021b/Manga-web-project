@@ -167,8 +167,8 @@ function AuthCard() {
             </Collapse>
 
             <Collapse open={!isSignup}>
-              <div className="pb-5 fade-up" style={{ animationDelay: '380ms' }}>
-                <div className="flex justify-start">
+              <div className="mt-3 mb-5 fade-up" style={{ animationDelay: '380ms' }}>
+                <div className="flex justify-end">
                   <LinkButton onClick={() => {}} disabled={isSubmitting}>
                     {FORGOT_PASSWORD_TEXT}
                   </LinkButton>
