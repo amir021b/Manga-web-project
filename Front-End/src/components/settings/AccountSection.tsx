@@ -6,9 +6,12 @@ import Button from '../ui/Button';
 import FloatingInput from '../ui/FloatingInput';
 import PasswordToggle from '../ui/PasswordToggle';
 import usePasswordForm from '../../hooks/usePasswordForm';
-import { changePassword, updateEmail } from '../../services/settingsApi';
+import {
+  useChangePassword,
+  useUpdateEmail,
+} from '../../hooks/api/useSettings';
 import { useToast } from '../../context/ToastContext';
-import type { UserData } from '../../context/UserContext';
+import type { UserData } from '../../types/api';
 import type { MangaItem } from '../../data/bigThree';
 
 interface Router {
@@ -28,6 +31,8 @@ function AccountSection({ user, setCurrentUser, setBackpack, router }: AccountSe
   const [newEmail, setNewEmail] = useState('');
   const [confirmDelete, setConfirmDelete] = useState(false);
   const { addToast } = useToast();
+  const { mutateAsync: changePassword } = useChangePassword();
+  const { mutateAsync: updateEmail } = useUpdateEmail();
 
   const email = user?.email || 'user@mangahub.com';
 

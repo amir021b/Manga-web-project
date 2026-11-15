@@ -1,67 +1,41 @@
-const API_URL = "http://localhost:5000/api/users/backpack";
+import api, { getApiErrorMessage, getStoredToken } from "@/lib/axios";
+import type {
+  ApiResponse,
+  BackpackResponse,
+  BackpackToggleResult,
+} from "@/types/api";
 
-export interface BackpackItem {
-  id: number | string;
-  title: string;
-  genre: string;
-  posterUrl?: string;
-}
+const BACKPACK_ENDPOINT = "/api/users/backpack";
 
 export async function fetchBackpack(): Promise<string[]> {
-  const token = localStorage.getItem("mangahub_token");
-  if (!token) return [];
+  if (!getStoredToken()) return [];
 
   try {
-    const res = await fetch(API_URL, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const { data } = await api.get<BackpackResponse>(BACKPACK_ENDPOINT);
+    const payload = data.data;
+    const backpack = Array.isArray(payload)
+      ? payload
+      : payload?.backpack ?? [];
 
-    if (!res.ok) return [];
-    const result = await res.json();
-    return result.data?.backpack || [];
-  } catch (err) {
-    console.error("Failed to fetch backpack:", err);
+    return backpack.map((id) => String(id));
+  } catch {
     return [];
   }
 }
 
-export async function toggleBackpackItem(mangaId: string | number): Promise<BackpackItem[]> {
-  const token = localStorage.getItem("mangahub_token");
-  if (!token) return [];
+export async function toggleBackpackItem(
+  mangaId: string | number,
+): Promise<BackpackToggleResult> {
+  if (!getStoredToken()) return [];
 
-  const res = await fetch(API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ mangaId: String(mangaId) }),
-  });
+  try {
+    const { data } = await api.post<ApiResponse<BackpackToggleResult>>(
+      BACKPACK_ENDPOINT,
+      { mangaId: String(mangaId) },
+    );
 
-  const result = await res.json();
-  if (!res.ok) throw new Error(result.message || "Failed to update backpack");
-  return result.data;
+    return data.data ?? [];
+  } catch (error) {
+    throw new Error(getApiErrorMessage(error, "Failed to update backpack"));
+  }
 }
-
-export async function addToBackpack(itemOrId: BackpackItem | string | number) {
-  const id =
-    typeof itemOrId === "object" && itemOrId !== null ? itemOrId.id : itemOrId;
-  return toggleBackpackItem(id);
-}
-
-export async function removeFromBackpack(itemOrId: BackpackItem | string | number) {
-  const id =
-    typeof itemOrId === "object" && itemOrId !== null ? itemOrId.id : itemOrId;
-  return toggleBackpackItem(id);
-}
-
-const backpackApi = {
-  fetchBackpack,
-  toggleBackpackItem,
-  addToBackpack,
-  removeFromBackpack,
-};
-
-export default backpackApi;

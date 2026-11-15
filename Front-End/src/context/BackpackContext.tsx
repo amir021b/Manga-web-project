@@ -1,9 +1,14 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
-import { fetchBackpack, toggleBackpackItem } from "../services/backpackApi";
-import { bigThree, bestSellers, latestUpdates } from "../data";
-import type { MangaItem } from "../data/bigThree";
+import { createContext, useContext, useMemo } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  useBackpackQuery,
+  useToggleBackpackItem,
+} from "@/hooks/api/useBackpack";
+import { queryKeys } from "@/hooks/api/queryKeys";
+import { getAllManga, type MangaItem } from "@/services/mangaApi";
+import { useUser } from "./UserContext";
 
 interface BackpackContextValue {
   backpack: MangaItem[];
@@ -16,80 +21,73 @@ interface BackpackContextValue {
 const BackpackContext = createContext<BackpackContextValue>({
   backpack: [],
   setBackpack: () => {},
-  addToBackpack: async () => {},
-  removeFromBackpack: async () => {},
+  addToBackpack: () => {},
+  removeFromBackpack: () => {},
   isInBackpack: () => false,
 });
 
-const allManga: MangaItem[] = [...bigThree, ...bestSellers, ...latestUpdates];
+const allManga: MangaItem[] = getAllManga();
+
+const normalizeId = (id: string | number): string => String(id);
 
 export function BackpackProvider({ children }: { children: React.ReactNode }) {
-  const [backpack, setBackpack] = useState<MangaItem[]>([]);
+  const { isLoggedIn } = useUser();
+  const queryClient = useQueryClient();
+  const { data: backpackIds = [] } = useBackpackQuery(isLoggedIn);
+  const toggleBackpackItem = useToggleBackpackItem();
 
-  useEffect(() => {
-    let mounted = true;
-
-    async function loadBackpack() {
-      const token = localStorage.getItem("mangahub_token");
-      if (!token) return;
-
-      try {
-        const ids = await fetchBackpack();
-        if (mounted && Array.isArray(ids)) {
-          const matchedManga = ids
-            .map((id) => allManga.find((m) => String(m.id) === String(id)))
-            .filter((m): m is MangaItem => m !== undefined);
-
-          setBackpack(matchedManga);
-        }
-      } catch (err) {
-        console.error("Failed to load backpack from API:", err);
-      }
-    }
-
-    loadBackpack();
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  const addToBackpack = async (manga: MangaItem | string | number) => {
-    const mangaId = typeof manga === "object" ? manga.id : manga;
-    const mangaObj =
-      typeof manga === "object"
-        ? manga
-        : allManga.find((m) => String(m.id) === String(mangaId)) || {
-            id: Number(mangaId),
-          } as MangaItem;
-
-    setBackpack((prev) => {
-      if (prev.some((item) => String(item.id) === String(mangaId))) return prev;
-      return [...prev, mangaObj];
+  const backpack = useMemo(() => {
+    return backpackIds.flatMap((id) => {
+      const manga = allManga.find(
+        (item) => normalizeId(item.id) === normalizeId(id),
+      );
+      return manga ? [manga] : [];
     });
+  }, [backpackIds]);
 
-    try {
-      await toggleBackpackItem(mangaId);
-    } catch (err) {
-      console.error("Failed to sync addToBackpack with backend:", err);
-    }
+  const setBackpack = (nextBackpack: MangaItem[]) => {
+    queryClient.setQueryData<string[]>(
+      queryKeys.backpack,
+      nextBackpack.map((item) => normalizeId(item.id)),
+    );
   };
 
-  const removeFromBackpack = async (itemOrId: MangaItem | string | number) => {
-    const mangaId = typeof itemOrId === "object" ? itemOrId.id : itemOrId;
+  const addToBackpack = (manga: MangaItem | string | number) => {
+    const mangaId = typeof manga === "object" ? manga.id : manga;
+    const normalizedId = normalizeId(mangaId);
 
-    setBackpack((prev) =>
-      prev.filter((item) => String(item.id) !== String(mangaId)),
-    );
+    if (backpackIds.includes(normalizedId)) return;
 
-    try {
-      await toggleBackpackItem(mangaId);
-    } catch (err) {
-      console.error("Failed to sync removeFromBackpack with backend:", err);
+    if (!isLoggedIn) {
+      queryClient.setQueryData<string[]>(queryKeys.backpack, [
+        ...backpackIds,
+        normalizedId,
+      ]);
+      return;
     }
+
+    toggleBackpackItem.mutate({ id: mangaId, action: "add" });
+  };
+
+  const removeFromBackpack = (itemOrId: MangaItem | string | number) => {
+    const mangaId = typeof itemOrId === "object" ? itemOrId.id : itemOrId;
+    const normalizedId = normalizeId(mangaId);
+
+    if (!backpackIds.includes(normalizedId)) return;
+
+    if (!isLoggedIn) {
+      queryClient.setQueryData<string[]>(
+        queryKeys.backpack,
+        backpackIds.filter((id) => id !== normalizedId),
+      );
+      return;
+    }
+
+    toggleBackpackItem.mutate({ id: mangaId, action: "remove" });
   };
 
   const isInBackpack = (id: string | number) => {
-    return backpack.some((item) => String(item.id) === String(id));
+    return backpackIds.includes(normalizeId(id));
   };
 
   return (
@@ -109,7 +107,7 @@ export function BackpackProvider({ children }: { children: React.ReactNode }) {
 
 export function useBackpack(): BackpackContextValue {
   const context = useContext(BackpackContext);
-  if (!context && typeof window !== 'undefined') {
+  if (!context && typeof window !== "undefined") {
     throw new Error("useBackpack must be used within a BackpackProvider");
   }
   return context;

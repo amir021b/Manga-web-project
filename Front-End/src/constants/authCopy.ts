@@ -3,7 +3,7 @@ export const STATUS = {
   SUBMITTING: "submitting",
   SUCCESS: "success",
 };
-export const AUTH_MODES = { LOGIN: "login", SIGNUP: "signup" };
+export const AUTH_MODES = { LOGIN: "login", SIGNUP: "signup" } as const;
 
 export const AUTH_COPY = {
   [AUTH_MODES.LOGIN]: {

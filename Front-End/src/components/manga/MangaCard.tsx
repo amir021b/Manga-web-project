@@ -1,29 +1,33 @@
 "use client";
 
 import { useBackpack } from '../../context/BackpackContext';
-import { useToast } from '../../context/ToastContext';
-import type { MangaItem } from '../../data/bigThree';
+import { hasAvailableChapters } from '../../services/mangaApi';
 
 interface MangaCardProps {
   id: number | string;
   title: string;
-  genre: string;
+  genres: string[];
   posterUrl?: string;
   to?: string;
   hoverLift?: boolean;
   hoverLiftClass?: string;
   showSaveButton?: boolean;
   badge?: React.ReactNode;
-  synopsis?: string | null;
-  rating?: string | null;
 }
 
-function MangaCard({ id, title, genre, posterUrl, to, hoverLift = true, hoverLiftClass = 'hover:-translate-y-2', showSaveButton = true, badge = null }: MangaCardProps) {
+function MangaCard({ id, title, genres, posterUrl, to, hoverLift = true, hoverLiftClass = 'hover:-translate-y-2', showSaveButton = true, badge = null }: MangaCardProps) {
   const { addToBackpack, removeFromBackpack, isInBackpack } = useBackpack();
-  const { addToast } = useToast();
   const saved = isInBackpack(id);
   const destination = to || (id != null ? `/manga/${id}` : '#');
   const hasPoster = Boolean(posterUrl);
+  const isComingSoon = !hasAvailableChapters(id);
+  const statusBadge = isComingSoon ? (
+    <span className="absolute top-3 left-3 z-20 rounded-full border border-amber-400/40 bg-amber-500/20 px-3 py-1 text-xs font-bold uppercase tracking-wide text-amber-100 backdrop-blur-md shadow-[0_0_20px_rgba(245,158,11,0.25)]">
+      Coming Soon
+    </span>
+  ) : (
+    badge
+  );
 
   const handleSave = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -31,8 +35,7 @@ function MangaCard({ id, title, genre, posterUrl, to, hoverLift = true, hoverLif
     if (saved) {
       removeFromBackpack(id);
     } else {
-      addToBackpack({ id, title, genre, posterUrl } as MangaItem);
-      addToast('Added to your backpack!');
+      addToBackpack(id);
     }
   };
 
@@ -47,9 +50,18 @@ function MangaCard({ id, title, genre, posterUrl, to, hoverLift = true, hoverLif
       <div
         className={[
           'absolute inset-0',
-          hasPoster ? 'bg-cover bg-center' : 'bg-[var(--mh-surface)] flex items-center justify-center',
+          hasPoster
+            ? 'bg-cover bg-center overflow-hidden'
+            : 'bg-[var(--mh-surface)] flex items-center justify-center',
         ].join(' ')}
-        style={hasPoster ? { backgroundImage: `url(${posterUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
+        style={hasPoster
+          ? {
+              backgroundImage: `url("${posterUrl}")`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              filter: 'grayscale(100%)',
+            }
+          : undefined}
       >
         {!hasPoster && (
           <div className="flex flex-col items-center justify-center gap-2 p-8 text-[var(--mh-text-secondary)]/80">
@@ -73,7 +85,7 @@ function MangaCard({ id, title, genre, posterUrl, to, hoverLift = true, hoverLif
       {hasPoster && (
         <div className="absolute inset-x-0 bottom-0 z-10 p-4 text-left">
           <h3 className="text-base font-bold uppercase tracking-wide text-[var(--mh-text)]">{title}</h3>
-          <p className="mb-2 text-xs text-[var(--mh-text-secondary)]">{genre}</p>
+          <p className="mb-2 text-xs text-[var(--mh-text-secondary)]">{genres.join(' · ')}</p>
           <a
             href={destination}
             className="inline-block text-xs text-[var(--mh-text-secondary)] opacity-80 transition-all duration-300 group-hover:opacity-100 hover:text-[var(--mh-text)]"
@@ -92,7 +104,7 @@ function MangaCard({ id, title, genre, posterUrl, to, hoverLift = true, hoverLif
           {saved ? 'Remove' : 'Save'}
         </button>
       )}
-      {badge}
+      {statusBadge}
     </article>
   );
 }

@@ -10,7 +10,6 @@ import { newUserBundle } from '@/data/newUserBundle';
 import type { MangaItem } from '@/data/bigThree';
 
 function HomePage() {
-  const mangaItems: MangaItem[] = bigThree;
 
   return (
     <section
@@ -34,13 +33,13 @@ function HomePage() {
           <div className="relative z-10 text-center">
             <div className="flex justify-center">
               <MangaGrid className="max-w-[768px] w-full mx-auto">
-                {mangaItems.map((item: MangaItem, idx: number) => (
+                {bigThree.map((item: MangaItem, idx: number) => (
                   <div key={item.id} className="fade-up" style={{ animationDelay: `${idx * 100}ms` }}>
                     <MangaCard
                       key={item.id}
                       id={item.id}
                       title={item.title}
-                      genre={item.genre}
+                      genres={item.genres}
                       posterUrl={item.posterUrl}
                     />
                   </div>
@@ -85,7 +84,7 @@ function HomePage() {
                   key={item.id}
                   id={item.id}
                   title={item.title}
-                  genre={item.genre}
+                  genres={item.genres}
                   posterUrl={item.posterUrl}
                 />
               </div>
@@ -106,7 +105,7 @@ function HomePage() {
                   key={item.id}
                   id={item.id}
                   title={item.title}
-                  genre={item.genre}
+                  genres={item.genres}
                   posterUrl={item.posterUrl}
                   badge={
                     <span className="absolute top-3 left-3 z-20 rounded-full border border-red-400/40 bg-red-500/20 px-3 py-1 text-xs font-bold uppercase tracking-wide text-red-200 backdrop-blur-md shadow-[0_0_20px_rgba(239,68,68,0.25)]">

@@ -9,8 +9,10 @@ import {
   STATUS,
 } from "../constants/authCopy";
 import { validateForm } from "../utils/validators";
-import { submitAuth } from "../services/authApi";
+import { useAuthMutation } from "./api/useAuth";
 import { useUser } from "../context/UserContext";
+import type { AuthRequestError } from "../services/authApi";
+import type { AuthMode } from "@/types/api";
 
 const INITIAL_VALUES = {
   username: "",
@@ -24,7 +26,7 @@ export function useAuthForm() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const [mode, setMode] = useState<string>(() => {
+  const [mode, setMode] = useState<AuthMode>(() => {
     return (pathname ?? "").includes("signup")
       ? AUTH_MODES.SIGNUP
       : AUTH_MODES.LOGIN;
@@ -44,6 +46,7 @@ export function useAuthForm() {
   const submittingRef = useRef(false);
 
   const { setCurrentUser } = useUser();
+  const authMutation = useAuthMutation();
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -119,7 +122,8 @@ export function useAuthForm() {
     setStatus(STATUS.SUBMITTING);
     submittingRef.current = true;
 
-    submitAuth(values, mode)
+    authMutation
+      .mutateAsync({ values, mode })
       .then((response) => {
         submittingRef.current = false;
         if (isMountedRef.current) {
@@ -139,13 +143,15 @@ export function useAuthForm() {
           }, 1500);
         }
       })
-      .catch((error: Error & { code?: string }) => {
+      .catch((error: AuthRequestError) => {
         submittingRef.current = false;
         if (isMountedRef.current) {
           if (error && error.code === "email_exists") {
             setErrors((prev) => ({ ...prev, email: "email_exists" }));
           } else if (error && error.code === "invalid_credentials") {
             setErrors((prev) => ({ ...prev, email: "invalid_credentials" }));
+          } else if (error && error.code === "network_error") {
+            setErrors((prev) => ({ ...prev, email: "network_error" }));
           } else {
             setErrors((prev) => ({ ...prev, email: "server_error" }));
           }
@@ -183,7 +189,7 @@ export function useAuthForm() {
     setIsTermsOpen(false);
   };
 
-  const switchMode = (newMode: string) => {
+  const switchMode = (newMode: AuthMode) => {
     if (isSubmitting) return;
     setMode(newMode);
   };

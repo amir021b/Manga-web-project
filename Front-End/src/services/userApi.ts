@@ -1,50 +1,48 @@
-const API_URL = "http://localhost:5000/api/users";
+import api, { getApiErrorMessage, getStoredToken } from "@/lib/axios";
+import type {
+  ProfilePayload,
+  ProfileResponse,
+  UpdateProfileInput,
+  UserData,
+} from "@/types/api";
 
-interface UserData {
-  username?: string;
-  email?: string;
-  avatar?: string | null;
-  bio?: string;
+const PROFILE_ENDPOINT = "/api/users/profile";
+
+export function unwrapUserPayload(
+  payload: ProfilePayload | undefined,
+): UserData | null {
+  if (!payload) return null;
+
+  if (typeof payload === "object" && payload !== null && "user" in payload) {
+    return payload.user ?? null;
+  }
+
+  return payload as UserData;
 }
 
 export async function fetchProfile(): Promise<UserData | null> {
-  const token = localStorage.getItem("mangahub_token");
-  if (!token) return null;
+  if (!getStoredToken()) return null;
 
   try {
-    const res = await fetch(`${API_URL}/profile`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!res.ok) return null;
-    const result = await res.json();
-    return result.data?.user || result.data;
-  } catch (err) {
-    console.error("Failed to fetch profile:", err);
+    const { data } = await api.get<ProfileResponse>(PROFILE_ENDPOINT);
+    return unwrapUserPayload(data.data);
+  } catch {
     return null;
   }
 }
 
-export async function updateProfile(userData: UserData): Promise<UserData | null> {
-  const token = localStorage.getItem("mangahub_token");
-  if (!token) throw new Error("No token found");
-
-  const res = await fetch(`${API_URL}/profile`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({
+export async function updateProfile(
+  userData: UpdateProfileInput,
+): Promise<UserData | null> {
+  try {
+    const { data } = await api.put<ProfileResponse>(PROFILE_ENDPOINT, {
       username: userData.username,
       bio: userData.bio,
       avatar: userData.avatar,
-    }),
-  });
+    });
 
-  const result = await res.json();
-  if (!res.ok) throw new Error(result.message || "Failed to update profile");
-  return result.data?.user || result.data;
+    return unwrapUserPayload(data.data);
+  } catch (error) {
+    throw new Error(getApiErrorMessage(error, "Failed to update profile"));
+  }
 }

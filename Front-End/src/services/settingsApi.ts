@@ -1,34 +1,30 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || '';
-const SETTINGS_ENDPOINT = `${API_BASE}/api/user/settings`;
+import api, { getApiErrorMessage } from "@/lib/axios";
+import type {
+  ApiResponse,
+  ChangePasswordInput,
+  ProfilePayload,
+  UpdateEmailInput,
+} from "@/types/api";
 
-const authHeaders = (): HeadersInit => {
-  const token = sessionStorage.getItem('mangahub_token');
-  return token ? { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } : {};
-};
+const SETTINGS_ENDPOINT = "/api/user/settings";
 
-const handleResponse = async (res: Response) => {
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || 'Request failed');
+export async function changePassword(
+  input: ChangePasswordInput,
+): Promise<void> {
+  try {
+    await api.post(`${SETTINGS_ENDPOINT}/password`, input);
+  } catch (error) {
+    throw new Error(getApiErrorMessage(error, "Could not update password."));
   }
-  const text = await res.text();
-  return text ? JSON.parse(text) : null;
-};
-
-export async function changePassword({ currentPassword, newPassword }: { currentPassword: string; newPassword: string }) {
-  const res = await fetch(`${SETTINGS_ENDPOINT}/password`, {
-    method: 'POST',
-    headers: authHeaders(),
-    body: JSON.stringify({ currentPassword, newPassword }),
-  });
-  return handleResponse(res);
 }
 
-export async function updateEmail({ email }: { email: string }) {
-  const res = await fetch(`${SETTINGS_ENDPOINT}/email`, {
-    method: 'POST',
-    headers: authHeaders(),
-    body: JSON.stringify({ email }),
-  });
-  return handleResponse(res);
+export async function updateEmail(input: UpdateEmailInput): Promise<void> {
+  try {
+    await api.post<ApiResponse<ProfilePayload>>(
+      `${SETTINGS_ENDPOINT}/email`,
+      input,
+    );
+  } catch (error) {
+    throw new Error(getApiErrorMessage(error, "Could not update email."));
+  }
 }

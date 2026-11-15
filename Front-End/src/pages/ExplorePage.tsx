@@ -3,29 +3,25 @@
 import { useState, useMemo } from 'react';
 import MangaGrid from '@/components/manga/MangaGrid';
 import MangaCard from '@/components/manga/MangaCard';
-import { bigThree } from '@/data/bigThree';
-import { bestSellers } from '@/data/bestSellers';
-import { latestUpdates } from '@/data/latestUpdates';
+import { useMangaList } from '@/hooks/api/useManga';
 import type { MangaItem } from '@/data/bigThree';
-
-const allManga: MangaItem[] = [...bigThree, ...bestSellers, ...latestUpdates];
-
-const GENRES = [
-  'All',
-  'Best Sellers',
-  ...Array.from(new Set(allManga.map((m) => m.genre))).sort(),
-];
 
 function ExplorePage() {
   const [selectedGenre, setSelectedGenre] = useState('All');
+  const { data: allManga = [] } = useMangaList();
+
+  const genres = useMemo(
+    () => [
+      'All',
+      ...Array.from(new Set(allManga.flatMap((m) => m.genres))).sort(),
+    ],
+    [allManga],
+  );
 
   const filteredManga = useMemo(() => {
     if (selectedGenre === 'All') return allManga;
-    if (selectedGenre === 'Best Sellers') {
-      return allManga.filter((m) => m.badge === 'Best Seller');
-    }
-    return allManga.filter((m) => m.genre === selectedGenre);
-  }, [selectedGenre]);
+    return allManga.filter((m) => m.genres.includes(selectedGenre));
+  }, [allManga, selectedGenre]);
 
   return (
     <section className="min-h-screen w-full bg-transparent px-4 pt-24 pb-8">
@@ -37,7 +33,7 @@ function ExplorePage() {
           </div>
 
           <div className="flex flex-wrap gap-2 overflow-x-auto pb-1 no-scrollbar">
-            {GENRES.map((genre: string, idx: number) => {
+            {genres.map((genre: string, idx: number) => {
               const isActive = selectedGenre === genre;
               return (
                 <button
@@ -69,15 +65,9 @@ function ExplorePage() {
                 <MangaCard
                   id={item.id}
                   title={item.title}
-                  genre={item.genre}
+                  genres={item.genres}
                   posterUrl={item.posterUrl}
-                  badge={
-                    item.badge ? (
-                      <span className="absolute top-3 left-3 z-20 rounded-full border border-yellow-400/40 bg-yellow-500/20 px-3 py-1 text-xs font-bold uppercase tracking-wide text-yellow-200 backdrop-blur-md shadow-[0_0_20px_rgba(234,179,8,0.25)]">
-                        {item.badge}
-                      </span>
-                    ) : null
-                  }
+                  badge={null}
                 />
               </div>
             ))}

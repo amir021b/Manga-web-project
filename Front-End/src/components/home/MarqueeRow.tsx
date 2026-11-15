@@ -83,17 +83,8 @@ function MarqueeRow({ items, className }: MarqueeRowProps) {
             <MangaCard
               id={item.id}
               title={item.title}
-              genre={item.genre}
+              genres={item.genres}
               posterUrl={item.posterUrl}
-              badge={
-                item.badge ? (
-                  <span className="absolute top-3 left-3 z-20 rounded-full border border-yellow-400/40 bg-yellow-500/20 px-3 py-1 text-xs font-bold uppercase tracking-wide text-yellow-200 backdrop-blur-md shadow-[0_0_20px_rgba(234,179,8,0.25)]">
-                    {item.badge}
-                  </span>
-                ) : null
-              }
-              synopsis={item.synopsis || null}
-              rating={item.rating || null}
               hoverLift={true}
               hoverLiftClass="hover:-translate-y-1"
             />

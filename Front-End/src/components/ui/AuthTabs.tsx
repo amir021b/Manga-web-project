@@ -1,8 +1,9 @@
 import { AUTH_MODES, AUTH_COPY } from '../../constants/authCopy';
+import type { AuthMode } from '../../types/api';
 
 interface AuthTabsProps {
-  mode: string;
-  onChange: (mode: string) => void;
+  mode: AuthMode;
+  onChange: (mode: AuthMode) => void;
   disabled?: boolean;
 }
 

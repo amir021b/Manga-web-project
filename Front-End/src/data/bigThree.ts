@@ -1,30 +1,5 @@
-export interface MangaItem {
-  id: number | string;
-  title: string;
-  genre: string;
-  posterUrl?: string;
-  badge?: string;
-  rating?: string;
-  synopsis?: string;
-}
+import { getMangaByIds, type MangaItem } from '@/services/mangaApi';
 
-export const bigThree: MangaItem[] = [
-  {
-    id: 1,
-    title: "Berserk",
-    genre: "Dark Fantasy",
-    posterUrl: "/Berserk_black_white_4x.png",
-  },
-  {
-    id: 2,
-    title: "Vinland Saga",
-    genre: "Historical",
-    posterUrl: "/Vinland_Saga_black_white_4x.png",
-  },
-  {
-    id: 3,
-    title: "Vagabond",
-    genre: "Samurai",
-    posterUrl: "/Vagabond_black_white_4x.png",
-  },
-];
+export type { MangaItem } from '@/services/mangaApi';
+
+export const bigThree: MangaItem[] = getMangaByIds([17, 19, 18]);

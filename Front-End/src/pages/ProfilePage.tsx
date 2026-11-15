@@ -9,7 +9,7 @@ import SettingsTab from "@/components/settings/SettingsTab";
 import EditProfileModal from "@/components/profile/EditProfileModal";
 import { useBackpack } from "@/context/BackpackContext";
 import { useUser } from "@/context/UserContext";
-import { fetchProfile } from "@/services/userApi";
+import { useUpdateProfile } from "@/hooks/api/useUser";
 import {
   User,
   Pencil,
@@ -18,7 +18,7 @@ import {
   Settings as SettingsIcon,
   LogOut,
 } from "lucide-react";
-import type { UserData } from "@/context/UserContext";
+import type { UserData } from "@/types/api";
 import type { MangaItem } from "@/data/bigThree";
 
 const TABS = [
@@ -31,6 +31,7 @@ function ProfilePage() {
   const router = useRouter();
   const { backpack } = useBackpack();
   const { user, setCurrentUser, logout, isLoggedIn } = useUser();
+  const { mutateAsync: updateProfile } = useUpdateProfile();
   const [activeTab, setActiveTab] = useState("backpack");
   const [isEditOpen, setIsEditOpen] = useState(false);
 
@@ -40,50 +41,15 @@ function ProfilePage() {
     }
   }, [isLoggedIn, router]);
 
-  useEffect(() => {
-    let mounted = true;
-    const loadProfile = async () => {
-      if (!isLoggedIn) return;
-      try {
-        const data = await fetchProfile();
-
-        if (mounted && data) setCurrentUser(data);
-      } catch {
-        // Keep existing session
-      }
-    };
-    loadProfile();
-    return () => {
-      mounted = false;
-    };
-  }, [isLoggedIn, setCurrentUser]);
-
   const handleSave = async (next: { username: string; bio: string; avatar: string | null }) => {
-    setCurrentUser(next as UserData);
-    localStorage.setItem("mangahub_user", JSON.stringify(next));
+    const optimisticUser: UserData = { ...user, ...next };
+    setCurrentUser(optimisticUser);
 
-    const token = localStorage.getItem("mangahub_token");
-    if (!token) return;
+    if (!isLoggedIn) return;
 
     try {
-      const res = await fetch("http://localhost:5000/api/users/profile", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          username: next.username,
-          bio: next.bio,
-          avatar: next.avatar,
-        }),
-      });
-
-      const result = await res.json();
-      if (res.ok && result.data?.user) {
-        setCurrentUser(result.data.user);
-        localStorage.setItem("mangahub_user", JSON.stringify(result.data.user));
-      }
+      const savedUser = await updateProfile(next);
+      if (savedUser) setCurrentUser(savedUser);
     } catch (err) {
       console.error("Failed to update profile:", err);
     }
@@ -184,7 +150,7 @@ function ProfilePage() {
                       key={item.id}
                       id={item.id}
                       title={item.title}
-                      genre={item.genre}
+                      genres={item.genres}
                       posterUrl={item.posterUrl}
                       hoverLift={false}
                     />

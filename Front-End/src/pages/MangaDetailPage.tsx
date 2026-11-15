@@ -1,17 +1,8 @@
 "use client";
 
 import { useBackpack } from '@/context/BackpackContext';
-import { useToast } from '@/context/ToastContext';
-import { bigThree, bestSellers, latestUpdates } from '@/data';
-import { mangaDetails } from '@/data/mangaDetails';
+import { useMangaById } from '@/hooks/api/useManga';
 import Link from 'next/link';
-import type { MangaItem } from '@/data/bigThree';
-
-interface Chapter {
-  chapterId: number;
-  title: string;
-  date: string;
-}
 
 interface MangaDetailPageProps {
   id: string | number;
@@ -19,14 +10,10 @@ interface MangaDetailPageProps {
 
 function MangaDetailPage({ id: idProp }: MangaDetailPageProps) {
   const { addToBackpack, removeFromBackpack, isInBackpack } = useBackpack();
-  const { addToast } = useToast();
 
-  const allManga: MangaItem[] = [...bigThree, ...bestSellers, ...latestUpdates];
-  const manga = allManga.find((m) => String(m.id) === String(idProp));
-  const mangaId = manga ? Number(manga.id) : 0;
-  const detail = mangaDetails[mangaId] || {};
-  const saved = isInBackpack(mangaId);
-  const isBerserk = mangaId === 1;
+  const mangaId = Number(idProp);
+  const { data: manga } = useMangaById(mangaId);
+  const saved = manga ? isInBackpack(mangaId) : false;
 
   if (!manga) {
     return (
@@ -51,96 +38,107 @@ function MangaDetailPage({ id: idProp }: MangaDetailPageProps) {
     e.preventDefault();
     if (saved) {
       removeFromBackpack(mangaId);
-      addToast('Removed from your backpack.');
     } else {
-      addToBackpack(manga);
-      addToast('Added to your backpack!');
+      addToBackpack(mangaId);
     }
   };
 
-  const genreTags = manga.genre ? manga.genre.split(/\s*,\s*/) : [];
-  const chapters: Chapter[] = detail.chapters || [];
+  const genreTags = manga.genres;
+  const chapters = manga.detail.chapters;
+  const isComingSoon = chapters.length === 0;
+  const firstChapterId = chapters[0]?.chapterId;
 
   return (
-    <section className="min-h-screen w-full bg-transparent px-4 pt-20 pb-16">
-      <div className="relative w-full h-72 md:h-96 overflow-hidden rounded-xl max-w-5xl mx-auto">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: isBerserk ? `url('/Lone Warrior Beneath Storm Clouds.png')` : undefined,
-            backgroundSize: isBerserk ? 'cover' : undefined,
-            backgroundPosition: isBerserk ? 'center' : undefined,
-          }}
-        />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02),transparent_70%)]" />
-
-        <div className="fade-up absolute left-8 top-1/2 -translate-y-1/2 z-40 w-[180px]" style={{ animationDelay: '80ms' }}>
-          <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-[var(--mh-border)] bg-[var(--mh-surface)] shadow-[var(--mh-shadow-strong)]">
-            <div
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${manga.posterUrl || '/Vinland_Saga_black_white_4x.png'})` }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-            <button
-              onClick={handleSave}
-              aria-label={saved ? 'Remove from backpack' : 'Add to backpack'}
-              className="absolute top-3 right-3 z-50 rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface)]/90 backdrop-blur-md px-3 py-1.5 text-[10px] font-semibold text-[var(--mh-text)] transition hover:bg-[var(--mh-surface)] hover:shadow-[var(--mh-shadow)]"
-            >
-              {saved ? 'Removed' : 'Save'}
-            </button>
+    <section className="min-h-screen w-full bg-transparent px-4 pt-16 pb-16">
+      <div className="max-w-5xl mx-auto">
+        <div className="relative z-10 flex flex-col lg:flex-row gap-8 items-start lg:items-center">
+          <div className="flex-shrink-0 w-[180px] lg:w-[220px]">
+            <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-[var(--mh-border)] bg-[var(--mh-surface)] shadow-[var(--mh-shadow-strong)]">
+              {manga.posterUrl ? (
+                <div
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{
+                    backgroundImage: `url("${manga.posterUrl}")`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    filter: 'grayscale(100%)',
+                  }}
+                />
+              ) : (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[var(--mh-surface)] text-[var(--mh-text-secondary)]/80">
+                  <svg
+                    className="w-10 h-10"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                  <span className="text-xs font-medium uppercase tracking-widest">No Cover Yet</span>
+                </div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+              <button
+                onClick={handleSave}
+                aria-label={saved ? 'Remove from backpack' : 'Add to backpack'}
+                className="absolute top-3 right-3 z-50 rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface)]/90 backdrop-blur-md px-3 py-1.5 text-xs font-semibold text-[var(--mh-text)] transition hover:bg-[var(--mh-surface-strong)] hover:text-[var(--mh-text)]"
+              >
+                {saved ? 'Remove' : 'Save'}
+              </button>
+            </div>
           </div>
-        </div>
-
-        <div className="absolute inset-0 z-30 flex flex-col items-start px-6 md:px-8 pt-16 pb-24 pl-56 md:pl-64">
-          <div className="w-full flex-1">
-            <div className="fade-up" style={{ animationDelay: '160ms' }}>
-              <h2 className="text-[10px] font-bold uppercase tracking-widest text-[var(--mh-accent)] mb-1">
-                Manga
-              </h2>
-              <h1 className="text-4xl md:text-5xl font-bold text-[var(--mh-text)] tracking-tight leading-[1.1] mb-3">
-                {manga.title}
-              </h1>
-              <p className="text-[11px] font-medium italic text-[var(--mh-text-secondary)]/70 mb-6 md:mb-8 max-w-md">
-                {detail.synopsis ? detail.synopsis.split('. ').slice(0, 2).join('. ') + '.' : 'A dark fantasy masterpiece.'}
+          <div className="flex-1">
+            <div className="mb-4">
+              <div className="flex items-start gap-4 sm:gap-6">
+                <h1 className="text-2xl font-bold text-[var(--mh-text)] leading-tight">{manga.title}</h1>
+                <span
+                  className={[
+                    'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-xs font-medium uppercase tracking-wider',
+                    isComingSoon
+                      ? 'border-amber-400/40 bg-amber-500/15 text-amber-100'
+                      : 'border-[var(--mh-border-soft)] bg-[var(--mh-surface-strong)]/50 text-[var(--mh-text-secondary)]',
+                  ].join(' ')}
+                >
+                  {isComingSoon ? 'Coming Soon' : manga.status}
+                </span>
+              </div>
+              <p className="mt-2 text-sm text-[var(--mh-text-secondary)]">
+                {manga.japaneseTitle}
+                <span className="mx-2 text-[var(--mh-text-muted)]">·</span>
+                By {manga.author}
               </p>
             </div>
-
-            <div className="fade-up" style={{ animationDelay: '240ms' }}>
-              <div className="flex flex-wrap items-center gap-3 md:gap-5 mb-6 md:mb-8">
+            <div className="flex flex-wrap gap-2 mb-6">
+              {genreTags.map((tag: string, i: number) => (
                 <span
-                  className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface)] text-xs font-bold text-[var(--mh-text-secondary)]"
+                  key={i}
+                  className="px-2.5 py-0.5 rounded-full border border-[var(--mh-border-soft)] bg-[var(--mh-surface-strong)]/50 text-xs font-medium uppercase tracking-wider text-[var(--mh-text-secondary)]"
                 >
-                  {detail.rating || '—'}
+                  {tag}
                 </span>
-                <span
-                  className="px-2.5 py-0.5 rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface)] text-xs text-[var(--mh-text-secondary)]"
-                >
-                  {detail.author || 'Unknown Author'}
-                </span>
-                <span
-                  className="px-2.5 py-0.5 rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface)] text-xs text-[var(--mh-text-secondary)]"
-                >
-                  {detail.status || '—'}
-                </span>
-                {genreTags.map((tag: string, i: number) => (
-                  <span
-                    key={i}
-                    className="px-2.5 py-0.5 rounded-full border border-[var(--mh-border-soft)] bg-[var(--mh-surface-strong)]/50 text-xs font-medium uppercase tracking-wider text-[var(--mh-text-secondary)]"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
+              ))}
             </div>
-
             <div className="fade-up" style={{ animationDelay: '300ms' }}>
               <div className="flex flex-col sm:flex-row gap-3">
-                <Link
-                  href={`/manga/${mangaId}/chapter/1`}
-                  className="w-full sm:w-auto flex-1 h-12 rounded-[11px] bg-[#f2f2f2] text-black font-bold text-[15px] flex items-center justify-center shadow-[0_6px_24px_rgba(255,255,255,0.12)] transition-all duration-200 hover:bg-white hover:shadow-[0_6px_24px_rgba(255,255,255,0.25)] active:translate-y-[1px] text-center"
-                >
-                  Start Reading
-                </Link>
+                {firstChapterId !== undefined ? (
+                  <Link
+                    href={`/manga/${mangaId}/chapter/${firstChapterId}`}
+                    className="w-full sm:w-auto flex-1 h-12 rounded-[11px] bg-[#f2f2f2] text-black font-bold text-[15px] flex items-center justify-center shadow-[0_6px_24px_rgba(255,255,255,0.12)] transition-all duration-200 hover:bg-white hover:shadow-[0_6px_24px_rgba(255,255,255,0.25)] active:translate-y-[1px] text-center"
+                  >
+                    Start Reading
+                  </Link>
+                ) : (
+                  <button
+                    disabled
+                    className="w-full sm:w-auto flex-1 h-12 rounded-[11px] bg-[#f2f2f2]/50 text-black font-bold text-[15px] flex items-center justify-center opacity-50 cursor-not-allowed text-center"
+                  >
+                    Coming Soon
+                  </button>
+                )}
                 <button
                   onClick={handleSave}
                   aria-label={saved ? 'Remove from backpack' : 'Add to backpack'}
@@ -155,18 +153,16 @@ function MangaDetailPage({ id: idProp }: MangaDetailPageProps) {
       </div>
 
       <div className="max-w-5xl mx-auto mt-16">
-        {detail.synopsis && (
-          <section className="fade-up mb-16" style={{ animationDelay: '390ms' }}>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold uppercase tracking-widest text-[var(--mh-text-secondary)] border-b border-[var(--mh-border)] pb-3">
-                Synopsis
-              </h2>
-            </div>
-            <p className="text-[var(--mh-text-secondary)]/90 leading-relaxed text-sm sm:text-base max-w-3xl">
-              {detail.synopsis}
-            </p>
-          </section>
-        )}
+        <section className="fade-up mb-16" style={{ animationDelay: '390ms' }}>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold uppercase tracking-widest text-[var(--mh-text-secondary)] border-b border-[var(--mh-border)] pb-3">
+              Synopsis
+            </h2>
+          </div>
+          <p className="text-[var(--mh-text-secondary)]/90 leading-relaxed text-sm sm:text-base max-w-3xl">
+            {manga.description}
+          </p>
+        </section>
 
         <section className="fade-up mb-8 w-full" style={{ animationDelay: '450ms' }}>
           <div className="flex items-center justify-between mb-6">
@@ -176,7 +172,7 @@ function MangaDetailPage({ id: idProp }: MangaDetailPageProps) {
           </div>
           <div className="space-y-1 rounded-xl border border-[var(--mh-border)] bg-[var(--mh-surface)] overflow-hidden shadow-sm">
             {chapters.length > 0 ? (
-              chapters.map((ch: Chapter) => (
+              chapters.map((ch) => (
                 <Link
                   key={ch.chapterId}
                   href={`/manga/${mangaId}/chapter/${ch.chapterId}`}
