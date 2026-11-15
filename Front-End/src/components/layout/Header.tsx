@@ -74,7 +74,7 @@ function Header() {
               type="button"
               onClick={() => router.push('/profile')}
               aria-label="Profile"
-              className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface-strong)] text-[var(--mh-text)] transition hover:bg-[var(--mh-surface)] hover:text-[var(--mh-text)]"
+              className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface-strong)] text-[var(--mh-text)] transition hover:bg-[var(--mh-surface)] hover:text-[var(--mh-text)]"
             >
               {user.avatar ? (
                 <Image
@@ -82,10 +82,8 @@ function Header() {
                   alt="avatar"
                   width={36}
                   height={36}
-                  className="w-full h-full rounded-full object-cover"
-                  fill
-                  sizes="36px"
-                  style={{ objectFit: 'cover' }}
+                  unoptimized
+                  className="h-full w-full rounded-full object-cover"
                 />
               ) : (
                 <User strokeWidth={0.75} className="h-5 w-5" />

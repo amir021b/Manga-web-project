@@ -1,8 +1,8 @@
 "use client";
 
-import { useBackpack } from '@/context/BackpackContext';
-import { useMangaById } from '@/hooks/api/useManga';
-import Link from 'next/link';
+import { useBackpack } from "@/context/BackpackContext";
+import { useMangaById } from "@/hooks/api/useManga";
+import Link from "next/link";
 
 interface MangaDetailPageProps {
   id: string | number;
@@ -19,9 +19,11 @@ function MangaDetailPage({ id: idProp }: MangaDetailPageProps) {
     return (
       <section className="min-h-screen flex items-center justify-center px-4 bg-[var(--mh-bg)]">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-[var(--mh-text)]">Manga not found</h1>
+          <h1 className="text-2xl font-bold text-[var(--mh-text)]">
+            Manga not found
+          </h1>
           <p className="text-[var(--mh-text-secondary)] mt-2">
-            The manga you&#39;re looking for doesn&#39;t exist.
+            The manga you are looking for does not exist.
           </p>
           <Link
             href="/"
@@ -45,7 +47,6 @@ function MangaDetailPage({ id: idProp }: MangaDetailPageProps) {
 
   const genreTags = manga.genres;
   const chapters = manga.detail.chapters;
-  const isComingSoon = chapters.length === 0;
   const firstChapterId = chapters[0]?.chapterId;
 
   return (
@@ -59,9 +60,9 @@ function MangaDetailPage({ id: idProp }: MangaDetailPageProps) {
                   className="absolute inset-0 bg-cover bg-center"
                   style={{
                     backgroundImage: `url("${manga.posterUrl}")`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    filter: 'grayscale(100%)',
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    filter: "grayscale(100%)",
                   }}
                 />
               ) : (
@@ -78,32 +79,34 @@ function MangaDetailPage({ id: idProp }: MangaDetailPageProps) {
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                     <circle cx="12" cy="12" r="3" />
                   </svg>
-                  <span className="text-xs font-medium uppercase tracking-widest">No Cover Yet</span>
+                  <span className="text-xs font-medium uppercase tracking-widest">
+                    No Cover Yet
+                  </span>
                 </div>
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
               <button
                 onClick={handleSave}
-                aria-label={saved ? 'Remove from backpack' : 'Add to backpack'}
+                aria-label={saved ? "Remove from backpack" : "Add to backpack"}
                 className="absolute top-3 right-3 z-50 rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface)]/90 backdrop-blur-md px-3 py-1.5 text-xs font-semibold text-[var(--mh-text)] transition hover:bg-[var(--mh-surface-strong)] hover:text-[var(--mh-text)]"
               >
-                {saved ? 'Remove' : 'Save'}
+                {saved ? "Remove" : "Save"}
               </button>
             </div>
           </div>
           <div className="flex-1">
             <div className="mb-4">
               <div className="flex items-start gap-4 sm:gap-6">
-                <h1 className="text-2xl font-bold text-[var(--mh-text)] leading-tight">{manga.title}</h1>
+                <h1 className="text-2xl font-bold text-[var(--mh-text)] leading-tight">
+                  {manga.title}
+                </h1>
                 <span
                   className={[
-                    'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-xs font-medium uppercase tracking-wider',
-                    isComingSoon
-                      ? 'border-amber-400/40 bg-amber-500/15 text-amber-100'
-                      : 'border-[var(--mh-border-soft)] bg-[var(--mh-surface-strong)]/50 text-[var(--mh-text-secondary)]',
-                  ].join(' ')}
+                    "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-xs font-medium uppercase tracking-wider",
+                    "border-[var(--mh-border-soft)] bg-[var(--mh-surface-strong)]/50 text-[var(--mh-text-secondary)]",
+                  ].join(" ")}
                 >
-                  {isComingSoon ? 'Coming Soon' : manga.status}
+                  {manga.status}
                 </span>
               </div>
               <p className="mt-2 text-sm text-[var(--mh-text-secondary)]">
@@ -122,7 +125,7 @@ function MangaDetailPage({ id: idProp }: MangaDetailPageProps) {
                 </span>
               ))}
             </div>
-            <div className="fade-up" style={{ animationDelay: '300ms' }}>
+            <div className="fade-up" style={{ animationDelay: "300ms" }}>
               <div className="flex flex-col sm:flex-row gap-3">
                 {firstChapterId !== undefined ? (
                   <Link
@@ -134,17 +137,19 @@ function MangaDetailPage({ id: idProp }: MangaDetailPageProps) {
                 ) : (
                   <button
                     disabled
-                    className="w-full sm:w-auto flex-1 h-12 rounded-[11px] bg-[#f2f2f2]/50 text-black font-bold text-[15px] flex items-center justify-center opacity-50 cursor-not-allowed text-center"
+                    className="w-full sm:w-auto flex-1 h-12 rounded-[11px] border border-[var(--mh-border)] bg-[var(--mh-surface)] text-[var(--mh-text-muted)] font-bold text-[15px] cursor-not-allowed flex items-center justify-center text-center"
                   >
                     Coming Soon
                   </button>
                 )}
                 <button
                   onClick={handleSave}
-                  aria-label={saved ? 'Remove from backpack' : 'Add to backpack'}
+                  aria-label={
+                    saved ? "Remove from backpack" : "Add to backpack"
+                  }
                   className="w-full sm:w-auto flex-1 h-12 rounded-[11px] border border-[var(--mh-border)] bg-[var(--mh-surface)] text-[var(--mh-text)] font-bold text-[15px] transition-all duration-200 hover:bg-[var(--mh-surface-strong)] active:translate-y-[1px] text-center"
                 >
-                  {saved ? 'Remove from Backpack' : 'Save to Backpack'}
+                  {saved ? "Remove from Backpack" : "Save to Backpack"}
                 </button>
               </div>
             </div>
@@ -153,7 +158,7 @@ function MangaDetailPage({ id: idProp }: MangaDetailPageProps) {
       </div>
 
       <div className="max-w-5xl mx-auto mt-16">
-        <section className="fade-up mb-16" style={{ animationDelay: '390ms' }}>
+        <section className="fade-up mb-16" style={{ animationDelay: "390ms" }}>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold uppercase tracking-widest text-[var(--mh-text-secondary)] border-b border-[var(--mh-border)] pb-3">
               Synopsis
@@ -164,7 +169,10 @@ function MangaDetailPage({ id: idProp }: MangaDetailPageProps) {
           </p>
         </section>
 
-        <section className="fade-up mb-8 w-full" style={{ animationDelay: '450ms' }}>
+        <section
+          className="fade-up mb-8 w-full"
+          style={{ animationDelay: "450ms" }}
+        >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold uppercase tracking-widest text-[var(--mh-text-secondary)] border-b border-[var(--mh-border)] pb-3">
               Chapters ({chapters.length})
@@ -187,7 +195,9 @@ function MangaDetailPage({ id: idProp }: MangaDetailPageProps) {
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-[var(--mh-text-secondary)]">{ch.date}</span>
+                    <span className="text-xs text-[var(--mh-text-secondary)]">
+                      {ch.date}
+                    </span>
                     <span className="text-[10px] font-bold text-[var(--mh-text-secondary)] group-hover:text-[var(--mh-text)] transition uppercase tracking-wider">
                       Read
                     </span>

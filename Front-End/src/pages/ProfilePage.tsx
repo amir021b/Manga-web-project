@@ -30,16 +30,17 @@ const TABS = [
 function ProfilePage() {
   const router = useRouter();
   const { backpack } = useBackpack();
-  const { user, setCurrentUser, logout, isLoggedIn } = useUser();
+  const { user, setCurrentUser, logout, isLoggedIn, isLoadingAuth } =
+    useUser();
   const { mutateAsync: updateProfile } = useUpdateProfile();
   const [activeTab, setActiveTab] = useState("backpack");
   const [isEditOpen, setIsEditOpen] = useState(false);
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (!isLoadingAuth && !isLoggedIn) {
       router.replace("/login");
     }
-  }, [isLoggedIn, router]);
+  }, [isLoadingAuth, isLoggedIn, router]);
 
   const handleSave = async (next: { username: string; bio: string; avatar: string | null }) => {
     const optimisticUser: UserData = { ...user, ...next };
@@ -78,10 +79,8 @@ function ProfilePage() {
                   alt="avatar"
                   width={96}
                   height={96}
+                  unoptimized
                   className="h-full w-full object-cover"
-                  fill
-                  sizes="96px"
-                  style={{ objectFit: 'cover' }}
                 />
               ) : (
                 <User strokeWidth={1.25} className="h-12 w-12" />

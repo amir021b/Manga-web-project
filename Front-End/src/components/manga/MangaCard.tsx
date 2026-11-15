@@ -20,14 +20,6 @@ function MangaCard({ id, title, genres, posterUrl, to, hoverLift = true, hoverLi
   const saved = isInBackpack(id);
   const destination = to || (id != null ? `/manga/${id}` : '#');
   const hasPoster = Boolean(posterUrl);
-  const isComingSoon = !hasAvailableChapters(id);
-  const statusBadge = isComingSoon ? (
-    <span className="absolute top-3 left-3 z-20 rounded-full border border-amber-400/40 bg-amber-500/20 px-3 py-1 text-xs font-bold uppercase tracking-wide text-amber-100 backdrop-blur-md shadow-[0_0_20px_rgba(245,158,11,0.25)]">
-      Coming Soon
-    </span>
-  ) : (
-    badge
-  );
 
   const handleSave = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -93,18 +85,17 @@ function MangaCard({ id, title, genres, posterUrl, to, hoverLift = true, hoverLi
             View Details →
           </a>
         </div>
-      )}
+      )} 
       {showSaveButton && (
         <button
           type="button"
           onClick={handleSave}
           aria-label={saved ? 'Remove from backpack' : 'Add to backpack'}
-          className="absolute top-3 right-3 z-20 rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface)] px-3 py-2 text-xs font-semibold text-[var(--mh-text)] transition hover:bg-[var(--mh-surface-strong)] hover:text-[var(--mh-text)]"
+          className="absolute top-3 left-3 rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface)] px-3 py-2 text-xs font-semibold text-[var(--mh-text)] transition hover:bg-[var(--mh-surface-strong)] hover:text-[var(--mh-text)]"
         >
           {saved ? 'Remove' : 'Save'}
         </button>
       )}
-      {statusBadge}
     </article>
   );
 }

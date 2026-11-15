@@ -8,6 +8,20 @@ import type {
 
 const PROFILE_ENDPOINT = "/api/users/profile";
 
+export const USE_MOCK_PROFILE = true;
+
+const mockProfile: UserData = {
+  id: "mock-user",
+  username: "Manga Tester",
+  email: "manga.tester@mangahub.local",
+  bio: "Frontend UI testing profile with mocked data.",
+  avatar: "/avatars/manga-tester.png",
+};
+
+export function getMockProfile(): UserData {
+  return { ...mockProfile };
+}
+
 export function unwrapUserPayload(
   payload: ProfilePayload | undefined,
 ): UserData | null {
@@ -21,6 +35,8 @@ export function unwrapUserPayload(
 }
 
 export async function fetchProfile(): Promise<UserData | null> {
+  if (USE_MOCK_PROFILE) return getMockProfile();
+
   if (!getStoredToken()) return null;
 
   try {
@@ -34,6 +50,11 @@ export async function fetchProfile(): Promise<UserData | null> {
 export async function updateProfile(
   userData: UpdateProfileInput,
 ): Promise<UserData | null> {
+  if (USE_MOCK_PROFILE) {
+    Object.assign(mockProfile, userData);
+    return getMockProfile();
+  }
+
   try {
     const { data } = await api.put<ProfileResponse>(PROFILE_ENDPOINT, {
       username: userData.username,

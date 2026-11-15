@@ -8,6 +8,7 @@ import {
 } from "@/hooks/api/useBackpack";
 import { queryKeys } from "@/hooks/api/queryKeys";
 import { getAllManga, type MangaItem } from "@/services/mangaApi";
+import { USE_MOCK_PROFILE } from "@/services/userApi";
 import { useUser } from "./UserContext";
 
 interface BackpackContextValue {
@@ -32,8 +33,9 @@ const normalizeId = (id: string | number): string => String(id);
 
 export function BackpackProvider({ children }: { children: React.ReactNode }) {
   const { isLoggedIn } = useUser();
+  const canSyncBackpack = isLoggedIn && !USE_MOCK_PROFILE;
   const queryClient = useQueryClient();
-  const { data: backpackIds = [] } = useBackpackQuery(isLoggedIn);
+  const { data: backpackIds = [] } = useBackpackQuery(canSyncBackpack);
   const toggleBackpackItem = useToggleBackpackItem();
 
   const backpack = useMemo(() => {
@@ -58,7 +60,7 @@ export function BackpackProvider({ children }: { children: React.ReactNode }) {
 
     if (backpackIds.includes(normalizedId)) return;
 
-    if (!isLoggedIn) {
+    if (!canSyncBackpack) {
       queryClient.setQueryData<string[]>(queryKeys.backpack, [
         ...backpackIds,
         normalizedId,
@@ -75,7 +77,7 @@ export function BackpackProvider({ children }: { children: React.ReactNode }) {
 
     if (!backpackIds.includes(normalizedId)) return;
 
-    if (!isLoggedIn) {
+    if (!canSyncBackpack) {
       queryClient.setQueryData<string[]>(
         queryKeys.backpack,
         backpackIds.filter((id) => id !== normalizedId),

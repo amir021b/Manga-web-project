@@ -29,6 +29,7 @@ function EditProfileModal({ user, onSave, onClose }: EditProfileModalProps) {
     avatarPreview,
     setAvatarPreview,
     crop,
+    isPanning,
     resetCrop,
     handleAvatarChange,
     handlePanStart,
@@ -36,7 +37,10 @@ function EditProfileModal({ user, onSave, onClose }: EditProfileModalProps) {
     handlePanEnd,
     handleZoom,
     cropImage,
-    transform,
+    previewWidth,
+    previewHeight,
+    minZoom,
+    maxZoom,
   } = useAvatarCrop(user?.avatar ?? null);
 
   useEffect(() => {
@@ -103,21 +107,40 @@ function EditProfileModal({ user, onSave, onClose }: EditProfileModalProps) {
         <form onSubmit={handleSave} className="mt-6 space-y-4">
           <div className="flex flex-col items-center gap-3">
             <div
-              className="relative h-40 w-40 cursor-grab overflow-hidden rounded-full border-2 border-[var(--mh-border)] bg-[var(--mh-surface)] shadow-[0_0_24px_rgba(0,0,0,0.15)] active:cursor-grabbing"
-              onMouseDown={handlePanStart}
-              onMouseMove={handlePanMove}
-              onMouseUp={handlePanEnd}
-              onMouseLeave={handlePanEnd}
+              className={`relative h-40 w-40 touch-none select-none overflow-hidden rounded-full border-2 border-[var(--mh-border)] bg-[var(--mh-surface)] shadow-[0_0_24px_rgba(0,0,0,0.15)] ${
+                isPanning ? "cursor-grabbing" : "cursor-grab"
+              }`}
+              onPointerDown={handlePanStart}
+              onPointerMove={handlePanMove}
+              onPointerUp={handlePanEnd}
+              onPointerCancel={handlePanEnd}
             >
               {avatarPreview ? (
-                <Image
-                  src={avatarPreview}
-                  alt="avatar preview"
-                  className="absolute left-1/2 top-1/2 max-w-none select-none"
-                  fill
-                  sizes="180px"
-                  style={{ transform, objectFit: 'cover' }}
-                />
+                <div
+                  className="absolute left-1/2 top-1/2 will-change-transform"
+                  style={{
+                    width: previewWidth,
+                    height: previewHeight,
+                    transform: `translate(-50%, -50%) translate(${crop.x}px, ${crop.y}px)`,
+                  }}
+                >
+                  <Image
+                    src={avatarPreview}
+                    alt="avatar preview"
+                    width={Math.round(previewWidth)}
+                    height={Math.round(previewHeight)}
+                    unoptimized
+                    draggable={false}
+                    className="h-full w-full max-w-none select-none object-cover"
+                    style={{
+                      transform: `scale(${crop.zoom})`,
+                      transition: isPanning
+                        ? "none"
+                        : "transform 80ms linear",
+                      willChange: "transform",
+                    }}
+                  />
+                </div>
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-[var(--mh-text-secondary)]/60">
                   <User strokeWidth={1.25} className="h-12 w-12" />
@@ -142,11 +165,12 @@ function EditProfileModal({ user, onSave, onClose }: EditProfileModalProps) {
                 <ZoomIn className="h-4 w-4 shrink-0 text-[var(--mh-text-secondary)]/60" />
                 <input
                   type="range"
-                  min="0.1"
-                  max="3"
+                  min={minZoom}
+                  max={maxZoom}
                   step="0.01"
                   value={crop.zoom}
                   onChange={handleZoom}
+                  aria-label="Avatar zoom"
                   className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-white/10 accent-white"
                 />
               </div>

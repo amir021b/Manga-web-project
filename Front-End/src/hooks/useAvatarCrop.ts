@@ -2,7 +2,9 @@
 
 import { useState, useRef, useEffect } from 'react';
 
-const VIEWPORT = 160;
+export const AVATAR_VIEWPORT = 160;
+export const AVATAR_MIN_ZOOM = 1;
+export const AVATAR_MAX_ZOOM = 4;
 
 interface CropState {
   zoom: number;
@@ -22,13 +24,53 @@ interface ImgDims {
   height: number;
 }
 
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function getFitSize(dims: ImgDims | null) {
+  if (!dims || dims.width <= 0 || dims.height <= 0) {
+    return { width: AVATAR_VIEWPORT, height: AVATAR_VIEWPORT };
+  }
+
+  const scale = Math.min(
+    AVATAR_VIEWPORT / dims.width,
+    AVATAR_VIEWPORT / dims.height,
+  );
+
+  return {
+    width: dims.width * scale,
+    height: dims.height * scale,
+  };
+}
+
+function getMaxZoom(dims: ImgDims | null) {
+  const fit = getFitSize(dims);
+  const coverZoom = AVATAR_VIEWPORT / Math.max(1, Math.min(fit.width, fit.height));
+  return Math.max(AVATAR_MAX_ZOOM, coverZoom * 1.5);
+}
+
+function constrainCrop(crop: CropState, dims: ImgDims | null): CropState {
+  const zoom = clamp(crop.zoom, AVATAR_MIN_ZOOM, getMaxZoom(dims));
+  const fit = getFitSize(dims);
+  const maxX = Math.max(0, (fit.width * zoom - AVATAR_VIEWPORT) / 2);
+  const maxY = Math.max(0, (fit.height * zoom - AVATAR_VIEWPORT) / 2);
+
+  return {
+    zoom,
+    x: clamp(crop.x, -maxX, maxX),
+    y: clamp(crop.y, -maxY, maxY),
+  };
+}
+
 function useAvatarCrop(initialAvatar: string | null = null) {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(initialAvatar);
   const [imgDims, setImgDims] = useState<ImgDims | null>(null);
-  const [crop, setCrop] = useState<CropState>({ zoom: 1, x: 0, y: 0 });
+  const [crop, setCrop] = useState<CropState>({ zoom: AVATAR_MIN_ZOOM, x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
   const panStart = useRef<PanStart>({ x: 0, y: 0, cropX: 0, cropY: 0 });
+  const panningRef = useRef(false);
 
   useEffect(() => {
     return () => {
@@ -37,36 +79,50 @@ function useAvatarCrop(initialAvatar: string | null = null) {
   }, [avatarPreview, avatarFile]);
 
   useEffect(() => {
+    if (!avatarPreview) return;
+
+    let cancelled = false;
     const img = new Image();
+
     img.onload = () => {
-      setImgDims({ width: img.naturalWidth, height: img.naturalHeight });
-      const fs = Math.min(VIEWPORT / img.naturalWidth, VIEWPORT / img.naturalHeight);
-      setCrop({ zoom: fs, x: 0, y: 0 });
+      if (cancelled) return;
+      const dims = { width: img.naturalWidth, height: img.naturalHeight };
+      setImgDims(dims);
+      setCrop({ zoom: AVATAR_MIN_ZOOM, x: 0, y: 0 });
     };
+
     img.onerror = () => {
+      if (cancelled) return;
       setImgDims(null);
-      setCrop({ zoom: 1, x: 0, y: 0 });
+      setCrop({ zoom: AVATAR_MIN_ZOOM, x: 0, y: 0 });
     };
-    img.src = avatarPreview || '';
+
+    img.src = avatarPreview;
+
+    return () => {
+      cancelled = true;
+    };
   }, [avatarPreview]);
 
   const resetCrop = () => {
-    const fs = imgDims
-      ? Math.min(VIEWPORT / imgDims.width, VIEWPORT / imgDims.height)
-      : 1;
-    setCrop({ zoom: fs, x: 0, y: 0 });
+    setCrop({ zoom: AVATAR_MIN_ZOOM, x: 0, y: 0 });
   };
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (avatarPreview && avatarFile) URL.revokeObjectURL(avatarPreview);
+    setImgDims(null);
+    setCrop({ zoom: AVATAR_MIN_ZOOM, x: 0, y: 0 });
     setAvatarFile(file);
     setAvatarPreview(URL.createObjectURL(file));
   };
 
-  const handlePanStart = (e: React.MouseEvent) => {
-    if (!avatarPreview) return;
+  const handlePanStart = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!avatarPreview || e.button !== 0) return;
+    e.preventDefault();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    panningRef.current = true;
     setIsPanning(true);
     panStart.current = {
       x: e.clientX,
@@ -76,56 +132,95 @@ function useAvatarCrop(initialAvatar: string | null = null) {
     };
   };
 
-  const handlePanMove = (e: React.MouseEvent) => {
-    if (!isPanning) return;
+  const handlePanMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!panningRef.current) return;
+    e.preventDefault();
+
     const dx = e.clientX - panStart.current.x;
     const dy = e.clientY - panStart.current.y;
-    setCrop((c) => ({
-      ...c,
-      x: panStart.current.cropX + dx,
-      y: panStart.current.cropY + dy,
-    }));
+
+    setCrop((current) =>
+      constrainCrop(
+        {
+          ...current,
+          x: panStart.current.cropX + dx,
+          y: panStart.current.cropY + dy,
+        },
+        imgDims,
+      ),
+    );
   };
 
-  const handlePanEnd = () => setIsPanning(false);
+  const handlePanEnd = (e?: React.PointerEvent<HTMLDivElement>) => {
+    if (!panningRef.current) return;
+    panningRef.current = false;
+    setIsPanning(false);
+
+    if (e && e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+  };
 
   const handleZoom = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const zoom = parseFloat(e.target.value);
-    setCrop((c) => ({ ...c, zoom }));
+    const nextZoom = Number.parseFloat(e.target.value);
+    const zoom = Number.isFinite(nextZoom)
+      ? clamp(nextZoom, AVATAR_MIN_ZOOM, getMaxZoom(imgDims))
+      : AVATAR_MIN_ZOOM;
+
+    setCrop((current) => constrainCrop({ ...current, zoom }, imgDims));
   };
 
   const cropImage = (): Promise<string | null> => {
     return new Promise((resolve) => {
       if (!avatarPreview) return resolve(null);
+
       const img = new Image();
       img.crossOrigin = 'anonymous';
+
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        canvas.width = VIEWPORT;
-        canvas.height = VIEWPORT;
+        canvas.width = AVATAR_VIEWPORT;
+        canvas.height = AVATAR_VIEWPORT;
+
         const ctx = canvas.getContext('2d');
         if (!ctx) return resolve(null);
+
+        const dims = { width: img.naturalWidth, height: img.naturalHeight };
+        const fit = getFitSize(dims);
+        const totalScale = (fit.width / dims.width) * crop.zoom;
+        const displayedWidth = dims.width * totalScale;
+        const displayedHeight = dims.height * totalScale;
+        const left = (AVATAR_VIEWPORT - displayedWidth) / 2 + crop.x;
+        const top = (AVATAR_VIEWPORT - displayedHeight) / 2 + crop.y;
+
         ctx.beginPath();
-        ctx.arc(VIEWPORT / 2, VIEWPORT / 2, VIEWPORT / 2, 0, Math.PI * 2);
+        ctx.arc(
+          AVATAR_VIEWPORT / 2,
+          AVATAR_VIEWPORT / 2,
+          AVATAR_VIEWPORT / 2,
+          0,
+          Math.PI * 2,
+        );
         ctx.closePath();
         ctx.clip();
-        const scale = crop.zoom;
-        const dispW = img.naturalWidth * scale;
-        const dispH = img.naturalHeight * scale;
-        const left = VIEWPORT / 2 - dispW / 2 + crop.x;
-        const top = VIEWPORT / 2 - dispH / 2 + crop.y;
-        const sx = (0 - left) / scale;
-        const sy = (0 - top) / scale;
-        const sSize = VIEWPORT / scale;
-        ctx.drawImage(img, sx, sy, sSize, sSize, 0, 0, VIEWPORT, VIEWPORT);
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(
+          img,
+          left,
+          top,
+          displayedWidth,
+          displayedHeight,
+        );
+
         resolve(canvas.toDataURL('image/png'));
       };
+
       img.onerror = () => resolve(null);
       img.src = avatarPreview;
     });
   };
 
-  const transform = `translate(-50%, -50%) translate(${crop.x}px, ${crop.y}px) scale(${crop.zoom})`;
+  const fit = getFitSize(imgDims);
 
   return {
     avatarFile,
@@ -135,8 +230,6 @@ function useAvatarCrop(initialAvatar: string | null = null) {
     crop,
     setCrop,
     isPanning,
-    setIsPanning,
-    panStart,
     resetCrop,
     handleAvatarChange,
     handlePanStart,
@@ -144,7 +237,10 @@ function useAvatarCrop(initialAvatar: string | null = null) {
     handlePanEnd,
     handleZoom,
     cropImage,
-    transform,
+    previewWidth: fit.width,
+    previewHeight: fit.height,
+    minZoom: AVATAR_MIN_ZOOM,
+    maxZoom: getMaxZoom(imgDims),
   };
 }
 
