@@ -14,7 +14,7 @@ export const ACCENT_OPTIONS = [
 
 export const DENSITY_OPTIONS = [
   { id: 'comfortable', label: 'Comfortable' },
-  { id: 'compact', label: 'Compact' },
+  // { id: 'compact', label: 'Compact' }, // Hidden until density is implemented
 ];
 
 export type AccentOption = { id: string; label: string; color: string };
@@ -52,7 +52,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     try { return localStorage.getItem('mangahub_accent') || 'red'; } catch { return 'red'; }
   });
   const [density, setDensity] = useState(() => {
-    try { return localStorage.getItem('mangahub_density') || 'comfortable'; } catch { return 'comfortable'; }
+    try {
+      const saved = localStorage.getItem('mangahub_density');
+      return saved === 'compact' ? 'comfortable' : saved || 'comfortable';
+    } catch { return 'comfortable'; }
   });
 
   useEffect(() => {
