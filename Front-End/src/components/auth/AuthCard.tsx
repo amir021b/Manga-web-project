@@ -50,7 +50,7 @@ function AuthCard() {
   }
 
   return (
-    <div className="auth-card-in">
+    <div className="auth-card-in w-full max-w-[420px]">
       <GlassCard>
         <div className="fade-up mb-6" style={{ animationDelay: '80ms' }}>
           <Logo />
