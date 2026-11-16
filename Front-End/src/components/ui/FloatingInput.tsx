@@ -12,6 +12,7 @@ interface FloatingInputProps {
   leadingIcon?: React.ReactNode;
   error?: string;
   className?: string;
+  variant?: "default" | "floating";
 }
 
 function FloatingInput({
@@ -28,11 +29,14 @@ function FloatingInput({
   leadingIcon,
   error,
   className,
+  variant = "default",
 }: FloatingInputProps) {
+  const isFloating = variant === "floating" && Boolean(label);
+
   return (
     <div className="group relative">
       <div className="relative">
-        {leadingIcon && (
+        {leadingIcon && !isFloating && (
           <div
             className="absolute left-3 top-1/2 -translate-y-1/2 z-10 text-zinc-400"
             aria-hidden="true"
@@ -46,15 +50,23 @@ function FloatingInput({
           type={type}
           value={value}
           onChange={onChange}
-          placeholder={placeholder}
+          placeholder={isFloating ? " " : placeholder}
           autoComplete={autoComplete}
           disabled={disabled}
-          aria-label={label}
+          aria-label={isFloating ? undefined : label}
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `${id}-error` : undefined}
           className={[
-            "w-full rounded-[20px] border border-white/10 bg-zinc-900/80 px-4 py-3.5 text-white placeholder-zinc-500 text-[15px] cursor-text",
-            leadingIcon ? "pl-10 pr-4" : endAdornment ? "pl-4 pr-16" : "pl-4 pr-4",
+            "w-full rounded-[20px] border border-white/10 bg-[#151517] px-4 py-3.5 text-white placeholder-zinc-500 text-[15px] cursor-text",
+            isFloating
+              ? endAdornment
+                ? "peer pl-4 pr-16"
+                : "peer pl-4 pr-4"
+              : leadingIcon
+                ? "pl-10 pr-4"
+                : endAdornment
+                  ? "pl-4 pr-16"
+                  : "pl-4 pr-4",
             "transition-all duration-300 motion-reduce:transition-none",
             "disabled:opacity-100 cursor-not-allowed",
             error ? "border border-dashed border-white/55" : "",
@@ -62,6 +74,20 @@ function FloatingInput({
             className || "",
           ].join(" ")}
         />
+        {isFloating ? (
+          <label
+            htmlFor={id}
+            className={[
+              "pointer-events-none absolute left-4 top-0 z-10 -translate-y-1/2 select-none rounded-sm px-1 text-[11px] text-zinc-400",
+              "bg-[#151517]",
+              "transition-all duration-200 motion-reduce:transition-none",
+              "peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:bg-transparent peer-placeholder-shown:px-0 peer-placeholder-shown:text-[15px]",
+              "peer-focus:top-0 peer-focus:-translate-y-1/2 peer-focus:bg-[#151517] peer-focus:px-1 peer-focus:text-[11px]",
+            ].join(" ")}
+          >
+            {label}
+          </label>
+        ) : null}
         {endAdornment && (
           <div className="absolute right-2 top-1/2 -translate-y-1/2 z-10">
             {endAdornment}

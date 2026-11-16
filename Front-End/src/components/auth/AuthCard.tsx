@@ -13,7 +13,6 @@ import LinkButton from '@/components/ui/LinkButton';
 import Collapse from '@/components/ui/Collapse';
 import StarBackground from '@/components/layout/StarBackground';
 import TermsDialog from './TermsDialog';
-import { User, Mail, Lock } from 'lucide-react';
 
 function AuthCard() {
   const {
@@ -71,10 +70,10 @@ function AuthCard() {
                   type="text"
                   value={values.username}
                   onChange={handleChange("username") as (e: React.ChangeEvent<HTMLInputElement>) => void}
-                  placeholder="Username"
+                  label="Username"
                   autoComplete="nickname"
                   disabled={isSubmitting || !isSignup}
-                  leadingIcon={<User className="w-4 h-4" />}
+                  variant="floating"
                   error={errors.username ? ERROR_MESSAGES[errors.username as keyof typeof ERROR_MESSAGES] : undefined}
                 />
               </div>
@@ -87,10 +86,10 @@ function AuthCard() {
                 type="email"
                 value={values.email}
                 onChange={handleChange("email") as (e: React.ChangeEvent<HTMLInputElement>) => void}
-                placeholder="Email address"
+                label="Email address"
                 autoComplete={isSignup ? "email" : "username"}
                 disabled={isSubmitting}
-                leadingIcon={<Mail className="w-4 h-4" />}
+                variant="floating"
                 error={errors.email ? ERROR_MESSAGES[errors.email as keyof typeof ERROR_MESSAGES] : undefined}
               />
             </div>
@@ -102,10 +101,10 @@ function AuthCard() {
                 type={showPassword ? "text" : "password"}
                 value={values.password}
                 onChange={handleChange("password") as (e: React.ChangeEvent<HTMLInputElement>) => void}
-                placeholder="Password"
+                label="Password"
                 autoComplete={isSignup ? "new-password" : "current-password"}
                 disabled={isSubmitting}
-                leadingIcon={<Lock className="w-4 h-4" />}
+                variant="floating"
                 endAdornment={
                   <PasswordToggle
                     visible={showPassword}
@@ -125,10 +124,10 @@ function AuthCard() {
                   type={showConfirm ? "text" : "password"}
                   value={values.confirmPassword}
                   onChange={handleChange("confirmPassword") as (e: React.ChangeEvent<HTMLInputElement>) => void}
-                  placeholder="Confirm password"
+                  label="Confirm password"
                   autoComplete="new-password"
                   disabled={isSubmitting || !isSignup}
-                  leadingIcon={<Lock className="w-4 h-4" />}
+                  variant="floating"
                   endAdornment={
                     <PasswordToggle
                       visible={showConfirm}

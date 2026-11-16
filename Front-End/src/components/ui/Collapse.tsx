@@ -9,7 +9,7 @@ function Collapse({ open, children }: { open: boolean; children: React.ReactNode
       ].join(" ")}
     >
       <div
-        className="min-h-0 overflow-hidden pt-2 -mt-2 px-1 -mx-1"
+        className="min-h-0 overflow-hidden pt-2 -mt-2 px-1 -mx-1 focus-within:overflow-visible"
         inert={!open}
         aria-hidden={!open}
       >
