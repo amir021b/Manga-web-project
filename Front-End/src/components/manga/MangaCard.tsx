@@ -90,7 +90,7 @@ function MangaCard({ id, title, genres, posterUrl, to, hoverLift = true, hoverLi
           type="button"
           onClick={handleSave}
           aria-label={saved ? 'Remove from backpack' : 'Add to backpack'}
-          className="absolute top-3 left-3 rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface)] px-3 py-2 text-xs font-semibold text-[var(--mh-text)] transition hover:bg-[var(--mh-surface-strong)] hover:text-[var(--mh-text)]"
+          className="absolute top-3 left-3 rounded-full border border-white/30 bg-black/60 backdrop-blur-sm px-3 py-2 text-xs font-semibold text-white transition hover:bg-black/80 hover:text-white"
         >
           {saved ? 'Remove' : 'Save'}
         </button>

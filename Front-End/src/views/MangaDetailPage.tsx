@@ -88,7 +88,7 @@ function MangaDetailPage({ id: idProp }: MangaDetailPageProps) {
               <button
                 onClick={handleSave}
                 aria-label={saved ? "Remove from backpack" : "Add to backpack"}
-                className="absolute top-3 right-3 z-50 rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface)]/90 backdrop-blur-md px-3 py-1.5 text-xs font-semibold text-[var(--mh-text)] transition hover:bg-[var(--mh-surface-strong)] hover:text-[var(--mh-text)]"
+                className="absolute top-3 right-3 z-50 rounded-full border border-white/30 bg-black/60 backdrop-blur-sm px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-black/80 hover:text-white"
               >
                 {saved ? "Remove" : "Save"}
               </button>
@@ -147,7 +147,7 @@ function MangaDetailPage({ id: idProp }: MangaDetailPageProps) {
                   aria-label={
                     saved ? "Remove from backpack" : "Add to backpack"
                   }
-                  className="w-full sm:w-auto flex-1 h-12 rounded-[11px] border border-[var(--mh-border)] bg-[var(--mh-surface)] text-[var(--mh-text)] font-bold text-[15px] transition-all duration-200 hover:bg-[var(--mh-surface-strong)] active:translate-y-[1px] text-center"
+                  className="w-full sm:w-auto flex-1 h-12 rounded-[11px] border border-white/30 bg-black/60 backdrop-blur-sm text-white font-bold text-[15px] transition-all duration-200 hover:bg-black/80 active:translate-y-[1px] text-center"
                 >
                   {saved ? "Remove from Backpack" : "Save to Backpack"}
                 </button>
