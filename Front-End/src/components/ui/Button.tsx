@@ -1,3 +1,5 @@
+"use client";
+
 function Button({ type = "button", children, disabled, loading = false, loadingLabel, onClick, className, style }: { type?: "button" | "submit" | "reset"; children: React.ReactNode; disabled?: boolean; loading?: boolean; loadingLabel?: string; onClick?: () => void; className?: string; style?: React.CSSProperties }) {
   const isDisabled = disabled || loading;
   return (

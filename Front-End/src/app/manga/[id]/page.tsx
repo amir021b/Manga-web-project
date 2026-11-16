@@ -1,5 +1,5 @@
 import Layout from '@/components/layout/Layout';
-import MangaDetailPage from '@/pages/MangaDetailPage';
+import MangaDetailPage from '@/views/MangaDetailPage';
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

@@ -1,7 +1,6 @@
 "use client";
 
 import { useBackpack } from '../../context/BackpackContext';
-import { hasAvailableChapters } from '../../services/mangaApi';
 
 interface MangaCardProps {
   id: number | string;

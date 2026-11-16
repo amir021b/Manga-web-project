@@ -1,5 +1,5 @@
 import Layout from '@/components/layout/Layout';
-import ReaderPage from '@/pages/ReaderPage';
+import ReaderPage from '@/views/ReaderPage';
 
 export default async function Page({ params }: { params: Promise<{ id: string; chapterId: string }> }) {
   const { id, chapterId } = await params;

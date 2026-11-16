@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import Layout from '@/components/layout/Layout';
-import SearchPage from '@/pages/SearchPage';
+import SearchPage from '@/views/SearchPage';
 
 export default function Page() {
   return (
