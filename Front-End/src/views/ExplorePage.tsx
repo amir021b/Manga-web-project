@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import MangaGrid from '@/components/manga/MangaGrid';
 import MangaCard from '@/components/manga/MangaCard';
 import { useMangaList } from '@/hooks/api/useManga';
-import type { MangaItem } from '@/data/bigThree';
+import type { MangaItem } from '@/services/data';
 
 function ExplorePage() {
   const [selectedGenre, setSelectedGenre] = useState('All');

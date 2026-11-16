@@ -7,7 +7,7 @@ import {
   searchManga,
   type MangaItem,
   type MangaWithDetails,
-} from "@/services/mangaApi";
+} from "@/services/data";
 import { queryKeys } from "./queryKeys";
 
 export function useMangaList() {

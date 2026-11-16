@@ -12,7 +12,7 @@ import {
 } from '../../hooks/api/useSettings';
 import { useToast } from '../../context/ToastContext';
 import type { UserData } from '../../types/api';
-import type { MangaItem } from '../../data/bigThree';
+import type { MangaItem } from '@/services/data';
 
 interface Router {
   push: (href: string) => void;

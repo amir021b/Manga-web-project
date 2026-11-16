@@ -13,7 +13,7 @@ import {
   clearStoredToken,
 } from "@/lib/axios";
 import { useProfileQuery } from "@/hooks/api/useUser";
-import { getMockProfile, USE_MOCK_PROFILE } from "@/services/userApi";
+import { getMockProfile, USE_MOCK_PROFILE } from "@/services/data";
 import type { UserData } from "@/types/api";
 
 interface UserContextValue {

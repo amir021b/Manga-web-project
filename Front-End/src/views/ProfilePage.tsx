@@ -19,7 +19,7 @@ import {
   LogOut,
 } from "lucide-react";
 import type { UserData } from "@/types/api";
-import type { MangaItem } from "@/data/bigThree";
+import type { MangaItem } from "@/services/data";
 
 const TABS = [
   { id: "backpack", label: "Backpack", icon: Bookmark },

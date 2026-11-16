@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchProfile, updateProfile } from "@/services/userApi";
+import { fetchProfile, updateProfile } from "@/services/data";
 import { queryKeys } from "./queryKeys";
 import type { UpdateProfileInput, UserData } from "@/types/api";
 

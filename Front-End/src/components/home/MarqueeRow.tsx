@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from 'react';
-import type { MangaItem } from '../../data/bigThree';
+import type { MangaItem } from '@/services/data';
 import MangaCard from '../manga/MangaCard';
 
 interface MarqueeRowProps {
