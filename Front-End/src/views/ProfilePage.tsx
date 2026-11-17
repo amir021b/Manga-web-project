@@ -195,9 +195,27 @@ function ProfilePage() {
                             : `Chapter #${entry.chapterId}`}
                         </p>
                       </div>
-                      <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-[var(--mh-text-muted)]">
-                        {entry.volumeId}
-                      </span>
+                      <div className="shrink-0 flex flex-col items-end gap-1.5">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--mh-text-muted)]">
+                          {entry.volumeId}
+                        </span>
+                        {typeof entry.progress === "number" &&
+                          entry.progress > 0 && (
+                            <div className="flex items-center gap-1.5">
+                              <span className="h-1 w-14 overflow-hidden rounded-full bg-[var(--mh-surface-strong)]">
+                                <span
+                                  className="block h-full rounded-full bg-[var(--mh-accent)]"
+                                  style={{
+                                    width: `${Math.round(entry.progress * 100)}%`,
+                                  }}
+                                />
+                              </span>
+                              <span className="text-[10px] text-[var(--mh-text-muted)]">
+                                {Math.round(entry.progress * 100)}%
+                              </span>
+                            </div>
+                          )}
+                      </div>
                     </Link>
                   );
                 })}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -9,8 +9,81 @@ import {
   getMangaById,
   getVolume,
 } from "@/services/data";
-import { recordReading } from "@/hooks/useReadingHistory";
+import {
+  getReadingProgress,
+  recordReading,
+  updateReadingProgress,
+} from "@/hooks/useReadingHistory";
+import {
+  useReaderSettings,
+  type ReaderMargin,
+  type ReaderMode,
+} from "@/hooks/useReaderSettings";
 import { toPublicUrl } from "@/lib/readerPaths";
+
+const MARGIN_CLASSES: Record<ReaderMargin, string> = {
+  none: "w-full max-w-[360px]",
+  small: "w-full max-w-[480px]",
+  medium: "w-full max-w-[640px]",
+  large: "w-full",
+};
+
+const MARGIN_OPTIONS: { id: ReaderMargin; label: string }[] = [
+  { id: "none", label: "None" },
+  { id: "small", label: "Small" },
+  { id: "medium", label: "Medium" },
+  { id: "large", label: "Large" },
+];
+
+const MODE_OPTIONS: { id: ReaderMode; label: string }[] = [
+  { id: "scroll", label: "Scroll" },
+  { id: "paged", label: "Paged" },
+];
+
+const TOGGLE_BASE =
+  "rounded-[10px] border px-2.5 py-1.5 text-[11px] font-medium transition duration-200";
+const TOGGLE_ACTIVE =
+  "border-[var(--mh-border)] bg-[var(--mh-surface-strong)] text-[var(--mh-text)] shadow-[0_0_0_1px_var(--mh-accent)]";
+const TOGGLE_IDLE =
+  "border-[var(--mh-border)] text-[var(--mh-text-secondary)] hover:border-[var(--mh-border-soft)] hover:bg-[var(--mh-surface)]";
+
+const NAV_BUTTON =
+  "inline-flex items-center gap-1.5 rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface)] px-3 py-1.5 text-xs text-[var(--mh-text-secondary)] transition hover:bg-[var(--mh-surface-strong)] hover:text-[var(--mh-text)]";
+const NAV_DISABLED =
+  "inline-flex items-center rounded-full border border-[var(--mh-border)] px-3 py-1.5 text-xs text-[var(--mh-text-muted)] cursor-not-allowed";
+
+interface ChapterReaderState {
+  chapterKey: number | null;
+  page: number;
+}
+
+interface ChapterScrollState {
+  chapterKey: number | null;
+  progress: number;
+}
+
+interface ChapterZoomState {
+  chapterKey: number | null;
+  page: number | null;
+}
+
+function pageToProgress(page: number, total: number): number {
+  if (total <= 1) return 0;
+  return Math.min(1, Math.max(0, page / (total - 1)));
+}
+
+function progressToPage(progress: number, total: number): number {
+  if (total <= 1) return 0;
+  return Math.min(total - 1, Math.max(0, Math.round(progress * (total - 1))));
+}
+
+function scrollProgressFor(element: HTMLElement | null): number | null {
+  if (!element) return null;
+  const rect = element.getBoundingClientRect();
+  const scrollable = rect.height - window.innerHeight;
+  if (scrollable <= 1) return null;
+  return Math.min(1, Math.max(0, -rect.top / scrollable));
+}
 
 function ReaderPage({
   id,
@@ -20,6 +93,61 @@ function ReaderPage({
   chapterId: string | number;
 }) {
   const router = useRouter();
+  const { settings, updateSettings, isHydrated } = useReaderSettings();
+
+  const [pagedState, setPagedState] = useState<ChapterReaderState>({
+    chapterKey: null,
+    page: 0,
+  });
+  const [scrollState, setScrollState] = useState<ChapterScrollState>({
+    chapterKey: null,
+    progress: 0,
+  });
+  const [zoomState, setZoomState] = useState<ChapterZoomState>({
+    chapterKey: null,
+    page: null,
+  });
+  const [toolbarHidden, setToolbarHidden] = useState(false);
+
+  const columnRef = useRef<HTMLDivElement | null>(null);
+  const pageRefs = useRef<Array<HTMLImageElement | null>>([]);
+  const initialProgressRef = useRef(0);
+  const restoredRef = useRef(false);
+  const attemptRestoreRef = useRef<() => void>(() => {});
+  const lastProgressWriteRef = useRef(0);
+  const scrollRafRef = useRef<number | null>(null);
+
+  const mangaId = Number(id);
+  const numericChapterId = Number(chapterId);
+  const manga = Number.isFinite(mangaId) ? getMangaById(mangaId) : undefined;
+  const chapter =
+    manga && Number.isFinite(numericChapterId)
+      ? getChapter(mangaId, numericChapterId)
+      : undefined;
+  const volume =
+    manga && chapter ? getVolume(mangaId, chapter.volumeId) : undefined;
+  const { prev, next } =
+    manga && chapter
+      ? getAdjacentChapters(mangaId, chapter.chapterId)
+      : { prev: null, next: null };
+
+  const totalPages = chapter?.pages.length ?? 0;
+  const maxPage = Math.max(totalPages - 1, 0);
+  const volumeHref = chapter
+    ? `/manga/${mangaId}/volume/${chapter.volumeId}`
+    : "/";
+  const prevHref = prev ? `/manga/${mangaId}/chapter/${prev.chapterId}` : null;
+  const nextHref = next ? `/manga/${mangaId}/chapter/${next.chapterId}` : null;
+
+  const mangaKey = manga?.id ?? null;
+  const chapterKey = chapter?.chapterId ?? null;
+  const chapterVolumeId = chapter?.volumeId ?? null;
+
+  const currentPage =
+    pagedState.chapterKey === chapterKey ? pagedState.page : 0;
+  const scrollProgress =
+    scrollState.chapterKey === chapterKey ? scrollState.progress : 0;
+  const zoomPage = zoomState.chapterKey === chapterKey ? zoomState.page : null;
 
   useEffect(() => {
     if (!id || !chapterId) {
@@ -28,29 +156,292 @@ function ReaderPage({
   }, [id, chapterId, router]);
 
   useEffect(() => {
-    if (!id || !chapterId) return;
-    const numericMangaId = Number(id);
-    const numericChapterId = Number(chapterId);
-    if (
-      !Number.isFinite(numericMangaId) ||
-      !Number.isFinite(numericChapterId)
-    ) {
+    if (mangaKey === null || chapterKey === null || !chapterVolumeId) return;
+    initialProgressRef.current = getReadingProgress(mangaKey, chapterKey);
+    restoredRef.current = false;
+    lastProgressWriteRef.current = 0;
+    recordReading(mangaKey, chapterKey, chapterVolumeId);
+  }, [mangaKey, chapterKey, chapterVolumeId]);
+
+  useEffect(() => {
+    if (!isHydrated || chapterKey === null) return;
+    if (restoredRef.current) return;
+
+    const target = initialProgressRef.current;
+
+    if (settings.mode === "paged") {
+      const page = progressToPage(target, totalPages);
+      const frame = requestAnimationFrame(() => {
+        if (restoredRef.current) return;
+        setPagedState({ chapterKey, page });
+        restoredRef.current = true;
+      });
+      return () => cancelAnimationFrame(frame);
+    }
+
+    if (target <= 0) {
+      restoredRef.current = true;
       return;
     }
-    const chapter = getChapter(numericMangaId, numericChapterId);
-    if (chapter) {
-      recordReading(numericMangaId, chapter.chapterId, chapter.volumeId);
+
+    const attemptRestore = () => {
+      if (restoredRef.current) return;
+      const element = columnRef.current;
+      if (!element) return;
+
+      const rect = element.getBoundingClientRect();
+      const scrollable = rect.height - window.innerHeight;
+      if (scrollable <= 1) return;
+
+      window.scrollTo({
+        top: window.scrollY + rect.top + target * scrollable,
+        behavior: "auto",
+      });
+
+      const nextProgress = scrollProgressFor(element);
+      if (nextProgress !== null && Math.abs(nextProgress - target) < 0.02) {
+        restoredRef.current = true;
+        setScrollState({ chapterKey, progress: target });
+      }
+    };
+
+    attemptRestoreRef.current = attemptRestore;
+    const frame = requestAnimationFrame(attemptRestore);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      attemptRestoreRef.current = () => {};
+    };
+  }, [isHydrated, settings.mode, chapterKey, totalPages]);
+
+  useEffect(() => {
+    if (chapterKey === null || mangaKey === null) return;
+
+    let lastY = window.scrollY;
+
+    const handleScroll = () => {
+      const y = window.scrollY;
+      const delta = y - lastY;
+
+      if (y <= 64) {
+        setToolbarHidden(false);
+      } else if (delta > 4) {
+        setToolbarHidden(true);
+      } else if (delta < -4) {
+        setToolbarHidden(false);
+      }
+      lastY = y;
+
+      if (scrollRafRef.current !== null) return;
+      scrollRafRef.current = requestAnimationFrame(() => {
+        scrollRafRef.current = null;
+        if (settings.mode !== "scroll") return;
+
+        const progress = scrollProgressFor(columnRef.current);
+        if (progress === null) return;
+        setScrollState({ chapterKey, progress });
+
+        if (!restoredRef.current) return;
+        const now = Date.now();
+        if (now - lastProgressWriteRef.current >= 1000) {
+          lastProgressWriteRef.current = now;
+          updateReadingProgress(mangaKey, chapterKey, progress);
+        }
+      });
+    };
+
+    const handlePointerMove = (event: PointerEvent) => {
+      if (event.clientY <= 96) setToolbarHidden(false);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("pointermove", handlePointerMove, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("pointermove", handlePointerMove);
+      if (scrollRafRef.current !== null) {
+        cancelAnimationFrame(scrollRafRef.current);
+        scrollRafRef.current = null;
+      }
+    };
+  }, [mangaKey, chapterKey, settings.mode]);
+
+  const goToPage = (page: number) => {
+    if (chapterKey === null || mangaKey === null || totalPages === 0) return;
+    const clamped = Math.min(Math.max(page, 0), maxPage);
+    const nextProgress = pageToProgress(clamped, totalPages);
+    setPagedState({ chapterKey, page: clamped });
+    setScrollState({ chapterKey, progress: nextProgress });
+    updateReadingProgress(mangaKey, chapterKey, nextProgress);
+  };
+
+  const goToNextPage = () => {
+    if (currentPage < maxPage) {
+      goToPage(currentPage + 1);
+    } else if (nextHref) {
+      router.push(nextHref);
     }
-  }, [id, chapterId]);
+  };
+
+  const goToPrevPage = () => {
+    if (currentPage > 0) {
+      goToPage(currentPage - 1);
+    } else if (prevHref) {
+      router.push(prevHref);
+    }
+  };
+
+  useEffect(() => {
+    if (chapterKey === null) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target;
+      if (target instanceof HTMLElement) {
+        const tag = target.tagName;
+        if (
+          tag === "INPUT" ||
+          tag === "TEXTAREA" ||
+          tag === "SELECT" ||
+          target.isContentEditable
+        ) {
+          return;
+        }
+      }
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+
+      if (zoomPage !== null) {
+        if (event.key === "Escape") {
+          setZoomState({ chapterKey, page: null });
+        }
+        return;
+      }
+
+      if (event.key === "Escape") {
+        router.push(volumeHref);
+        return;
+      }
+
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+      event.preventDefault();
+
+      const forward = event.key === "ArrowRight";
+
+      if (settings.mode === "paged") {
+        if (mangaKey === null) return;
+        if (forward) {
+          if (currentPage < maxPage) {
+            const page = currentPage + 1;
+            const nextProgress = pageToProgress(page, totalPages);
+            setPagedState({ chapterKey, page });
+            setScrollState({ chapterKey, progress: nextProgress });
+            updateReadingProgress(mangaKey, chapterKey, nextProgress);
+          } else if (nextHref) {
+            router.push(nextHref);
+          }
+        } else if (currentPage > 0) {
+          const page = currentPage - 1;
+          const nextProgress = pageToProgress(page, totalPages);
+          setPagedState({ chapterKey, page });
+          setScrollState({ chapterKey, progress: nextProgress });
+          updateReadingProgress(mangaKey, chapterKey, nextProgress);
+        } else if (prevHref) {
+          router.push(prevHref);
+        }
+        return;
+      }
+
+      if (forward) {
+        if (nextHref) router.push(nextHref);
+      } else if (prevHref) {
+        router.push(prevHref);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [
+    chapterKey,
+    mangaKey,
+    zoomPage,
+    settings.mode,
+    currentPage,
+    maxPage,
+    totalPages,
+    nextHref,
+    prevHref,
+    volumeHref,
+    router,
+  ]);
+
+  const handleImageLoad = () => {
+    if (settings.mode === "scroll") {
+      attemptRestoreRef.current();
+    }
+  };
+
+  const handleImageClick = (
+    event: React.MouseEvent<HTMLImageElement>,
+    pageIndex: number,
+  ) => {
+    if (chapterKey === null) return;
+    if (settings.mode === "paged") {
+      const rect = event.currentTarget.getBoundingClientRect();
+      const clickedLeft = event.clientX - rect.left < rect.width / 2;
+      if (clickedLeft) {
+        goToPrevPage();
+      } else {
+        goToNextPage();
+      }
+      return;
+    }
+    setZoomState({ chapterKey, page: pageIndex });
+  };
+
+  const handleChangeMode = (mode: ReaderMode) => {
+    if (mode === settings.mode || chapterKey === null) return;
+    if (mode === "paged") {
+      setPagedState({
+        chapterKey,
+        page: progressToPage(scrollProgress, totalPages),
+      });
+    } else {
+      setScrollState({
+        chapterKey,
+        progress: pageToProgress(currentPage, totalPages),
+      });
+    }
+    updateSettings({ mode });
+  };
+
+  const activePage =
+    settings.mode === "paged"
+      ? Math.min(currentPage, maxPage)
+      : Math.min(maxPage, Math.round(scrollProgress * maxPage));
+
+  const progressRatio =
+    settings.mode === "paged"
+      ? pageToProgress(Math.min(currentPage, maxPage), totalPages)
+      : scrollProgress;
+
+  const handleJumpToPage = (page: number) => {
+    if (settings.mode === "paged") {
+      goToPage(page);
+      return;
+    }
+    if (chapterKey === null || totalPages === 0) return;
+    const clamped = Math.min(Math.max(page, 0), maxPage);
+    setScrollState({
+      chapterKey,
+      progress: pageToProgress(clamped, totalPages),
+    });
+    pageRefs.current[clamped]?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
 
   if (!id || !chapterId) return null;
-
-  const mangaId = Number(id);
-  const numericChapterId = Number(chapterId);
-  const manga = Number.isFinite(mangaId) ? getMangaById(mangaId) : undefined;
-  const chapter = Number.isFinite(numericChapterId)
-    ? getChapter(mangaId, numericChapterId)
-    : undefined;
 
   if (!manga || !chapter) {
     return (
@@ -73,24 +464,170 @@ function ReaderPage({
     );
   }
 
-  const volume = getVolume(mangaId, chapter.volumeId);
-  const { prev, next } = getAdjacentChapters(mangaId, chapter.chapterId);
-  const volumeHref = `/manga/${mangaId}/volume/${chapter.volumeId}`;
+  const visiblePages =
+    settings.mode === "paged"
+      ? [Math.min(currentPage, Math.max(totalPages - 1, 0))]
+      : chapter.pages.map((_, index) => index);
+  const marginClass = MARGIN_CLASSES[settings.margin];
 
   return (
-    <section className="min-h-screen w-full bg-[var(--mh-bg)] px-4 pt-20 pb-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <Link
-            href={volumeHref}
-            className="text-xs text-[var(--mh-text-secondary)] underline underline-offset-4 hover:text-[var(--mh-text)] transition"
-          >
-            ← Back to Volume {volume?.number ?? ""}
-          </Link>
+    <section className="min-h-screen w-full bg-transparent px-4 pt-20 pb-8">
+      <div
+        role="progressbar"
+        aria-label="Reading progress"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(progressRatio * 100)}
+        className="fixed left-1/2 top-20 z-30 h-0.5 w-[calc(100%-2rem)] max-w-3xl -translate-x-1/2 overflow-hidden rounded-full bg-[var(--mh-surface-strong)]"
+      >
+        <div
+          className="h-full bg-[var(--mh-accent)] transition-[width] duration-150"
+          style={{ width: `${progressRatio * 100}%` }}
+        />
+      </div>
+
+      <div className="w-full mx-auto">
+        <div
+          className={`sticky top-24 z-30 mb-6 transition-all duration-300 ${
+            toolbarHidden
+              ? "-translate-y-full opacity-0 pointer-events-none"
+              : "translate-y-0 opacity-100"
+          }`}
+        >
+          <div className="flex items-center justify-between gap-2 rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface-strong)] px-3 py-2 shadow-[var(--mh-shadow)] backdrop-blur-md">
+            {prev ? (
+              <Link
+                href={`/manga/${mangaId}/chapter/${prev.chapterId}`}
+                className={NAV_BUTTON}
+              >
+                ← Ch. {prev.number}
+              </Link>
+            ) : (
+              <span className={NAV_DISABLED}>← Prev</span>
+            )}
+            <Link
+              href={volumeHref}
+              className="text-xs text-[var(--mh-text-secondary)] underline underline-offset-4 transition hover:text-[var(--mh-text)]"
+            >
+              Volume {volume?.number ?? ""}
+            </Link>
+            {next ? (
+              <Link
+                href={`/manga/${mangaId}/chapter/${next.chapterId}`}
+                className={NAV_BUTTON}
+              >
+                Ch. {next.number} →
+              </Link>
+            ) : (
+              <span className={NAV_DISABLED}>Next →</span>
+            )}
+          </div>
+        </div>
+
+        <div className="mb-6 rounded-xl border border-[var(--mh-border)] bg-[var(--mh-surface)] px-4 py-3 backdrop-blur-md">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--mh-text-muted)]">
+                Margin
+              </span>
+              <div className="flex flex-wrap gap-1">
+                {MARGIN_OPTIONS.map((option) => {
+                  const active = settings.margin === option.id;
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={() => updateSettings({ margin: option.id })}
+                      aria-pressed={active}
+                      className={`${TOGGLE_BASE} ${
+                        active ? TOGGLE_ACTIVE : TOGGLE_IDLE
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--mh-text-muted)]">
+                Dark pages
+              </span>
+              <button
+                type="button"
+                onClick={() =>
+                  updateSettings({ darkPages: !settings.darkPages })
+                }
+                aria-pressed={settings.darkPages}
+                className={`${TOGGLE_BASE} ${
+                  settings.darkPages ? TOGGLE_ACTIVE : TOGGLE_IDLE
+                }`}
+              >
+                {settings.darkPages ? "On" : "Off"}
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--mh-text-muted)]">
+                Mode
+              </span>
+              <div className="flex gap-1">
+                {MODE_OPTIONS.map((option) => {
+                  const active = settings.mode === option.id;
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={() => handleChangeMode(option.id)}
+                      aria-pressed={active}
+                      className={`${TOGGLE_BASE} ${
+                        active ? TOGGLE_ACTIVE : TOGGLE_IDLE
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <label
+                htmlFor="reader-page-jump"
+                className="text-[10px] font-bold uppercase tracking-widest text-[var(--mh-text-muted)]"
+              >
+                Jump
+              </label>
+              <select
+                id="reader-page-jump"
+                value={activePage}
+                onChange={(event) =>
+                  handleJumpToPage(Number(event.target.value))
+                }
+                className="rounded-full border border-[var(--mh-border)] bg-[var(--mh-input-bg)] px-3 py-1.5 text-xs text-[var(--mh-input-text)] outline-none transition focus:border-[var(--mh-accent)]"
+              >
+                {Array.from(
+                  { length: Math.max(totalPages, 1) },
+                  (_, index) => (
+                    <option key={index} value={index}>
+                      Page {index + 1}
+                    </option>
+                  ),
+                )}
+              </select>
+            </div>
+          </div>
+          <p className="mt-2 text-[10px] text-[var(--mh-text-muted)]">
+            ← → chapters · Esc volume
+          </p>
+        </div>
+
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--mh-text-muted)]">
+            {manga.title}
+          </p>
           <div className="text-right">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--mh-text-muted)]">
-              {manga.title}
-            </p>
             <h1 className="text-lg font-bold text-[var(--mh-text)]">
               Chapter {chapter.number}
             </h1>
@@ -100,17 +637,38 @@ function ReaderPage({
           </div>
         </div>
 
-        <div className="flex flex-col items-center gap-0 rounded-xl overflow-hidden border border-[var(--mh-border)] bg-[var(--mh-surface)]">
-          {chapter.pages.map((page, index) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              key={page}
-              src={toPublicUrl(page)}
-              alt={`${manga.title} chapter ${chapter.number} page ${index + 1}`}
-              loading={index < 2 ? "eager" : "lazy"}
-              className="block w-full h-auto bg-[var(--mh-surface)]"
-            />
-          ))}
+        <div
+          ref={columnRef}
+          className={`relative mx-auto flex flex-col items-center gap-0 overflow-hidden rounded-xl border border-[var(--mh-border)] bg-[var(--mh-bg)]/70 ${marginClass}`}
+        >
+          {visiblePages.map((pageIndex) => {
+            const page = chapter.pages[pageIndex];
+            if (!page) return null;
+            return (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={page}
+                ref={(element) => {
+                  pageRefs.current[pageIndex] = element;
+                }}
+                src={toPublicUrl(page)}
+                alt={`${manga.title} chapter ${chapter.number} page ${pageIndex + 1}`}
+                loading="lazy"
+                onClick={(event) => handleImageClick(event, pageIndex)}
+                onLoad={handleImageLoad}
+                className={`block h-auto w-full scroll-mt-40 bg-[var(--mh-surface)] ${
+                  settings.mode === "scroll"
+                    ? "cursor-zoom-in"
+                    : "cursor-pointer"
+                } ${settings.darkPages ? "brightness-75 contrast-100" : ""}`}
+              />
+            );
+          })}
+          {settings.mode === "paged" && (
+            <p className="w-full border-t border-[var(--mh-border)] py-3 text-center text-xs text-[var(--mh-text-secondary)]">
+              Page {Math.min(currentPage, maxPage) + 1} / {totalPages}
+            </p>
+          )}
         </div>
 
         <div className="mt-8 flex items-center justify-between gap-3">
@@ -146,6 +704,31 @@ function ReaderPage({
           )}
         </div>
       </div>
+
+      {zoomPage !== null && chapter.pages[zoomPage] && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Page ${zoomPage + 1} preview`}
+          onClick={() => {
+            if (chapterKey !== null) {
+              setZoomState({ chapterKey, page: null });
+            }
+          }}
+          className="fixed inset-0 z-40 flex items-center justify-center bg-black/85 px-4 py-8 backdrop-blur-sm backdrop-fade-in"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={toPublicUrl(chapter.pages[zoomPage])}
+            alt={`${manga.title} chapter ${chapter.number} page ${zoomPage + 1}`}
+            loading="lazy"
+            onClick={(event) => event.stopPropagation()}
+            className={`modal-fade-in max-h-full max-w-full object-contain ${
+              settings.darkPages ? "brightness-75 contrast-100" : ""
+            }`}
+          />
+        </div>
+      )}
     </section>
   );
 }
