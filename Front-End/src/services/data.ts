@@ -1,13 +1,19 @@
 import api, { getApiErrorMessage, getStoredToken } from "@/lib/axios";
 import {
+  getAdjacentChapters as getMockAdjacentChapters,
   getAvailableChapterCount as getMockAvailableChapterCount,
+  getChapter as getMockChapter,
   getAllManga as getMockAllManga,
   getMangaById as getMockMangaById,
   getMangaByIds as getMockMangaByIds,
+  getVolume as getMockVolume,
+  getVolumes as getMockVolumes,
   hasAvailableChapters as getMockHasAvailableChapters,
   searchManga as getMockSearchManga,
+  type Chapter,
   type MangaItem,
   type MangaWithDetails,
+  type Volume,
 } from "@/services/mangaApi";
 import {
   getMockProfile as getMockProfileImpl,
@@ -25,6 +31,7 @@ export type {
   MangaDetail,
   MangaItem,
   MangaWithDetails,
+  Volume,
 } from "@/services/mangaApi";
 
 const PROFILE_ENDPOINT = "/api/users/profile";
@@ -49,6 +56,35 @@ export function getMangaById(id: number): MangaWithDetails | undefined {
 export function getMangaByIds(ids: number[]): MangaItem[] {
   if (USE_MOCK_PROFILE) return getMockMangaByIds(ids);
   return notImplemented("getMangaByIds");
+}
+
+export function getVolumes(id: number | string): Volume[] {
+  if (USE_MOCK_PROFILE) return getMockVolumes(id);
+  return notImplemented("getVolumes");
+}
+
+export function getVolume(
+  id: number | string,
+  volumeId: string,
+): Volume | undefined {
+  if (USE_MOCK_PROFILE) return getMockVolume(id, volumeId);
+  return notImplemented("getVolume");
+}
+
+export function getChapter(
+  id: number | string,
+  chapterId: number | string,
+): Chapter | undefined {
+  if (USE_MOCK_PROFILE) return getMockChapter(id, chapterId);
+  return notImplemented("getChapter");
+}
+
+export function getAdjacentChapters(
+  id: number | string,
+  chapterId: number | string,
+): { prev: Chapter | null; next: Chapter | null } {
+  if (USE_MOCK_PROFILE) return getMockAdjacentChapters(id, chapterId);
+  return notImplemented("getAdjacentChapters");
 }
 
 export function getAvailableChapterCount(id: number | string): number {

@@ -80,6 +80,7 @@ function AccountSection({ user, setCurrentUser, setBackpack, router }: AccountSe
   const handleDeleteAccount = () => {
     localStorage.removeItem('mangahub_backpack');
     localStorage.removeItem('mangahub_notifications');
+    localStorage.removeItem('mangahub_history');
     setBackpack([]);
     setConfirmDelete(false);
     addToast('Account deleted');

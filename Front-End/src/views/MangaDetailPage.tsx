@@ -46,8 +46,8 @@ function MangaDetailPage({ id: idProp }: MangaDetailPageProps) {
   };
 
   const genreTags = manga.genres;
-  const chapters = manga.detail.chapters;
-  const firstChapterId = chapters[0]?.chapterId;
+  const volumes = manga.detail.volumes;
+  const firstChapterId = volumes[0]?.chapters[0]?.chapterId;
 
   return (
     <section className="min-h-screen w-full bg-transparent px-4 pt-16 pb-16">
@@ -175,41 +175,52 @@ function MangaDetailPage({ id: idProp }: MangaDetailPageProps) {
         >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold uppercase tracking-widest text-[var(--mh-text-secondary)] border-b border-[var(--mh-border)] pb-3">
-              Chapters ({chapters.length})
+              Volumes ({volumes.length})
             </h2>
           </div>
-          <div className="space-y-1 rounded-xl border border-[var(--mh-border)] bg-[var(--mh-surface)] overflow-hidden shadow-sm">
-            {chapters.length > 0 ? (
-              chapters.map((ch) => (
+          {volumes.length > 0 ? (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {volumes.map((volume) => (
                 <Link
-                  key={ch.chapterId}
-                  href={`/manga/${mangaId}/chapter/${ch.chapterId}`}
-                  className="block flex items-center justify-between px-5 py-4 text-sm border-b border-[var(--mh-border)] last:border-0 transition hover:bg-[var(--mh-surface-strong)] group"
+                  key={volume.volumeId}
+                  href={`/manga/${mangaId}/volume/${volume.volumeId}`}
+                  className="group relative overflow-hidden rounded-xl border border-[var(--mh-border)] bg-[var(--mh-surface)] shadow-sm transition hover:border-[var(--mh-text-secondary)]"
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="w-8 text-[10px] font-bold text-[var(--mh-text-muted)] uppercase tracking-wider">
-                      Ch. {ch.chapterId}
-                    </span>
-                    <span className="text-[var(--mh-text)] group-hover:text-[var(--mh-accent)] transition">
-                      {ch.title}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-[var(--mh-text-secondary)]">
-                      {ch.date}
-                    </span>
-                    <span className="text-[10px] font-bold text-[var(--mh-text-secondary)] group-hover:text-[var(--mh-text)] transition uppercase tracking-wider">
-                      Read
-                    </span>
+                  <div className="relative aspect-[3/4]">
+                    {volume.coverImage ? (
+                      <div
+                        className="absolute inset-0 bg-cover bg-center transition duration-300 group-hover:scale-[1.03]"
+                        style={{
+                          backgroundImage: `url("${volume.coverImage}")`,
+                        }}
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center text-xs uppercase tracking-widest text-[var(--mh-text-muted)]">
+                        No Cover
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-3">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-white/80">
+                        Vol. {volume.number}
+                      </p>
+                      <p className="text-sm font-bold text-white leading-tight">
+                        {volume.title}
+                      </p>
+                      <p className="mt-1 text-[10px] uppercase tracking-wider text-white/60">
+                        {volume.chapters.length}{" "}
+                        {volume.chapters.length === 1 ? "chapter" : "chapters"}
+                      </p>
+                    </div>
                   </div>
                 </Link>
-              ))
-            ) : (
-              <div className="px-5 py-8 text-center text-[var(--mh-text-secondary)]">
-                No chapters available yet.
-              </div>
-            )}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-xl border border-[var(--mh-border)] bg-[var(--mh-surface)] px-5 py-8 text-center text-[var(--mh-text-secondary)]">
+              No volumes available yet.
+            </div>
+          )}
         </section>
       </div>
     </section>

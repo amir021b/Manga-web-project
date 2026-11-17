@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import MangaCard from "@/components/manga/MangaCard";
 import MangaGrid from "@/components/manga/MangaGrid";
 import SettingsTab from "@/components/settings/SettingsTab";
@@ -10,6 +11,7 @@ import EditProfileModal from "@/components/profile/EditProfileModal";
 import { useBackpack } from "@/context/BackpackContext";
 import { useUser } from "@/context/UserContext";
 import { useUpdateProfile } from "@/hooks/api/useUser";
+import { useReadingHistory } from "@/hooks/useReadingHistory";
 import {
   User,
   Pencil,
@@ -19,7 +21,7 @@ import {
   LogOut,
 } from "lucide-react";
 import type { UserData } from "@/types/api";
-import type { MangaItem } from "@/services/data";
+import { getChapter, getMangaById, type MangaItem } from "@/services/data";
 
 const TABS = [
   { id: "backpack", label: "Backpack", icon: Bookmark },
@@ -33,6 +35,7 @@ function ProfilePage() {
   const { user, setCurrentUser, logout, isLoggedIn, isLoadingAuth } =
     useUser();
   const { mutateAsync: updateProfile } = useUpdateProfile();
+  const readingHistory = useReadingHistory();
   const [activeTab, setActiveTab] = useState("backpack");
   const [isEditOpen, setIsEditOpen] = useState(false);
 
@@ -162,12 +165,44 @@ function ProfilePage() {
 
         {activeTab === "history" && (
           <div key="history" className="tab-content-in">
-            <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-[var(--mh-border)] bg-[var(--mh-surface)] py-16 text-center backdrop-blur-md">
-              <History className="h-8 w-8 text-[var(--mh-text-secondary)]" />
-              <p className="text-sm text-[var(--mh-text-secondary)]">
-                No reading history yet.
-              </p>
-            </div>
+            {readingHistory.length === 0 ? (
+              <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-[var(--mh-border)] bg-[var(--mh-surface)] py-16 text-center backdrop-blur-md">
+                <History className="h-8 w-8 text-[var(--mh-text-secondary)]" />
+                <p className="text-sm text-[var(--mh-text-secondary)]">
+                  No reading history yet.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-1 rounded-xl border border-[var(--mh-border)] bg-[var(--mh-surface)] overflow-hidden shadow-sm">
+                {readingHistory.map((entry) => {
+                  const manga = getMangaById(entry.mangaId);
+                  const chapter = getChapter(entry.mangaId, entry.chapterId);
+                  return (
+                    <Link
+                      key={entry.mangaId}
+                      href={`/manga/${entry.mangaId}/chapter/${entry.chapterId}`}
+                      className="flex items-center justify-between gap-4 px-5 py-4 text-sm border-b border-[var(--mh-border)] last:border-0 transition hover:bg-[var(--mh-surface-strong)] group"
+                    >
+                      <div className="min-w-0">
+                        <p className="font-medium text-[var(--mh-text)] group-hover:text-[var(--mh-accent)] transition truncate">
+                          {manga?.title ?? `Manga #${entry.mangaId}`}
+                        </p>
+                        <p className="mt-0.5 text-xs text-[var(--mh-text-secondary)] truncate">
+                          {chapter
+                            ? `Chapter ${chapter.number}${
+                                chapter.title ? ` · ${chapter.title}` : ""
+                              }`
+                            : `Chapter #${entry.chapterId}`}
+                        </p>
+                      </div>
+                      <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-[var(--mh-text-muted)]">
+                        {entry.volumeId}
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 
