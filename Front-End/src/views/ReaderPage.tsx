@@ -7,7 +7,6 @@ import {
   getAdjacentChapters,
   getChapter,
   getMangaById,
-  getVolume,
 } from "@/services/data";
 import {
   getReadingProgress,
@@ -46,11 +45,6 @@ const TOGGLE_ACTIVE =
   "border-[var(--mh-border)] bg-[var(--mh-surface-strong)] text-[var(--mh-text)] shadow-[0_0_0_1px_var(--mh-accent)]";
 const TOGGLE_IDLE =
   "border-[var(--mh-border)] text-[var(--mh-text-secondary)] hover:border-[var(--mh-border-soft)] hover:bg-[var(--mh-surface)]";
-
-const NAV_BUTTON =
-  "inline-flex items-center gap-1.5 rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface)] px-3 py-1.5 text-xs text-[var(--mh-text-secondary)] transition hover:bg-[var(--mh-surface-strong)] hover:text-[var(--mh-text)]";
-const NAV_DISABLED =
-  "inline-flex items-center rounded-full border border-[var(--mh-border)] px-3 py-1.5 text-xs text-[var(--mh-text-muted)] cursor-not-allowed";
 
 interface ChapterReaderState {
   chapterKey: number | null;
@@ -107,7 +101,6 @@ function ReaderPage({
     chapterKey: null,
     page: null,
   });
-  const [toolbarHidden, setToolbarHidden] = useState(false);
 
   const columnRef = useRef<HTMLDivElement | null>(null);
   const pageRefs = useRef<Array<HTMLImageElement | null>>([]);
@@ -124,8 +117,6 @@ function ReaderPage({
     manga && Number.isFinite(numericChapterId)
       ? getChapter(mangaId, numericChapterId)
       : undefined;
-  const volume =
-    manga && chapter ? getVolume(mangaId, chapter.volumeId) : undefined;
   const { prev, next } =
     manga && chapter
       ? getAdjacentChapters(mangaId, chapter.chapterId)
@@ -217,21 +208,7 @@ function ReaderPage({
   useEffect(() => {
     if (chapterKey === null || mangaKey === null) return;
 
-    let lastY = window.scrollY;
-
     const handleScroll = () => {
-      const y = window.scrollY;
-      const delta = y - lastY;
-
-      if (y <= 64) {
-        setToolbarHidden(false);
-      } else if (delta > 4) {
-        setToolbarHidden(true);
-      } else if (delta < -4) {
-        setToolbarHidden(false);
-      }
-      lastY = y;
-
       if (scrollRafRef.current !== null) return;
       scrollRafRef.current = requestAnimationFrame(() => {
         scrollRafRef.current = null;
@@ -250,16 +227,10 @@ function ReaderPage({
       });
     };
 
-    const handlePointerMove = (event: PointerEvent) => {
-      if (event.clientY <= 96) setToolbarHidden(false);
-    };
-
     window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("pointermove", handlePointerMove, { passive: true });
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("pointermove", handlePointerMove);
       if (scrollRafRef.current !== null) {
         cancelAnimationFrame(scrollRafRef.current);
         scrollRafRef.current = null;
@@ -478,7 +449,7 @@ function ReaderPage({
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={Math.round(progressRatio * 100)}
-        className="fixed left-1/2 top-20 z-30 h-0.5 w-[calc(100%-2rem)] max-w-3xl -translate-x-1/2 overflow-hidden rounded-full bg-[var(--mh-surface-strong)]"
+        className="fixed inset-x-0 top-0 z-40 h-0.5 overflow-hidden bg-transparent"
       >
         <div
           className="h-full bg-[var(--mh-accent)] transition-[width] duration-150"
@@ -487,43 +458,6 @@ function ReaderPage({
       </div>
 
       <div className="w-full mx-auto">
-        <div
-          className={`sticky top-24 z-30 mb-6 transition-all duration-300 ${
-            toolbarHidden
-              ? "-translate-y-full opacity-0 pointer-events-none"
-              : "translate-y-0 opacity-100"
-          }`}
-        >
-          <div className="flex items-center justify-between gap-2 rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface-strong)] px-3 py-2 shadow-[var(--mh-shadow)] backdrop-blur-md">
-            {prev ? (
-              <Link
-                href={`/manga/${mangaId}/chapter/${prev.chapterId}`}
-                className={NAV_BUTTON}
-              >
-                ← Ch. {prev.number}
-              </Link>
-            ) : (
-              <span className={NAV_DISABLED}>← Prev</span>
-            )}
-            <Link
-              href={volumeHref}
-              className="text-xs text-[var(--mh-text-secondary)] underline underline-offset-4 transition hover:text-[var(--mh-text)]"
-            >
-              Volume {volume?.number ?? ""}
-            </Link>
-            {next ? (
-              <Link
-                href={`/manga/${mangaId}/chapter/${next.chapterId}`}
-                className={NAV_BUTTON}
-              >
-                Ch. {next.number} →
-              </Link>
-            ) : (
-              <span className={NAV_DISABLED}>Next →</span>
-            )}
-          </div>
-        </div>
-
         <div className="mb-6 rounded-xl border border-[var(--mh-border)] bg-[var(--mh-surface)] px-4 py-3 backdrop-blur-md">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
             <div className="flex items-center gap-2">

@@ -6,6 +6,7 @@ import { UserProvider } from "@/context/UserContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { ToastProvider } from "@/context/ToastContext";
 import { BackpackProvider } from "@/context/BackpackContext";
+import { HeaderProvider } from "@/context/HeaderContext";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -27,7 +28,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       <UserProvider>
         <ThemeProvider>
           <ToastProvider>
-            <BackpackProvider>{children}</BackpackProvider>
+            <BackpackProvider>
+              <HeaderProvider>{children}</HeaderProvider>
+            </BackpackProvider>
           </ToastProvider>
         </ThemeProvider>
       </UserProvider>
