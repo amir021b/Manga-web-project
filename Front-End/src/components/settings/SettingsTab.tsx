@@ -53,7 +53,7 @@ export default function SettingsTab() {
         return (
           <article
             key={section.id}
-            className="overflow-hidden rounded-2xl border border-[var(--mh-border)] bg-[var(--mh-surface)] backdrop-blur-md"
+            className="overflow-hidden rounded-2xl border border-[var(--mh-border)] bg-[var(--mh-surface)]"
           >
             <button
               type="button"

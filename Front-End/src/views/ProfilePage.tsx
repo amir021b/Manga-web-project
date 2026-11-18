@@ -137,7 +137,7 @@ function ProfilePage() {
       <div className="mt-8">
         {activeTab === "backpack" && (
           <div key="backpack" className="tab-content-in">
-            <div className="flex flex-col items-center justify-center min-h-[300px] gap-3 rounded-2xl border border-[var(--mh-border)] bg-[var(--mh-surface)] pb-6 text-center backdrop-blur-md">
+            <div className="flex flex-col items-center justify-center min-h-[300px] gap-3 rounded-2xl border border-[var(--mh-border)] bg-[var(--mh-surface)] pb-6 text-center">
               {backpack.length === 0 ? (
                 <>
                   <Bookmark className="h-8 w-8 text-[var(--mh-text-secondary)]" />
