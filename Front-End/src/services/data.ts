@@ -1,5 +1,12 @@
 import api, { getApiErrorMessage, getStoredToken } from "@/lib/axios";
 import {
+  addComment as addMockComment,
+  deleteComment as deleteMockComment,
+  listComments as getMockListComments,
+  type AddCommentInput,
+  type MangaComment,
+} from "@/data/comments";
+import {
   getAdjacentChapters as getMockAdjacentChapters,
   getAvailableChapterCount as getMockAvailableChapterCount,
   getChapter as getMockChapter,
@@ -100,6 +107,21 @@ export function hasAvailableChapters(id: number | string): boolean {
 export function searchManga(query: string): MangaItem[] {
   if (USE_MOCK_PROFILE) return getMockSearchManga(query);
   return notImplemented("searchManga");
+}
+
+export function listComments(mangaId: number): MangaComment[] {
+  if (USE_MOCK_PROFILE) return getMockListComments(mangaId);
+  return notImplemented("listComments");
+}
+
+export function addComment(input: AddCommentInput): MangaComment {
+  if (USE_MOCK_PROFILE) return addMockComment(input);
+  return notImplemented("addComment");
+}
+
+export function deleteComment(id: string, authorName: string): void {
+  if (USE_MOCK_PROFILE) return deleteMockComment(id, authorName);
+  return notImplemented("deleteComment");
 }
 
 export function getMockProfile(): UserData {

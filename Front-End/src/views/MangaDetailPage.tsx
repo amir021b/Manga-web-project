@@ -1,5 +1,6 @@
 "use client";
 
+import CommentsSection from "@/components/comments/CommentsSection";
 import { useBackpack } from "@/context/BackpackContext";
 import { useMangaById } from "@/hooks/api/useManga";
 import Link from "next/link";
@@ -222,6 +223,10 @@ function MangaDetailPage({ id: idProp }: MangaDetailPageProps) {
             </div>
           )}
         </section>
+
+        <div className="fade-up" style={{ animationDelay: "510ms" }}>
+          <CommentsSection mangaId={mangaId} />
+        </div>
       </div>
     </section>
   );
