@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, startTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   AUTH_MODES,
@@ -26,11 +26,9 @@ export function useAuthForm() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const [mode, setMode] = useState<AuthMode>(() => {
-    return (pathname ?? "").includes("signup")
-      ? AUTH_MODES.SIGNUP
-      : AUTH_MODES.LOGIN;
-  });
+  const mode: AuthMode = (pathname ?? "").includes("signup")
+    ? AUTH_MODES.SIGNUP
+    : AUTH_MODES.LOGIN;
 
   const [values, setValues] = useState({ ...INITIAL_VALUES });
   const [showPassword, setShowPassword] = useState(false);
@@ -58,7 +56,6 @@ export function useAuthForm() {
 
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    setValues({ ...INITIAL_VALUES });
     setErrors({});
     setShowPassword(false);
     setShowConfirm(false);
@@ -67,16 +64,6 @@ export function useAuthForm() {
     submittingRef.current = false;
   }, [mode]);
   /* eslint-enable react-hooks/set-state-in-effect */
-
-  // Keep the URL in sync with the local mode in the background.
-  // Only navigates when the current pathname doesn't already match the target,
-  // which prevents infinite loops and avoids jarring remounts on tab clicks.
-  useEffect(() => {
-    const targetPath = mode === AUTH_MODES.SIGNUP ? "/signup" : "/login";
-    if (pathname !== targetPath) {
-      router.push(targetPath, { scroll: false });
-    }
-  }, [mode, pathname, router]);
 
   const copy = AUTH_COPY[mode as keyof typeof AUTH_COPY];
   const isSignup = mode === AUTH_MODES.SIGNUP;
@@ -190,8 +177,13 @@ export function useAuthForm() {
   };
 
   const switchMode = (newMode: AuthMode) => {
-    if (isSubmitting) return;
-    setMode(newMode);
+    if (isSubmitting || newMode === mode) return;
+    startTransition(() => {
+      router.replace(
+        newMode === AUTH_MODES.SIGNUP ? "/signup" : "/login",
+        { scroll: false },
+      );
+    });
   };
 
   const isFilled = REQUIRED_FIELDS[mode as keyof typeof REQUIRED_FIELDS].every((key: string) => {
