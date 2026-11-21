@@ -10,6 +10,7 @@ import { queryKeys } from "@/hooks/api/queryKeys";
 import { getAllManga, type MangaItem } from "@/services/mangaApi";
 import { USE_MOCK_API } from "@/lib/mockMode";
 import { persistBackpack } from "@/lib/backpackStorage";
+import { readStoredBackpack } from "@/lib/backpackStorage";
 import { useUser } from "./UserContext";
 
 interface BackpackContextValue {
@@ -44,6 +45,12 @@ export function BackpackProvider({ children }: { children: React.ReactNode }) {
       persistBackpack(backpackIds);
     }
   }, [backpackIds, canSyncBackpack]);
+
+  useEffect(() => {
+    if (!canSyncBackpack) {
+      queryClient.setQueryData(queryKeys.backpack, readStoredBackpack());
+    }
+  }, [canSyncBackpack, queryClient]);
 
   const backpack = useMemo(() => {
     return backpackIds.flatMap((id) => {

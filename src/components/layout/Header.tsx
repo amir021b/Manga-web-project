@@ -29,6 +29,7 @@ function NavLink({ href, children, isActive }: { href: string; children: React.R
 function Header() {
   const router = useRouter();
   const pathname = usePathname();
+  const normalizedPath = pathname.replace(/\/$/, '');
   const { user } = useUser();
   const { collapsed, toggle } = useHeaderCollapsed();
   const [query, setQuery] = useState('');
@@ -111,7 +112,7 @@ function Header() {
   };
 
   // Hide header on authentication pages
-  if (pathname === '/login' || pathname === '/signup') return null;
+  if (normalizedPath === '/login' || normalizedPath === '/signup') return null;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

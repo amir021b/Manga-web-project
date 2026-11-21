@@ -2,7 +2,6 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchBackpack, toggleBackpackItem } from "@/services/backpackApi";
-import { readStoredBackpack } from "@/lib/backpackStorage";
 import { queryKeys } from "./queryKeys";
 import type { BackpackToggleResult } from "@/types/api";
 
@@ -20,7 +19,7 @@ export function useBackpackQuery(enabled = true) {
     queryKey: queryKeys.backpack,
     queryFn: fetchBackpack,
     enabled,
-    initialData: enabled ? undefined : readStoredBackpack,
+    initialData: undefined,
     staleTime: 60 * 1000,
     retry: 1,
   });
