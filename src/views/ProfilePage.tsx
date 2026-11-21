@@ -156,15 +156,16 @@ function ProfilePage() {
                 </>
               ) : (
                 <MangaGrid className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
-                  {backpack.filter((item): item is MangaItem => item !== undefined).map((item: MangaItem) => (
-                    <MangaCard
-                      key={item.id}
-                      id={item.id}
-                      title={item.title}
-                      genres={item.genres}
-                      posterUrl={item.posterUrl}
-                      hoverLift={false}
-                    />
+                  {backpack.filter((item): item is MangaItem => item !== undefined).map((item: MangaItem, idx) => (
+                    <div className="fade-up" style={{ animationDelay: `${Math.min(idx * 50, 400)}ms` }} key={item.id}>
+                      <MangaCard
+                        id={item.id}
+                        title={item.title}
+                        genres={item.genres}
+                        posterUrl={item.posterUrl}
+                        hoverLift={false}
+                      />
+                    </div>
                   ))}
                 </MangaGrid>
               )}
