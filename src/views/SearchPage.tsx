@@ -29,8 +29,8 @@ function SearchPage() {
         </p>
 
         <MangaGrid className="grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-          {results.map((item) => (
-            <div key={item.id}>
+          {results.map((item, idx) => (
+            <div key={item.id} className="fade-up" style={{ animationDelay: `${idx * 50}ms` }}>
               <MangaCard
                 id={item.id}
                 title={item.title}
