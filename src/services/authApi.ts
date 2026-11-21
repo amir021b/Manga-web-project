@@ -4,6 +4,7 @@ import api, {
   getApiErrorStatus,
   setStoredToken,
 } from "@/lib/axios";
+import { USE_MOCK_API } from "@/lib/mockMode";
 import type {
   AuthErrorCode,
   AuthMode,
@@ -73,6 +74,18 @@ export async function submitAuth(
   values: AuthValues,
   mode: AuthMode,
 ): Promise<AuthResponse> {
+  if (USE_MOCK_API) {
+    return {
+      data: {
+        user: {
+          username: values.username || values.email.split("@")[0],
+          email: values.email,
+        },
+      },
+      message: "Mock authentication successful.",
+    };
+  }
+
   const endpoint = mode === "signup" ? "/api/auth/signup" : "/api/auth/login";
 
   try {

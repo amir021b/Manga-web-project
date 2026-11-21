@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useMemo } from "react";
+import { createContext, useContext, useEffect, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useBackpackQuery,
@@ -8,7 +8,8 @@ import {
 } from "@/hooks/api/useBackpack";
 import { queryKeys } from "@/hooks/api/queryKeys";
 import { getAllManga, type MangaItem } from "@/services/mangaApi";
-import { USE_MOCK_PROFILE } from "@/services/userApi";
+import { USE_MOCK_API } from "@/lib/mockMode";
+import { persistBackpack } from "@/lib/backpackStorage";
 import { useUser } from "./UserContext";
 
 interface BackpackContextValue {
@@ -33,10 +34,16 @@ const normalizeId = (id: string | number): string => String(id);
 
 export function BackpackProvider({ children }: { children: React.ReactNode }) {
   const { isLoggedIn } = useUser();
-  const canSyncBackpack = isLoggedIn && !USE_MOCK_PROFILE;
+  const canSyncBackpack = isLoggedIn && !USE_MOCK_API;
   const queryClient = useQueryClient();
   const { data: backpackIds = [] } = useBackpackQuery(canSyncBackpack);
   const toggleBackpackItem = useToggleBackpackItem();
+
+  useEffect(() => {
+    if (!canSyncBackpack) {
+      persistBackpack(backpackIds);
+    }
+  }, [backpackIds, canSyncBackpack]);
 
   const backpack = useMemo(() => {
     return backpackIds.flatMap((id) => {

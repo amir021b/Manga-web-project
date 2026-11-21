@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useBackpack } from '../../context/BackpackContext';
-import { useToast } from '../../context/ToastContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useUser } from '../../context/UserContext';
 import Collapse from '../ui/Collapse';
@@ -28,7 +27,6 @@ const SECTION_ICONS: Record<string, React.ComponentType<SVGProps<SVGSVGElement>>
 
 export default function SettingsTab() {
   const { setBackpack } = useBackpack();
-  const { addToast } = useToast();
   const { accent, setAccent, density, setDensity, ACCENT_OPTIONS, DENSITY_OPTIONS } = useTheme();
   const { user, setCurrentUser } = useUser();
 
@@ -94,9 +92,7 @@ export default function SettingsTab() {
                   <AccountSection
                     user={user}
                     setCurrentUser={setCurrentUser}
-                    addToast={(title, message) => addToast(title, message)}
-                    setBackpack={(b) => setBackpack(b)}
-                    router={{ push: () => {}, replace: () => {} }}
+                    setBackpack={setBackpack}
                   />
                 )}
                 {section.id === 'notifications' && (

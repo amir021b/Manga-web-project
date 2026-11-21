@@ -57,7 +57,8 @@ function FloatingInput({
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `${id}-error` : undefined}
           className={[
-            "w-full rounded-[20px] border border-white/10 bg-[#151517] px-4 py-3.5 text-white placeholder-zinc-500 text-[15px] cursor-text",
+            "w-full rounded-[20px] border border-white/10 bg-[#151517] px-4 py-3.5 text-white placeholder-zinc-500 text-[15px]",
+            disabled ? "cursor-not-allowed" : "cursor-text",
             isFloating
               ? endAdornment
                 ? "peer pl-4 pr-16"
@@ -68,7 +69,7 @@ function FloatingInput({
                   ? "pl-4 pr-16"
                   : "pl-4 pr-4",
             "transition-all duration-300 motion-reduce:transition-none",
-            "disabled:opacity-100 cursor-not-allowed",
+            "disabled:bg-white/5 disabled:text-zinc-400",
             error ? "border border-dashed border-white/55" : "",
             "focus:outline-none focus:border-white/40 focus:shadow-[0_0_20px_rgba(255,255,255,0.08)]",
             className || "",
@@ -83,6 +84,7 @@ function FloatingInput({
               "transition-all duration-200 motion-reduce:transition-none",
               "peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:bg-transparent peer-placeholder-shown:px-0 peer-placeholder-shown:text-[15px]",
               "peer-focus:top-0 peer-focus:-translate-y-1/2 peer-focus:bg-[#151517] peer-focus:px-1 peer-focus:text-[11px]",
+              "peer-disabled:text-zinc-500",
             ].join(" ")}
           >
             {label}

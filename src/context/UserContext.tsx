@@ -13,7 +13,8 @@ import {
   clearStoredToken,
 } from "@/lib/axios";
 import { useProfileQuery } from "@/hooks/api/useUser";
-import { getMockProfile, USE_MOCK_PROFILE } from "@/services/data";
+import { getMockProfile } from "@/services/data";
+import { USE_MOCK_API } from "@/lib/mockMode";
 import type { UserData } from "@/types/api";
 
 interface UserContextValue {
@@ -92,7 +93,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const restoreSession = () => {
-      setUser(USE_MOCK_PROFILE ? getMockProfile() : readStoredUser());
+      setUser(USE_MOCK_API ? getMockProfile() : readStoredUser());
       setIsLoadingAuth(false);
     };
 

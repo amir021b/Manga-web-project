@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 function Footer() {
   return (
     <footer
@@ -6,9 +8,9 @@ function Footer() {
       <div className="max-w-4xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-sm text-[var(--mh-text-secondary)]">
         <p>© {new Date().getFullYear()} MangaHub. Design preview.</p>
         <div className="flex gap-4">
-          <a href="#" className="hover:text-[var(--mh-text)] transition">Terms</a>
-          <a href="#" className="hover:text-[var(--mh-text)] transition">Privacy</a>
-          <a href="#" className="hover:text-[var(--mh-text)] transition">Contact</a>
+          <Link href="/terms" className="hover:text-[var(--mh-text)] transition">Terms</Link>
+          <Link href="/terms#privacy" className="hover:text-[var(--mh-text)] transition">Privacy</Link>
+          <a href="mailto:hello@mangahub.local" className="hover:text-[var(--mh-text)] transition">Contact</a>
         </div>
       </div>
     </footer>

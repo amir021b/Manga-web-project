@@ -1,4 +1,5 @@
 import api, { getApiErrorMessage } from "@/lib/axios";
+import { USE_MOCK_API } from "@/lib/mockMode";
 import type {
   ApiResponse,
   ChangePasswordInput,
@@ -11,6 +12,8 @@ const SETTINGS_ENDPOINT = "/api/user/settings";
 export async function changePassword(
   input: ChangePasswordInput,
 ): Promise<void> {
+  if (USE_MOCK_API) return;
+
   try {
     await api.post(`${SETTINGS_ENDPOINT}/password`, input);
   } catch (error) {
@@ -19,6 +22,8 @@ export async function changePassword(
 }
 
 export async function updateEmail(input: UpdateEmailInput): Promise<void> {
+  if (USE_MOCK_API) return;
+
   try {
     await api.post<ApiResponse<ProfilePayload>>(
       `${SETTINGS_ENDPOINT}/email`,

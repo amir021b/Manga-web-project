@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useSyncExternalStore,
+} from 'react';
 
 export const THEME_OPTIONS = [
   { id: 'dark', label: 'Dark', hint: 'Minimalist dark mode' },
@@ -32,6 +38,94 @@ interface ThemeContextValue {
   DENSITY_OPTIONS: typeof DENSITY_OPTIONS;
 }
 
+interface ThemeSettings {
+  theme: string;
+  accent: string;
+  density: string;
+}
+
+const DEFAULT_SETTINGS: ThemeSettings = {
+  theme: 'dark',
+  accent: 'red',
+  density: 'comfortable',
+};
+
+const listeners = new Set<() => void>();
+let currentSettings: ThemeSettings | null = null;
+
+function readSettings(): ThemeSettings {
+  if (typeof window === 'undefined') return DEFAULT_SETTINGS;
+
+  try {
+    const savedDensity = window.localStorage.getItem('mangahub_density');
+    return {
+      theme: window.localStorage.getItem('mangahub_theme') || 'dark',
+      accent: window.localStorage.getItem('mangahub_accent') || 'red',
+      density:
+        savedDensity === 'compact'
+          ? 'comfortable'
+          : savedDensity || 'comfortable',
+    };
+  } catch {
+    return DEFAULT_SETTINGS;
+  }
+}
+
+function getSettingsSnapshot(): ThemeSettings {
+  if (currentSettings === null) {
+    currentSettings = readSettings();
+  }
+  return currentSettings;
+}
+
+function getServerSettingsSnapshot(): ThemeSettings {
+  return DEFAULT_SETTINGS;
+}
+
+function applySettings(settings: ThemeSettings): void {
+  document.documentElement.dataset.theme = settings.theme;
+  document.documentElement.dataset.accent = settings.accent;
+  document.documentElement.dataset.density = settings.density;
+}
+
+function emitChange(): void {
+  listeners.forEach((listener) => listener());
+}
+
+function subscribeToSettings(listener: () => void): () => void {
+  listeners.add(listener);
+
+  const handleStorage = () => {
+    currentSettings = readSettings();
+    applySettings(currentSettings);
+    emitChange();
+  };
+
+  window.addEventListener('storage', handleStorage);
+  return () => {
+    listeners.delete(listener);
+    window.removeEventListener('storage', handleStorage);
+  };
+}
+
+function updateSettings(patch: Partial<ThemeSettings>): void {
+  const nextSettings = { ...getSettingsSnapshot(), ...patch };
+  currentSettings = nextSettings;
+
+  try {
+    window.localStorage.setItem('mangahub_theme', nextSettings.theme);
+    window.localStorage.setItem('mangahub_accent', nextSettings.accent);
+    window.localStorage.setItem('mangahub_density', nextSettings.density);
+  } catch {
+    applySettings(nextSettings);
+    emitChange();
+    return;
+  }
+
+  applySettings(nextSettings);
+  emitChange();
+}
+
 const ThemeContext = createContext<ThemeContextValue>({
   theme: 'dark',
   setTheme: () => {},
@@ -45,29 +139,39 @@ const ThemeContext = createContext<ThemeContextValue>({
 });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState(() => {
-    try { return localStorage.getItem('mangahub_theme') || 'dark'; } catch { return 'dark'; }
-  });
-  const [accent, setAccent] = useState(() => {
-    try { return localStorage.getItem('mangahub_accent') || 'red'; } catch { return 'red'; }
-  });
-  const [density, setDensity] = useState(() => {
-    try {
-      const saved = localStorage.getItem('mangahub_density');
-      return saved === 'compact' ? 'comfortable' : saved || 'comfortable';
-    } catch { return 'comfortable'; }
-  });
+  const settings = useSyncExternalStore(
+    subscribeToSettings,
+    getSettingsSnapshot,
+    getServerSettingsSnapshot,
+  );
 
   useEffect(() => {
-    localStorage.setItem('mangahub_theme', theme);
-    localStorage.setItem('mangahub_accent', accent);
-    localStorage.setItem('mangahub_density', density);
-    document.documentElement.dataset.theme = theme;
-    document.documentElement.dataset.accent = accent;
-    document.documentElement.dataset.density = density;
-  }, [theme, accent, density]);
+    applySettings(settings);
+  }, [settings]);
 
-  const value: ThemeContextValue = { theme, setTheme, accent, setAccent, density, setDensity, THEME_OPTIONS, ACCENT_OPTIONS, DENSITY_OPTIONS };
+  const setTheme = useCallback((theme: string) => {
+    updateSettings({ theme });
+  }, []);
+
+  const setAccent = useCallback((accent: string) => {
+    updateSettings({ accent });
+  }, []);
+
+  const setDensity = useCallback((density: string) => {
+    updateSettings({ density });
+  }, []);
+
+  const value: ThemeContextValue = {
+    theme: settings.theme,
+    setTheme,
+    accent: settings.accent,
+    setAccent,
+    density: settings.density,
+    setDensity,
+    THEME_OPTIONS,
+    ACCENT_OPTIONS,
+    DENSITY_OPTIONS,
+  };
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }

@@ -3,6 +3,7 @@
 import CommentsSection from "@/components/comments/CommentsSection";
 import { useBackpack } from "@/context/BackpackContext";
 import { useMangaById } from "@/hooks/api/useManga";
+import { toPublicUrl } from "@/lib/readerPaths";
 import Link from "next/link";
 
 interface MangaDetailPageProps {
@@ -60,7 +61,7 @@ function MangaDetailPage({ id: idProp }: MangaDetailPageProps) {
                 <div
                   className="absolute inset-0 bg-cover bg-center"
                   style={{
-                    backgroundImage: `url("${manga.posterUrl}")`,
+                    backgroundImage: `url("${toPublicUrl(manga.posterUrl)}")`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     filter: "grayscale(100%)",
@@ -192,7 +193,7 @@ function MangaDetailPage({ id: idProp }: MangaDetailPageProps) {
                       <div
                         className="absolute inset-0 bg-cover bg-center transition duration-300 group-hover:scale-[1.03]"
                         style={{
-                          backgroundImage: `url("${volume.coverImage}")`,
+                          backgroundImage: `url("${toPublicUrl(volume.coverImage)}")`,
                         }}
                       />
                     ) : (

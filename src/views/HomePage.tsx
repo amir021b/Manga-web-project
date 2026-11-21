@@ -25,7 +25,12 @@ function HomePage() {
           <div
             className="absolute inset-0 z-0 bg-cover bg-center transform-gpu translate-z-0 backface-hidden will-change-transform"
             style={{
-              backgroundImage: `url('/Monochrome Manga Warriors in Mist.png')`,
+              backgroundColor: '#0b0b0b',
+              backgroundImage: [
+                'radial-gradient(circle at 22% 30%, rgba(255,255,255,0.16), transparent 32%)',
+                'radial-gradient(circle at 78% 18%, rgba(255,255,255,0.08), transparent 30%)',
+                'repeating-radial-gradient(circle at 50% 55%, rgba(255,255,255,0.05) 0 1px, transparent 1px 5px)',
+              ].join(', '),
               animation: 'smoothZoom 18s ease-in-out infinite alternate',
             }}
           />

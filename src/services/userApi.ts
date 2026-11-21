@@ -1,4 +1,5 @@
-import api, { getApiErrorMessage, getStoredToken } from "@/lib/axios";
+import api, { getApiErrorMessage } from "@/lib/axios";
+import { USE_MOCK_API } from "@/lib/mockMode";
 import type {
   ProfilePayload,
   ProfileResponse,
@@ -7,8 +8,6 @@ import type {
 } from "@/types/api";
 
 const PROFILE_ENDPOINT = "/api/users/profile";
-
-export const USE_MOCK_PROFILE = true;
 
 const mockProfile: UserData = {
   id: "mock-user",
@@ -34,23 +33,10 @@ export function unwrapUserPayload(
   return payload as UserData;
 }
 
-export async function fetchProfile(): Promise<UserData | null> {
-  if (USE_MOCK_PROFILE) return getMockProfile();
-
-  if (!getStoredToken()) return null;
-
-  try {
-    const { data } = await api.get<ProfileResponse>(PROFILE_ENDPOINT);
-    return unwrapUserPayload(data.data);
-  } catch {
-    return null;
-  }
-}
-
 export async function updateProfile(
   userData: UpdateProfileInput,
 ): Promise<UserData | null> {
-  if (USE_MOCK_PROFILE) {
+  if (USE_MOCK_API) {
     Object.assign(mockProfile, userData);
     return getMockProfile();
   }

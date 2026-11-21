@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { getMangaById, getVolume } from "@/services/data";
+import { toPublicUrl } from "@/lib/readerPaths";
 
 interface VolumePageProps {
   id: string | number;
@@ -48,7 +49,7 @@ function VolumePage({ id: idProp, volumeId }: VolumePageProps) {
           <div className="relative aspect-[3/4] w-[160px] sm:w-[200px] shrink-0 rounded-2xl overflow-hidden border border-[var(--mh-border)] bg-[var(--mh-surface)] shadow-[var(--mh-shadow-strong)]">
             <div
               className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url("${volume.coverImage}")` }}
+              style={{ backgroundImage: `url("${toPublicUrl(volume.coverImage)}")` }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-4">

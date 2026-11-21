@@ -20,10 +20,15 @@ interface PasswordVisibility {
   confirm: boolean;
 }
 
-function usePasswordForm({ onSave }: { onSave: () => void }) {
+function usePasswordForm({
+  onSave,
+}: {
+  onSave: () => Promise<boolean> | boolean | void;
+}) {
   const [passwords, setPasswords] = useState<Passwords>({ current: '', new: '', confirm: '' });
   const [passwordErrors, setPasswordErrors] = useState<PasswordErrors>({});
   const [passwordVisibility, setPasswordVisibility] = useState<PasswordVisibility>({ current: false, new: false, confirm: false });
+  const [isSaving, setIsSaving] = useState(false);
 
   const validatePasswords = useCallback(() => {
     const errs: PasswordErrors = {};
@@ -36,16 +41,31 @@ function usePasswordForm({ onSave }: { onSave: () => void }) {
     return Object.keys(errs).length === 0;
   }, [passwords]);
 
-  const handleSubmit = useCallback((e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validatePasswords()) return;
-    onSave();
-    setPasswords({ current: '', new: '', confirm: '' });
-    setPasswordVisibility({ current: false, new: false, confirm: false });
-  }, [validatePasswords, onSave]);
+    if (isSaving || !validatePasswords()) return;
+
+    setIsSaving(true);
+    try {
+      const shouldClear = await onSave();
+      if (shouldClear === false) return;
+
+      setPasswords({ current: '', new: '', confirm: '' });
+      setPasswordErrors({});
+      setPasswordVisibility({ current: false, new: false, confirm: false });
+    } finally {
+      setIsSaving(false);
+    }
+  }, [validatePasswords, onSave, isSaving]);
 
   const handleChange = useCallback((field: keyof Passwords) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setPasswords((p) => ({ ...p, [field]: e.target.value }));
+    setPasswordErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
   }, []);
 
   const toggleVisibility = useCallback((field: keyof PasswordVisibility) => () => {
@@ -56,6 +76,7 @@ function usePasswordForm({ onSave }: { onSave: () => void }) {
     passwords,
     passwordErrors,
     passwordVisibility,
+    isSaving,
     handleSubmit,
     handleChange,
     toggleVisibility,

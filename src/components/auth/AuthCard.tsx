@@ -13,9 +13,11 @@ import Checkbox from '@/components/ui/Checkbox';
 import LinkButton from '@/components/ui/LinkButton';
 import Collapse from '@/components/ui/Collapse';
 import StarBackground from '@/components/layout/StarBackground';
+import { useToast } from '@/context/ToastContext';
 import TermsDialog from './TermsDialog';
 
 function AuthCard() {
+  const { addToast } = useToast();
   const {
     mode,
     values,
@@ -244,7 +246,15 @@ function AuthCard() {
               <Collapse open={!isSignup}>
                 <div className="mt-3 mb-5">
                   <div className="flex justify-end">
-                    <LinkButton onClick={() => {}} disabled={isSubmitting}>
+                    <LinkButton
+                      onClick={() =>
+                        addToast(
+                          "Password reset unavailable",
+                          "Password reset is not available in this preview.",
+                        )
+                      }
+                      disabled={isSubmitting}
+                    >
                       {FORGOT_PASSWORD_TEXT}
                     </LinkButton>
                   </div>

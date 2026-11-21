@@ -9,6 +9,7 @@ import MangaGrid from "@/components/manga/MangaGrid";
 import SettingsTab from "@/components/settings/SettingsTab";
 import EditProfileModal from "@/components/profile/EditProfileModal";
 import { useBackpack } from "@/context/BackpackContext";
+import { useToast } from "@/context/ToastContext";
 import { useUser } from "@/context/UserContext";
 import { useUpdateProfile } from "@/hooks/api/useUser";
 import { useReadingHistory } from "@/hooks/useReadingHistory";
@@ -22,6 +23,7 @@ import {
 } from "lucide-react";
 import type { UserData } from "@/types/api";
 import { getChapter, getMangaById, type MangaItem } from "@/services/data";
+import { withBasePath } from "@/lib/basePath";
 
 const TABS = [
   { id: "backpack", label: "Backpack", icon: Bookmark },
@@ -32,6 +34,7 @@ const TABS = [
 function ProfilePage() {
   const router = useRouter();
   const { backpack } = useBackpack();
+  const { addToast } = useToast();
   const { user, setCurrentUser, logout, isLoggedIn, isLoadingAuth } =
     useUser();
   const { mutateAsync: updateProfile } = useUpdateProfile();
@@ -46,6 +49,7 @@ function ProfilePage() {
   }, [isLoadingAuth, isLoggedIn, router]);
 
   const handleSave = async (next: { username: string; bio: string; avatar: string | null }) => {
+    const previousUser = user;
     const optimisticUser: UserData = { ...user, ...next };
     setCurrentUser(optimisticUser);
 
@@ -54,8 +58,13 @@ function ProfilePage() {
     try {
       const savedUser = await updateProfile(next);
       if (savedUser) setCurrentUser(savedUser);
+      addToast("Profile updated", "Your changes have been saved.");
     } catch (err) {
-      console.error("Failed to update profile:", err);
+      setCurrentUser(previousUser);
+      const message =
+        err instanceof Error ? err.message : "Could not save your profile.";
+      addToast("Profile update failed", message);
+      throw err;
     }
   };
   const handleLogout = () => {
@@ -78,7 +87,7 @@ function ProfilePage() {
             <div className="grid h-24 w-24 place-items-center overflow-hidden rounded-full border-2 border-[var(--mh-border)] bg-[var(--mh-surface)] text-[var(--mh-text)] shadow-[0_0_24px_rgba(0,0,0,0.25)]">
               {user?.avatar ? (
                 <Image
-                  src={user.avatar}
+                  src={withBasePath(user.avatar)}
                   alt="avatar"
                   width={96}
                   height={96}

@@ -32,6 +32,7 @@ import type {
   UpdateProfileInput,
   UserData,
 } from "@/types/api";
+import { USE_MOCK_API } from "@/lib/mockMode";
 
 export type {
   Chapter,
@@ -43,30 +44,27 @@ export type {
 
 const PROFILE_ENDPOINT = "/api/users/profile";
 
-export const USE_MOCK_PROFILE =
-  process.env.NEXT_PUBLIC_USE_MOCK !== "false";
-
 function notImplemented(name: string): never {
   throw new Error(`Not implemented: ${name}`);
 }
 
 export function getAllManga(): MangaItem[] {
-  if (USE_MOCK_PROFILE) return getMockAllManga();
+  if (USE_MOCK_API) return getMockAllManga();
   return notImplemented("getAllManga");
 }
 
 export function getMangaById(id: number): MangaWithDetails | undefined {
-  if (USE_MOCK_PROFILE) return getMockMangaById(id);
+  if (USE_MOCK_API) return getMockMangaById(id);
   return notImplemented("getMangaById");
 }
 
 export function getMangaByIds(ids: number[]): MangaItem[] {
-  if (USE_MOCK_PROFILE) return getMockMangaByIds(ids);
+  if (USE_MOCK_API) return getMockMangaByIds(ids);
   return notImplemented("getMangaByIds");
 }
 
 export function getVolumes(id: number | string): Volume[] {
-  if (USE_MOCK_PROFILE) return getMockVolumes(id);
+  if (USE_MOCK_API) return getMockVolumes(id);
   return notImplemented("getVolumes");
 }
 
@@ -74,7 +72,7 @@ export function getVolume(
   id: number | string,
   volumeId: string,
 ): Volume | undefined {
-  if (USE_MOCK_PROFILE) return getMockVolume(id, volumeId);
+  if (USE_MOCK_API) return getMockVolume(id, volumeId);
   return notImplemented("getVolume");
 }
 
@@ -82,7 +80,7 @@ export function getChapter(
   id: number | string,
   chapterId: number | string,
 ): Chapter | undefined {
-  if (USE_MOCK_PROFILE) return getMockChapter(id, chapterId);
+  if (USE_MOCK_API) return getMockChapter(id, chapterId);
   return notImplemented("getChapter");
 }
 
@@ -90,37 +88,37 @@ export function getAdjacentChapters(
   id: number | string,
   chapterId: number | string,
 ): { prev: Chapter | null; next: Chapter | null } {
-  if (USE_MOCK_PROFILE) return getMockAdjacentChapters(id, chapterId);
+  if (USE_MOCK_API) return getMockAdjacentChapters(id, chapterId);
   return notImplemented("getAdjacentChapters");
 }
 
 export function getAvailableChapterCount(id: number | string): number {
-  if (USE_MOCK_PROFILE) return getMockAvailableChapterCount(id);
+  if (USE_MOCK_API) return getMockAvailableChapterCount(id);
   return notImplemented("getAvailableChapterCount");
 }
 
 export function hasAvailableChapters(id: number | string): boolean {
-  if (USE_MOCK_PROFILE) return getMockHasAvailableChapters(id);
+  if (USE_MOCK_API) return getMockHasAvailableChapters(id);
   return notImplemented("hasAvailableChapters");
 }
 
 export function searchManga(query: string): MangaItem[] {
-  if (USE_MOCK_PROFILE) return getMockSearchManga(query);
+  if (USE_MOCK_API) return getMockSearchManga(query);
   return notImplemented("searchManga");
 }
 
 export function listComments(mangaId: number): MangaComment[] {
-  if (USE_MOCK_PROFILE) return getMockListComments(mangaId);
+  if (USE_MOCK_API) return getMockListComments(mangaId);
   return notImplemented("listComments");
 }
 
 export function addComment(input: AddCommentInput): MangaComment {
-  if (USE_MOCK_PROFILE) return addMockComment(input);
+  if (USE_MOCK_API) return addMockComment(input);
   return notImplemented("addComment");
 }
 
 export function deleteComment(id: string, authorName: string): void {
-  if (USE_MOCK_PROFILE) return deleteMockComment(id, authorName);
+  if (USE_MOCK_API) return deleteMockComment(id, authorName);
   return notImplemented("deleteComment");
 }
 
@@ -129,7 +127,7 @@ export function getMockProfile(): UserData {
 }
 
 export async function fetchProfile(): Promise<UserData | null> {
-  if (USE_MOCK_PROFILE) return getMockProfile();
+  if (USE_MOCK_API) return getMockProfile();
 
   if (!getStoredToken()) return null;
 
@@ -144,7 +142,7 @@ export async function fetchProfile(): Promise<UserData | null> {
 export async function updateProfile(
   userData: UpdateProfileInput,
 ): Promise<UserData | null> {
-  if (USE_MOCK_PROFILE) return updateMockProfile(userData);
+  if (USE_MOCK_API) return updateMockProfile(userData);
 
   try {
     const { data } = await api.put<ProfileResponse>(PROFILE_ENDPOINT, {

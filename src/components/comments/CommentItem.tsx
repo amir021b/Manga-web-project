@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { withBasePath } from "@/lib/basePath";
 import type { MangaComment } from "@/data/comments";
 
 interface CommentItemProps {
@@ -86,7 +87,7 @@ function CommentContent({
       <div className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full border border-[var(--mh-border)] bg-[var(--mh-surface-strong)] text-sm font-bold text-[var(--mh-text)]">
         {comment.authorAvatar ? (
           <Image
-            src={comment.authorAvatar}
+            src={withBasePath(comment.authorAvatar)}
             alt=""
             width={36}
             height={36}

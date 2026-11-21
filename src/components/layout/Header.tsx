@@ -8,6 +8,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useUser } from '../../context/UserContext';
 import { useHeaderCollapsed } from '../../context/HeaderContext';
+import { withBasePath } from '@/lib/basePath';
 
 const COLLAPSED_PILL_WIDTH = 38;
 const VIEWPORT_EDGE = 16;
@@ -30,10 +31,7 @@ function Header() {
   const pathname = usePathname();
   const { user } = useUser();
   const { collapsed, toggle } = useHeaderCollapsed();
-  const [query, setQuery] = useState(() => {
-    if (typeof window === 'undefined') return '';
-    return new URLSearchParams(window.location.search).get('q') || '';
-  });
+  const [query, setQuery] = useState('');
   const headerRef = useRef<HTMLElement | null>(null);
   const pillRef = useRef<HTMLDivElement | null>(null);
   const previousLeftRef = useRef<number | null>(null);
@@ -186,7 +184,7 @@ function Header() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search manga..."
-              className="w-full rounded-full border border-[var(--mh-border)] bg-[var(--mh-input-bg)] py-1.5 pl-9 pr-4 text-sm text-[var(--mh-input-text)] placeholder:[var(--mh-input-placeholder)] outline-none transition focus:border-[var(--mh-accent)] focus:bg-[var(--mh-input-bg)]"
+              className="w-full rounded-full border border-[var(--mh-border)] bg-[var(--mh-input-bg)] py-1.5 pl-9 pr-4 text-sm text-[var(--mh-input-text)] placeholder:text-[var(--mh-input-placeholder)] outline-none transition focus:border-[var(--mh-accent)] focus:bg-[var(--mh-input-bg)]"
             />
           </form>
         </div>
@@ -230,7 +228,7 @@ function Header() {
             >
               {user.avatar ? (
                 <Image
-                  src={user.avatar}
+                  src={withBasePath(user.avatar)}
                   alt="avatar"
                   width={36}
                   height={36}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Mail, Trash2 } from 'lucide-react';
 import Button from '../ui/Button';
 import FloatingInput from '../ui/FloatingInput';
@@ -11,52 +12,52 @@ import {
   useUpdateEmail,
 } from '../../hooks/api/useSettings';
 import { useToast } from '../../context/ToastContext';
+import { useUser } from '../../context/UserContext';
+import { clearStoredBackpack } from '@/lib/backpackStorage';
 import type { UserData } from '../../types/api';
 import type { MangaItem } from '@/services/data';
-
-interface Router {
-  push: (href: string) => void;
-  replace: (href: string) => void;
-}
 
 interface AccountSectionProps {
   user: UserData | null | undefined;
   setCurrentUser: (nextUser: UserData | null) => void;
   setBackpack: (backpack: MangaItem[]) => void;
-  addToast: (title: string, message?: string) => void;
-  router: Router;
 }
 
-function AccountSection({ user, setCurrentUser, setBackpack, router }: AccountSectionProps) {
+function AccountSection({ user, setCurrentUser, setBackpack }: AccountSectionProps) {
   const [newEmail, setNewEmail] = useState('');
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const router = useRouter();
   const { addToast } = useToast();
+  const { logout } = useUser();
   const { mutateAsync: changePassword } = useChangePassword();
   const { mutateAsync: updateEmail } = useUpdateEmail();
 
   const email = user?.email || 'user@mangahub.com';
 
-  const handlePasswordSave = async () => {
+  const {
+    passwords,
+    passwordErrors,
+    passwordVisibility,
+    isSaving,
+    handleSubmit,
+    handleChange,
+    toggleVisibility,
+  } = usePasswordForm({ onSave: handlePasswordSave });
+
+  async function handlePasswordSave(): Promise<boolean> {
     try {
       await changePassword({
         currentPassword: passwords.current,
         newPassword: passwords.new,
       });
       addToast('Password updated');
+      return true;
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Could not update password.';
       addToast('Password update failed', message);
+      return false;
     }
-  };
-
-  const {
-    passwords,
-    passwordErrors,
-    passwordVisibility,
-    handleSubmit,
-    handleChange,
-    toggleVisibility,
-  } = usePasswordForm({ onSave: handlePasswordSave });
+  }
 
   const handleUpdateEmail = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,11 +79,12 @@ function AccountSection({ user, setCurrentUser, setBackpack, router }: AccountSe
   };
 
   const handleDeleteAccount = () => {
-    localStorage.removeItem('mangahub_backpack');
+    clearStoredBackpack();
     localStorage.removeItem('mangahub_notifications');
     localStorage.removeItem('mangahub_history');
     setBackpack([]);
     setConfirmDelete(false);
+    logout();
     addToast('Account deleted');
     router.replace('/login');
   };
@@ -100,10 +102,12 @@ function AccountSection({ user, setCurrentUser, setBackpack, router }: AccountSe
               value={passwords.current}
               onChange={handleChange('current')}
               autoComplete="current-password"
+              disabled={isSaving}
               endAdornment={
                 <PasswordToggle
                   visible={passwordVisibility.current}
                   onToggle={toggleVisibility('current')}
+                  disabled={isSaving}
                 />
               }
               error={passwordErrors.current}
@@ -117,10 +121,12 @@ function AccountSection({ user, setCurrentUser, setBackpack, router }: AccountSe
               value={passwords.new}
               onChange={handleChange('new')}
               autoComplete="new-password"
+              disabled={isSaving}
               endAdornment={
                 <PasswordToggle
                   visible={passwordVisibility.new}
                   onToggle={toggleVisibility('new')}
+                  disabled={isSaving}
                 />
               }
               error={passwordErrors.new}
@@ -134,16 +140,20 @@ function AccountSection({ user, setCurrentUser, setBackpack, router }: AccountSe
               value={passwords.confirm}
               onChange={handleChange('confirm')}
               autoComplete="new-password"
+              disabled={isSaving}
               endAdornment={
                 <PasswordToggle
                   visible={passwordVisibility.confirm}
                   onToggle={toggleVisibility('confirm')}
+                  disabled={isSaving}
                 />
               }
               error={passwordErrors.confirm}
             />
           </div>
-          <Button type="submit" disabled={false}>Save Password</Button>
+          <Button type="submit" loading={isSaving} loadingLabel="Saving...">
+            Save Password
+          </Button>
         </form>
       </div>
 

@@ -1,6 +1,8 @@
 "use client";
 
+import Link from 'next/link';
 import { useBackpack } from '../../context/BackpackContext';
+import { toPublicUrl } from '@/lib/readerPaths';
 
 interface MangaCardProps {
   id: number | string;
@@ -17,7 +19,7 @@ interface MangaCardProps {
 function MangaCard({ id, title, genres, posterUrl, to, hoverLift = true, hoverLiftClass = 'hover:-translate-y-2', showSaveButton = true, badge = null }: MangaCardProps) {
   const { addToBackpack, removeFromBackpack, isInBackpack } = useBackpack();
   const saved = isInBackpack(id);
-  const destination = to || (id != null ? `/manga/${id}` : '#');
+  const destination = to || `/manga/${id}`;
   const hasPoster = Boolean(posterUrl);
 
   const handleSave = (e: React.MouseEvent) => {
@@ -47,7 +49,7 @@ function MangaCard({ id, title, genres, posterUrl, to, hoverLift = true, hoverLi
         ].join(' ')}
         style={hasPoster
           ? {
-              backgroundImage: `url("${posterUrl}")`,
+              backgroundImage: `url("${toPublicUrl(posterUrl!)}")`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               filter: 'grayscale(100%)',
@@ -73,24 +75,29 @@ function MangaCard({ id, title, genres, posterUrl, to, hoverLift = true, hoverLi
         )}
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
-      {hasPoster && (
-        <div className="absolute inset-x-0 bottom-0 z-10 p-4 text-left">
-          <h3 className="text-base font-bold uppercase tracking-wide text-[var(--mh-text)]">{title}</h3>
-          <p className="mb-2 text-xs text-[var(--mh-text-secondary)]">{genres.join(' · ')}</p>
-          <a
-            href={destination}
-            className="inline-block text-xs text-[var(--mh-text-secondary)] opacity-80 transition-all duration-300 group-hover:opacity-100 hover:text-[var(--mh-text)]"
-          >
-            View Details →
-          </a>
+      <Link
+        href={destination}
+        aria-label={`View ${title}`}
+        className="absolute inset-0 z-10"
+      />
+      {badge && (
+        <div className="pointer-events-none absolute right-3 top-3 z-20">
+          {badge}
         </div>
-      )} 
+      )}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 p-4 text-left">
+        <h3 className="text-base font-bold uppercase tracking-wide text-[var(--mh-text)]">{title}</h3>
+        <p className="mb-2 text-xs text-[var(--mh-text-secondary)]">{genres.join(' · ')}</p>
+        <span className="inline-block text-xs text-[var(--mh-text-secondary)] opacity-80 transition-all duration-300 group-hover:opacity-100">
+          View Details →
+        </span>
+      </div>
       {showSaveButton && (
         <button
           type="button"
           onClick={handleSave}
           aria-label={saved ? 'Remove from backpack' : 'Add to backpack'}
-          className="absolute top-3 left-3 rounded-full border border-white/30 bg-black/60 backdrop-blur-sm px-3 py-2 text-xs font-semibold text-white transition hover:bg-black/80 hover:text-white"
+          className="absolute left-3 top-3 z-30 rounded-full border border-white/30 bg-black/60 backdrop-blur-sm px-3 py-2 text-xs font-semibold text-white transition hover:bg-black/80 hover:text-white"
         >
           {saved ? 'Remove' : 'Save'}
         </button>
