@@ -21,10 +21,10 @@ import {
 import { toPublicUrl } from "@/lib/readerPaths";
 
 const MARGIN_CLASSES: Record<ReaderMargin, string> = {
-  none: "w-full max-w-[360px]",
-  small: "w-full max-w-[480px]",
-  medium: "w-full max-w-[640px]",
-  large: "w-full",
+  none: "w-full max-w-[300px]",
+  small: "w-full max-w-[400px]",
+  medium: "w-full max-w-[480px]",
+  large: "w-full max-w-[560px]",
 };
 
 const MARGIN_OPTIONS: { id: ReaderMargin; label: string }[] = [
@@ -458,7 +458,8 @@ function ReaderPage({
       </div>
 
       <div className="w-full mx-auto">
-        <div className="mb-6 rounded-xl border border-[var(--mh-border)] bg-[var(--mh-surface)] px-4 py-3 backdrop-blur-md">
+        <div className="mb-6 flex flex-wrap items-center justify-center gap-4">
+          <div className="max-w-fit rounded-xl border border-[var(--mh-border)] bg-[var(--mh-surface)] px-4 py-3 backdrop-blur-md">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--mh-text-muted)]">
@@ -555,13 +556,14 @@ function ReaderPage({
           <p className="mt-2 text-[10px] text-[var(--mh-text-muted)]">
             ← → chapters · Esc volume
           </p>
+          </div>
         </div>
 
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--mh-text-muted)]">
-            {manga.title}
-          </p>
-          <div className="text-right">
+        <div
+          ref={columnRef}
+          className={`relative mx-auto max-w-2xl flex flex-col items-center gap-0 overflow-hidden rounded-xl border border-[var(--mh-border)] bg-[var(--mh-bg)]/70 ${marginClass}`}
+        >
+          <div className="mb-4 text-center">
             <h1 className="text-lg font-bold text-[var(--mh-text)]">
               Chapter {chapter.number}
             </h1>
@@ -569,12 +571,6 @@ function ReaderPage({
               {chapter.title}
             </p>
           </div>
-        </div>
-
-        <div
-          ref={columnRef}
-          className={`relative mx-auto flex flex-col items-center gap-0 overflow-hidden rounded-xl border border-[var(--mh-border)] bg-[var(--mh-bg)]/70 ${marginClass}`}
-        >
           {visiblePages.map((pageIndex) => {
             const page = chapter.pages[pageIndex];
             if (!page) return null;
