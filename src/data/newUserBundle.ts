@@ -1,3 +1,3 @@
-import { bigThree } from './bigThree';
+import { getMangaByIds, type MangaItem } from '@/services/mangaApi';
 
-export const newUserBundle = bigThree;
+export const newUserBundle: MangaItem[] = getMangaByIds([10, 13, 14]);

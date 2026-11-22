@@ -1,5 +1,6 @@
 import MangaGrid from '@/components/manga/MangaGrid';
 import MangaCard from '@/components/manga/MangaCard';
+import BundleCard from '@/components/home/BundleCard';
 import MarqueeRow from '@/components/home/MarqueeRow';
 import SectionTitle from '@/components/home/SectionTitle';
 import SectionHeader from '@/components/home/SectionHeader';
@@ -78,49 +79,11 @@ function HomePage() {
 
         <>
           <SectionHeader
-            title="— T H E   B I G   T H R E E —"
-            subtitle="three masterpieces. one legacy."
-            className="pt-6"
-          />
-          <MangaGrid>
-            {bigThree.map((item: MangaItem, idx: number) => (
-              <div key={item.id} className="fade-up" style={{ animationDelay: `${idx * 100}ms` }}>
-                <MangaCard
-                  key={item.id}
-                  id={item.id}
-                  title={item.title}
-                  genres={item.genres}
-                  posterUrl={item.posterUrl}
-                />
-              </div>
-            ))}
-          </MangaGrid>
-        </>
-
-        <>
-          <SectionHeader
             title="— N E W   U S E R   S P E C I A L —"
             subtitle="exclusive bundle for new members."
             className="pt-6"
           />
-          <MangaGrid>
-            {newUserBundle.map((item: MangaItem, idx: number) => (
-              <div key={item.id} className="fade-up" style={{ animationDelay: `${idx * 100}ms` }}>
-                <MangaCard
-                  key={item.id}
-                  id={item.id}
-                  title={item.title}
-                  genres={item.genres}
-                  posterUrl={item.posterUrl}
-                  badge={
-                    <span className="absolute top-3 left-3 z-20 rounded-full border border-red-400/40 bg-red-500/20 px-3 py-1 text-xs font-bold uppercase tracking-wide text-red-200 backdrop-blur-md shadow-[0_0_20px_rgba(239,68,68,0.25)]">
-                      50% OFF
-                    </span>
-                  }
-                />
-              </div>
-            ))}
-          </MangaGrid>
+          <BundleCard posterUrl="/bundel-poster/blue-lock-new-user-bundle.png" items={newUserBundle} />
         </>
       </div>
     </section>
