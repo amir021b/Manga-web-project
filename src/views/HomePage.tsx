@@ -83,7 +83,7 @@ function HomePage() {
             subtitle="exclusive bundle for new members."
             className="pt-6"
           />
-          <BundleCard posterUrl="/bundel-poster/blue-lock-new-user-bundle.png" items={newUserBundle} />
+          <BundleCard posterUrl="/bundel-poster/New-User-Bundle.png" items={newUserBundle} />
         </>
       </div>
     </section>
