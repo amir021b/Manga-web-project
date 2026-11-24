@@ -1,6 +1,7 @@
 import MangaGrid from '@/components/manga/MangaGrid';
 import MangaCard from '@/components/manga/MangaCard';
 import BundleCard from '@/components/home/BundleCard';
+import BigThreeCarousel from '@/components/home/BigThreeCarousel';
 import MarqueeRow from '@/components/home/MarqueeRow';
 import SectionTitle from '@/components/home/SectionTitle';
 import SectionHeader from '@/components/home/SectionHeader';
@@ -37,7 +38,8 @@ function HomePage() {
           />
           <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/40 via-black/20 to-transparent" />
           <div className="relative z-10 text-center">
-            <div className="flex justify-center">
+            <BigThreeCarousel items={bigThree} className="sm:hidden" />
+            <div className="hidden sm:flex justify-center">
               <MangaGrid className="max-w-[768px] w-full mx-auto">
                 {bigThree.map((item: MangaItem, idx: number) => (
                   <div key={item.id} className="fade-up" style={{ animationDelay: `${idx * 100}ms` }}>
