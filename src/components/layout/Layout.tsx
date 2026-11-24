@@ -2,6 +2,7 @@ import StarBackground from './StarBackground';
 import Header from './Header';
 import Footer from './Footer';
 import LayoutMain from './LayoutMain';
+import MobileNav from './MobileNav';
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -9,6 +10,7 @@ function Layout({ children }: { children: React.ReactNode }) {
       <StarBackground />
       <Header />
       <LayoutMain>{children}</LayoutMain>
+      <MobileNav />
       <Footer />
     </div>
   );
