@@ -29,7 +29,7 @@ function NavLink({ href, children, isActive }: { href: string; children: React.R
 function Header() {
   const router = useRouter();
   const pathname = usePathname();
-  const normalizedPath = pathname.replace(/\/$/, '');
+  const normalizedPath = pathname.replace(/\/$/, '') || '/';
   const { user } = useUser();
   const { collapsed, toggle } = useHeaderCollapsed();
   const [query, setQuery] = useState('');
@@ -164,8 +164,8 @@ function Header() {
           }`}
           inert={collapsed || undefined}
         >
-          <NavLink href="/" isActive={pathname === '/'}>Home</NavLink>
-          <NavLink href="/explore" isActive={pathname === '/explore'}>Explore</NavLink>
+          <NavLink href="/" isActive={normalizedPath === '/'}>Home</NavLink>
+          <NavLink href="/explore" isActive={normalizedPath === '/explore'}>Explore</NavLink>
         </nav>
 
         <div
